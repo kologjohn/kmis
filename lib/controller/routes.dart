@@ -22,7 +22,6 @@ import '../screen/judgeui.dart';
 import '../screen/judgeselect.dart';
 import '../screen/judgesetup.dart';
 import '../screen/levelreg.dart';
-import '../screen/login.dart';
 import '../screen/marks.dart';
 import '../screen/newscoringsheet.dart';
 import '../screen/printcontestantscoresheet.dart';
@@ -34,6 +33,7 @@ import '../screen/registerzone.dart';
 import '../screen/regstaff.dart';
 import '../screen/seasonreg.dart';
 import '../screen/sexreg.dart';
+import '../screen/terminalreport.dart';
 import '../screen/testvote.dart';
 import '../screen/viewmarks.dart';
 import '../screen/viewscores.dart';
@@ -100,6 +100,7 @@ class Routes {
   static const adminresults = "/adminresults";
   static const testvote = "/testvote";
   static const rawvote = "/rawvote";
+  static const terminalreport = "/terminalreport";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
@@ -115,45 +116,44 @@ class Routes {
 ///  All routes migrated into GoRouter (no RoleGuard)
 final GoRouter router = GoRouter(
   initialLocation: Routes.login,
-  redirect: (context, state) async {
-    final provider = Provider.of<Myprovider>(context, listen: false);
 
-    await provider.getdata();
-    await provider.getaccessvel();
-
-    final loggingIn = state.matchedLocation == '/login';
-
-    // Not logged in → send to login
-    if (provider.auth.currentUser == null) {
-      return loggingIn ? null : '/login';
-    }
-
-    // If logged in & at /login → send to dashboard/home
-    if (loggingIn) {
-      if (provider.accesslevel == "Admin" || provider.accesslevel == "Super Admin") {
-        return Routes.dashboard; // or Routes.home
-      }
-      final allowed = Routes.roleAllowedRoutes[provider.accesslevel];
-      if (allowed != null && allowed.isNotEmpty) {
-        return allowed.first;
-      }
-      return '/login'; // fallback
-    }
-
-    // ✅ Allow Admin & Super Admin full access
-    if (provider.accesslevel == "Admin" || provider.accesslevel == "Super Admin") {
-      return null;
-    }
-
-    // Restrict Judge and others
-    final allowedRoutes = Routes.roleAllowedRoutes[provider.accesslevel] ?? [];
-    if (!allowedRoutes.contains(state.matchedLocation)) {
-      return allowedRoutes.isNotEmpty ? allowedRoutes.first : '/login';
-    }
-
-    return null; // Allow
-  },
-
+  // redirect: (context, state) async {
+  //   final provider = Provider.of<Myprovider>(context, listen: false);
+  //
+  //   await provider.getdata();
+  //   await provider.getaccessvel();
+  //
+  //   final loggingIn = state.matchedLocation == '/login';
+  //
+  //   // Not logged in → send to login
+  //   if (provider.auth.currentUser == null) {
+  //     return loggingIn ? null : '/dashboard';
+  //   }
+  //
+  //   // If logged in & at /login → send to dashboard/home
+  //   if (loggingIn) {
+  //     if (provider.accesslevel == "Admin" || provider.accesslevel == "Super Admin") {
+  //       return Routes.dashboard; // or Routes.home
+  //     }
+  //     final allowed = Routes.roleAllowedRoutes[provider.accesslevel];
+  //     if (allowed != null && allowed.isNotEmpty) {
+  //       return allowed.first;
+  //     }
+  //     return '/login'; // fallback
+  //   }
+  //   // ✅ Allow Admin & Super Admin full access
+  //   if (provider.accesslevel == "Admin" || provider.accesslevel == "Super Admin") {
+  //     return null;
+  //   }
+  //
+  //   // Restrict Judge and others
+  //   final allowedRoutes = Routes.roleAllowedRoutes[provider.accesslevel] ?? [];
+  //   if (!allowedRoutes.contains(state.matchedLocation)) {
+  //     return allowedRoutes.isNotEmpty ? allowedRoutes.first : '/login';
+  //   }
+  //
+  //   return null; // Allow
+  // },
   routes: [
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
     GoRoute(
@@ -204,7 +204,6 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.eviction, builder: (c, s) => EvictionSheet()),
     GoRoute(path: Routes.votes, builder: (c, s) => JudgeSelect()),
     GoRoute(path: Routes.votinglist, builder: (c, s) => VotingList()),
-
     GoRoute(path: Routes.regionlist, builder: (c, s) => RegionListPage()),
     GoRoute(
       path: Routes.regionreg,
@@ -230,5 +229,6 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.adminresults, builder: (c, s) => AdminResultsPage()),
     GoRoute(path: Routes.testvote, builder: (c, s) => Testvote()),
     GoRoute(path: Routes.rawvote, builder: (c, s) => Rawvote()),
+    GoRoute(path: Routes.terminalreport, builder: (c, s) => ReportSheet()),
   ],
 );

@@ -32,11 +32,9 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   String topCollector = '';
   List<Map<String, dynamic>> topCollectors = [];
   @override
-  void initState() {
-
+  void initState()  {
     super.initState();
   }
-
   String todayDate() {
     final now = DateTime.now();
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';

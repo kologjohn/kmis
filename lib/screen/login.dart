@@ -122,15 +122,15 @@ class _LoginPageState extends State<LoginPage> {
                                           icon: const Icon(Icons.login, color: Colors.white),
                                           onPressed: () async {
                                             if (!_formKey.currentState!.validate()) return;
-          
+
                                             final hud = ProgressHUD.of(innerContext);
                                             hud?.show();
-          
+
                                             final phone = _emailController.text.trim();
                                             final password = _passwordController.text.trim();
-          
+
                                             await value.login(phone, password, context);
-          
+
                                             hud?.dismiss();
                                           },
                                           style: ElevatedButton.styleFrom(
@@ -357,7 +357,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:provider/provider.dart';
-
+import 'package:go_router/go_router.dart';
 import 'forgot_password.dart';
 
 
@@ -414,7 +414,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                                 const SizedBox(height: 15),
                                 const Text(
-                                  'Bookworm',
+                                  'KMIS',
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
@@ -483,12 +483,12 @@ class _LoginPageState extends State<LoginPage> {
                                       final email = _emailController.text.trim();
                                       final password = _passwordController.text.trim();
                                       final progress = ProgressHUD.of(context);
-
-                                      try {
+                                      context.go(Routes.dashboard);
+                                    /*  try {
                                         progress?.show();
 
-                                        await value.login(email, password, context);
-
+                                        //await value.login(email, password, context);
+                                       context.go(Routes.dashboard);
                                       } on FirebaseAuthException catch (e) {
                                         // Firebase specific errors
                                         String msg = "Login failed";
@@ -512,7 +512,7 @@ class _LoginPageState extends State<LoginPage> {
 
                                       } finally {
                                         progress?.dismiss();
-                                      }
+                                      }*/
                                     }
                                   },
                                   child: Container(

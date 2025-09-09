@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       // theme: ThemeData.dark().copyWith(
       //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber.shade900),
       // ),
-      routerConfig: router, // ✅ use GoRouter defined in routes.dart
+      routerConfig: router, //use GoRouter defined in routes.dart
     );
   }
 }

@@ -1,9 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:provider/provider.dart';
+import '../controller/routes.dart';
 import 'forgot_password.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -729,6 +731,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                               // setState(() {
                                               //   _isVisible = !_isVisible;
                                               // });
+                                              context.go(Routes.dashboard);
                                             },
                                             child: const Text('Sign In'),
                                           ),
@@ -921,6 +924,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                       SizedBox(height: 3.0,),
                                       TextButton(
                                         onPressed: () {
+                                          context.go(Routes.dashboard);
                                           //value.showreg();
                                           // Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>  SignUpLauncherPage()));
                                           // Navigator.push(
@@ -964,8 +968,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                               ),
                                             ),
                                             // Facebook Icon Button
-                                            /*
-                                                            InkWell(
+                                            /* InkWell(
                                 onTap: ()async{
                                  await value.signInWithFacebook();
                                   // handle Facebook sign-up

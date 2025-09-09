@@ -13,7 +13,7 @@ class CustomDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<StatsProvider>(
+    return Consumer<Myprovider>(
       builder: (BuildContext context, value, Widget? child) {
         return Drawer(
           backgroundColor: Color(0xFF1C1D2A),
@@ -48,95 +48,86 @@ class CustomDrawer extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 10),
-                Visibility(
-                  visible: value.adminshow,
-                  child: Flexible(
+               Flexible(
                     child: ListView(
                       padding: EdgeInsets.symmetric(horizontal: 8),
                       children: [
-                        Visibility(
-                          visible: value.adminshow,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 8.0, top: 10, bottom: 4),
-                            child: Text(
-                              "STUDENTS REGISTRATION",
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 12,
-                                letterSpacing: 1.2,
-                              ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 8.0, top: 10, bottom: 4),
+                          child: Text(
+                            "STUDENTS REGISTRATION",
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 12,
+                              letterSpacing: 1.2,
                             ),
                           ),
                         ),
-                        Visibility(
-                          visible: value.superadminshow,
-                          child: Card(
-                            color: Colors.transparent,
-                            elevation: 0,
-                            child: ExpansionTile(
-                              collapsedIconColor: Colors.white,
-                              iconColor: Colors.white,
-                              leading: Icon(Icons.settings, color: Colors.white),
-                              title: Text(
-                                'Configurations',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              children: [
-                                _drawerTile(
-                                  icon: Icons.assignment,
-                                  title: 'Students Data',
-                                  onTap: () => context.go(Routes.registercontestant,),
-                                ),
-                                _drawerTile(
-                                  icon: Icons.military_tech,
-                                  title: 'Level Registration',
-                                  onTap: () =>
-                                      context.go(Routes.levelreg),
-                                ),
-                                _drawerTile(
-                                  icon: Icons.military_tech,
-                                  title: 'Region Registration',
-                                  onTap: () => context.go(Routes.regionreg),
-                                ),
-                                _drawerTile(
-                                  icon: Icons.schedule,
-                                  title: 'Season Registration',
-                                  onTap: () => context.go(
-                                    Routes.seasonreg,
-                                  ),
-                                ),
-                                _drawerTile(
-                                  icon: Icons.movie,
-                                  title: 'Episode Registration',
-                                  onTap: () => context.go(Routes.episodereg),
-                                ),
-                                _drawerTile(
-                                  icon: Icons.movie,
-                                  title: 'Week Registration',
-                                  onTap: () => context.go(Routes.weekreg)),
-                                _drawerTile(
-                                  icon: Icons.assignment,
-                                  title: 'Zone Registration',
-                                  onTap: () => context.go(Routes.registerzone,
-                                  ),
-                                ),
-                                _drawerTile(
-                                  icon: Icons.cleaning_services_rounded,
-                                  title: 'Clear Results',
-                                  onTap: () => context.go(Routes.clearscores,),
-                                ),
-                                _drawerTile(
-                                  icon: Icons.cleaning_services_rounded,
-                                  title: 'Eviction',
-                                  onTap: () =>context.go(Routes.marks,
-                                  ),
-                                ),
-                              ],
+                        Card(
+                          color: Colors.transparent,
+                          elevation: 0,
+                          child: ExpansionTile(
+                            collapsedIconColor: Colors.white,
+                            iconColor: Colors.white,
+                            leading: Icon(Icons.settings, color: Colors.white),
+                            title: Text(
+                              'Configurations',
+                              style: TextStyle(color: Colors.white),
                             ),
+                            children: [
+                              _drawerTile(
+                                icon: Icons.assignment,
+                                title: 'Students Data',
+                                onTap: () => context.go(Routes.registercontestant,),
+                              ),
+                              _drawerTile(
+                                icon: Icons.military_tech,
+                                title: 'Level Registration',
+                                onTap: () =>
+                                    context.go(Routes.levelreg),
+                              ),
+                              _drawerTile(
+                                icon: Icons.military_tech,
+                                title: 'Region Registration',
+                                onTap: () => context.go(Routes.regionreg),
+                              ),
+                              _drawerTile(
+                                icon: Icons.schedule,
+                                title: 'Season Registration',
+                                onTap: () => context.go(
+                                  Routes.seasonreg,
+                                ),
+                              ),
+                              _drawerTile(
+                                icon: Icons.movie,
+                                title: 'Episode Registration',
+                                onTap: () => context.go(Routes.episodereg),
+                              ),
+                              _drawerTile(
+                                icon: Icons.movie,
+                                title: 'Week Registration',
+                                onTap: () => context.go(Routes.weekreg)),
+                              _drawerTile(
+                                icon: Icons.assignment,
+                                title: 'Zone Registration',
+                                onTap: () => context.go(Routes.registerzone,
+                                ),
+                              ),
+                              _drawerTile(
+                                icon: Icons.cleaning_services_rounded,
+                                title: 'Clear Results',
+                                onTap: () => context.go(Routes.clearscores,),
+                              ),
+                              _drawerTile(
+                                icon: Icons.cleaning_services_rounded,
+                                title: 'Eviction',
+                                onTap: () =>context.go(Routes.marks,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        Visibility(
-                          visible: value.adminshow,
+                        SizedBox(
                           child: _drawerTile(
                             icon: Icons.vpn_key,
                             title: 'Assess Components',
@@ -144,8 +135,7 @@ class CustomDrawer extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Visibility(
-                          visible: value.adminshow,
+                        SizedBox(
                           child: _drawerTile(
                             icon: Icons.vpn_key,
                             title: 'Contestants List',
@@ -154,82 +144,76 @@ class CustomDrawer extends StatelessWidget {
                             }
                           ),
                         ),
-                        Visibility(
-                          visible: value.adminshow,
-                          child: Padding(
-                            padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
-                            child: Text(
-                              "JUDGE SETUP",
-                              style: TextStyle(
-                                color: Colors.white60,
-                                fontSize: 12,
-                                letterSpacing: 1.2,
-                              ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
+                          child: Text(
+                            "JUDGE SETUP",
+                            style: TextStyle(
+                              color: Colors.white60,
+                              fontSize: 12,
+                              letterSpacing: 1.2,
                             ),
                           ),
                         ),
-                        Visibility(
-                          visible: value.adminshow,
-                          child: Card(
-                            color: Colors.transparent,
-                            elevation: 0,
-                            child: ExpansionTile(
-                              collapsedIconColor: Colors.white,
-                              iconColor: Colors.white,
-                              leading: Icon(Icons.people, color: Colors.white),
-                              title: Text(
-                                'Judge Data',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              children: [
-
-                                SizedBox(
-                                  child: _drawerTile(
-                                    icon: Icons.person_add,
-                                    title: 'Judge set up',
-                                    onTap: () async {
-                                      try {
-                                        context.go(Routes.judgesetup,
-                                        );
-                                      } catch (e) {
-                                        print(e);
-                                      }
-                                    },
-                                  ),
-                                ),
-
-                                SizedBox(
-                                  child: _drawerTile(
-                                    icon: Icons.person_add,
-                                    title: 'View Judges',
-                                    onTap: () async {
-                                      try {
-                                        context.go(Routes.judgelist,
-                                        );
-                                      } catch (e) {
-                                        print(e);
-                                      }
-                                    },
-                                  ),
-                                ),
-                                SizedBox(
-                                  child: _drawerTile(
-                                    icon: Icons.person_add,
-                                    title: 'Contestant set up',
-                                    onTap: () async {
-                                      try {
-                                        context.go(Routes.contestantsetup,
-                                        );
-                                      } catch (e) {
-                                        print(e);
-                                      }
-                                    },
-                                  ),
-                                ),
-
-
-                              ],
+                        Card(
+                          color: Colors.transparent,
+                          elevation: 0,
+                          child: ExpansionTile(
+                            collapsedIconColor: Colors.white,
+                            iconColor: Colors.white,
+                            leading: Icon(Icons.people, color: Colors.white),
+                            title: Text(
+                              'Judge Data',
+                              style: TextStyle(color: Colors.white),
                             ),
+                            children: [
+
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.person_add,
+                                  title: 'Judge set up',
+                                  onTap: () async {
+                                    try {
+                                      context.go(Routes.judgesetup,
+                                      );
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  },
+                                ),
+                              ),
+
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.person_add,
+                                  title: 'View Judges',
+                                  onTap: () async {
+                                    try {
+                                      context.go(Routes.judgelist,
+                                      );
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.person_add,
+                                  title: 'Contestant set up',
+                                  onTap: () async {
+                                    try {
+                                      context.go(Routes.contestantsetup,
+                                      );
+                                    } catch (e) {
+                                      print(e);
+                                    }
+                                  },
+                                ),
+                              ),
+
+
+                            ],
                           ),
                         ),
                         Padding(
@@ -424,22 +408,31 @@ class CustomDrawer extends StatelessWidget {
                                   ),
                                 ),
                               ),
-
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.calendar_month,
+                                  title: 'Terminal report',
+                                  onTap: () =>context.go(Routes.terminalreport,
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                         Divider(color: Colors.white24, height: 30),
-                        _drawerTile(
-                          icon: Icons.logout,
-                          title: 'Logout',
-                          onTap: () async {
-                           await value.logout(context);
-                          },
+                        SizedBox(
+                          child: _drawerTile(
+                            icon: Icons.logout,
+                            title: 'Logout',
+                            onTap: () async {
+                             await value.logout(context);
+                            },
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
+
               ],
             ),
           ),
