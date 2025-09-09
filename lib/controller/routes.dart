@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/screen/signup.dart';
 import 'package:provider/provider.dart';
 // imports
 import '../components/dashboard.dart';
@@ -7,7 +7,6 @@ import '../screen/accesscomponent.dart';
 import '../screen/acceslist.dart';
 import '../screen/adminresults.dart';
 import '../screen/judgelandingpage.dart';
-import '../screen/actionbuttons.dart';
 import '../screen/autoform2.dart';
 import '../screen/bestcriteria.dart';
 import '../screen/clearscores.dart';
@@ -15,7 +14,6 @@ import '../screen/contestantlist.dart';
 import '../screen/contestantsetup.dart';
 import '../screen/episodereg.dart';
 import '../screen/episodelistpage.dart';
-// import '../screen/episodemanageheading.dart';
 import '../screen/eviction.dart';
 import '../screen/forgot_password.dart';
 import '../screen/judgelistpage.dart';
@@ -31,7 +29,6 @@ import '../screen/printcontestantscoresheet.dart';
 import '../screen/rawvote.dart';
 import '../screen/regionreg.dart';
 import '../screen/regionreglistpage.dart';
-import '../screen/regionupdate.dart';
 import '../screen/registerstudents.dart';
 import '../screen/registerzone.dart';
 import '../screen/regstaff.dart';
@@ -158,7 +155,7 @@ final GoRouter router = GoRouter(
   },
 
   routes: [
-    GoRoute(path: Routes.login, builder: (c, s) => LoginPage()),
+    GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
     GoRoute(
       path: Routes.registercontestant,
       builder: (context, state) {

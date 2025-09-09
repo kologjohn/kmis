@@ -491,11 +491,14 @@ class Myprovider extends ChangeNotifier {
     } catch (e, stack) {
       debugPrint("Error in getaccessvel: $e");
       //debugPrint(stack.toString());
-      accessLevels = [];
+      accessLevels = ["Super Admin", "Admin", "Judge"];
     } finally {
       isLoading = false;
+      accessLevels = ["Super Admin", "Admin", "Judge"];
+
       notifyListeners();
     }
+
   }
   logout(BuildContext context) async{
     SharedPreferences pref=await SharedPreferences.getInstance();

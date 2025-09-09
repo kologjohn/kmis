@@ -244,7 +244,7 @@ class _RegstaffState extends State<Regstaff> {
                                 ),
                                 const SizedBox(height: 20),
                                 DropdownButtonFormField<String>(
-                                  value: myRegion,
+                                  value: "Upper East",
                                   items: value.regionList
                                       .map(
                                         (cat) => DropdownMenuItem(
@@ -497,8 +497,7 @@ class _RegstaffState extends State<Regstaff> {
                                         DropdownButtonFormField<String>(
                                           value: episode,
                                           items: value.episodes
-                                              .map(
-                                                (ep) => DropdownMenuItem<String>(
+                                              .map((ep) => DropdownMenuItem<String>(
                                               value: ep.episodename,
                                               child: Text(
                                                 "Episode ${ep.episodename}",
@@ -556,169 +555,6 @@ class _RegstaffState extends State<Regstaff> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    /*
-                                    ElevatedButton.icon(
-                                      // onPressed: () async {
-                                      //   if (_formKey.currentState!.validate()) {
-                                      //     final progress = ProgressHUD.of(
-                                      //       context,
-                                      //     );
-                                      //     progress!.show();
-                                      //     final String nametxt = name.text
-                                      //         .trim();
-                                      //     final String phonetxt = phone.text
-                                      //         .trim();
-                                      //     final String sexName =
-                                      //         _selectedSex ?? "";
-                                      //     final String accesslevel =
-                                      //         _selectedAccessLevel ?? "";
-                                      //     final String Level = level ?? "";
-                                      //     final String Region = myRegion ?? "";
-                                      //     final String Zone = zone ?? "";
-                                      //     final String Episode = episode ?? "";
-                                      //     final String Week = week ?? "";
-                                      //     final data = Staff(
-                                      //       name: nametxt,
-                                      //       accessLevel: accesslevel,
-                                      //       phone: phonetxt,
-                                      //       email: "$phonetxt@bookworm.com",
-                                      //       sex: sexName,
-                                      //       region: Region,
-                                      //       zone: Zone,
-                                      //       week: Week,
-                                      //       episode: Episode,
-                                      //       level: Level,
-                                      //     ).toMap();
-                                      //     await value.db
-                                      //         .collection('staff')
-                                      //         .doc(phonetxt)
-                                      //         .set(
-                                      //           data,
-                                      //           SetOptions(merge: true),
-                                      //         );
-                                      //     // Save logic here...
-                                      //     await Future.delayed(
-                                      //       const Duration(seconds: 1),
-                                      //     ); // Simulate work
-                                      //     progress.dismiss();
-                                      //     ScaffoldMessenger.of(
-                                      //       context,
-                                      //     ).showSnackBar(
-                                      //       SnackBar(
-                                      //         content: Text(
-                                      //           isEdit
-                                      //               ? 'Data Updated Successfully'
-                                      //               : 'Data Saved Successfully',
-                                      //         ),
-                                      //         backgroundColor: Colors.green,
-                                      //       ),
-                                      //     );
-                                      //     if (!isEdit) {
-                                      //       // Clear form only if it's a new registration
-                                      //       setState(() {
-                                      //         _selectedAccessLevel = null;
-                                      //         _selectedSex = null;
-                                      //         week = null;
-                                      //         episode = null;
-                                      //         level = null;
-                                      //         zone = null;
-                                      //         myRegion = null;
-                                      //       });
-                                      //       name.clear();
-                                      //       phone.clear();
-                                      //     }
-                                      //   }
-                                      // },
-                                      onPressed: () async {
-                                        if (_formKey.currentState!.validate()) {
-                                          final progress = ProgressHUD.of(context);
-                                          progress!.show();
-
-                                          final String nametxt = name.text.trim();
-                                          final String phonetxt = phone.text.trim();
-                                          final String sexName = _selectedSex ?? "";
-                                          final String accesslevel = _selectedAccessLevel ?? "";
-                                          final String Level = level ?? "";
-                                          final String Region = myRegion ?? "";
-                                          final String Zone = zone ?? "";
-                                          final String Episode = episode ?? "";
-                                          final String Week = week ?? "";
-
-                                          // Build the staff object
-                                          final data = Staff(
-                                            name: nametxt,
-                                            accessLevel: accesslevel,
-                                            phone: phonetxt,
-                                            email: "$phonetxt@bookworm.com",
-                                            sex: sexName,
-                                            region: Region,
-                                            zone: Zone,
-                                            week: Week,
-                                            episode: Episode,
-                                            level: Level,
-                                          ).toMap();
-
-                                          // Save or update (merge ensures only changes are applied)
-                                          await value.db.collection('staff').doc(phonetxt).set(
-                                            data,
-                                            SetOptions(merge: true),
-                                          );
-
-                                          await Future.delayed(const Duration(seconds: 1)); // Simulate work
-                                          progress.dismiss();
-
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                isEdit ? 'Data Updated Successfully' : 'Data Saved Successfully',
-                                              ),
-                                              backgroundColor: Colors.green,
-                                            ),
-                                          );
-
-                                          if (!isEdit) {
-                                            // Clear form only if it's a new registration
-                                            setState(() {
-                                              _selectedAccessLevel = null;
-                                              _selectedSex = null;
-                                              week = null;
-                                              episode = null;
-                                              level = null;
-                                              zone = null;
-                                              myRegion = null;
-                                            });
-                                            name.clear();
-                                            phone.clear();
-                                          }
-                                        }
-                                      },
-                                      icon: Icon(
-                                        isEdit ? Icons.update : Icons.save,
-                                      ),
-                                      label: Text(
-                                        isEdit
-                                            ? 'Update Staff'
-                                            : 'Register Staff',
-                                      ),
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blueAccent,
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 40,
-                                          vertical: 15,
-                                        ),
-                                        textStyle: const TextStyle(
-                                          fontSize: 18,
-                                        ),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            10,
-                                          ),
-                                        ),
-                                        elevation: 5,
-                                      ),
-                                    ),
-                                    */
                                     ElevatedButton.icon(
                                       onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
