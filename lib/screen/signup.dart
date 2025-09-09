@@ -640,7 +640,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                               String countryCode = selectedDialCode.toString();
                                               String country = selectedCountryName.toString();
                                               final DateTime dateTime = Timestamp.now().toDate();
-                                              final userData = (name: name,email: email,phone: phone,countrycode: countryCode,countryname: country,agreedtoterms: agreeToTerms,createdat: dateTime,type: 'customer');
+                                              final userData = (name: name,email: email,phone: phone,countrycode: countryCode,countryname: country,agreedtoterms: agreeToTerms,createdat: dateTime,type: 'customer',school:school);
                                             }
                                           },
                                           child: Container(
