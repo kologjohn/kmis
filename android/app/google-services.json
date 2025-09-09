@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "171182914435",
+    "project_id": "kmis-16b02",
+    "storage_bucket": "kmis-16b02.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171182914435:android:02ac7245fa0300dacd54b6",
+        "android_client_info": {
+          "package_name": "com.ksoft.ksoftsms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4Kzt8uTGIZoTqpCLsMl3jOiShAwzNx7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:171182914435:android:3754aa4304861276cd54b6",
+        "android_client_info": {
+          "package_name": "com.ksoft.sms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC4Kzt8uTGIZoTqpCLsMl3jOiShAwzNx7A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
