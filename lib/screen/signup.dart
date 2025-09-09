@@ -137,6 +137,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _schoolController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool agreeToTerms = false;
@@ -482,6 +483,20 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                           ? 'Please enter your name'
                                           : null,
                                     ),
+                                    const SizedBox(height: 10),
+                                    TextFormField(
+                                      controller: _schoolController,
+                                      decoration: const InputDecoration(
+                                        labelText: 'School Name',
+                                        //floatingLabelStyle: TextStyle(color: Colors.orange),
+                                        border: UnderlineInputBorder(),
+                                      ),
+
+                                      validator: (value) =>
+                                      value == null || value.isEmpty
+                                          ? 'Please enter school Name'
+                                          : null,
+                                    ),
                                     const SizedBox(height: 8),
                                     TextFormField(
                                       controller: _emailController,
@@ -553,8 +568,9 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                         }
                                       },
                                       validator: (value) {
-                                        if (value == null)
+                                        if (value == null) {
                                           return 'Please select a country';
+                                        }
                                         if (!_phoneController.text.startsWith(
                                           selectedDialCode ?? '',
                                         )) {
@@ -611,44 +627,20 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                         InkWell(
                                           onTap: () async {
                                             if (_formKey.currentState!.validate()) {
-                                              if (!agreeToTerms) {
-                                                ScaffoldMessenger.of(
-                                                  context,
-                                                ).showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                      'You must agree to the terms to continue.',
-                                                    ),
-                                                  ),
-                                                );
+                                              if (!agreeToTerms){
+                                                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('You must agree to the terms to continue.'),));
                                                 return;
                                               }
 
-                                              final name = _nameController.text.trim();
-                                              final email = _emailController.text
-                                                  .trim();
-                                              final password = _passwordController.text;
-                                              final phone = _phoneController.text
-                                                  .trim();
-                                              final countryCode = selectedDialCode
-                                                  .toString();
-                                              final country = selectedCountryName
-                                                  .toString();
-
-                                              final DateTime dateTime = Timestamp.now()
-                                                  .toDate();
-
-                                              final userData = (
-                                              name: name,
-                                              email: email,
-                                              phone: phone,
-                                              countrycode: countryCode,
-                                              countryname: country,
-                                              agreedtoterms: agreeToTerms,
-                                              createdat: dateTime,
-                                              type: 'customer',
-                                              );
-
+                                              String school = _schoolController.text.trim();
+                                              String name = _nameController.text.trim();
+                                              String email = _emailController.text.trim();
+                                              String password = _passwordController.text;
+                                              String phone = _phoneController.text.trim();
+                                              String countryCode = selectedDialCode.toString();
+                                              String country = selectedCountryName.toString();
+                                              final DateTime dateTime = Timestamp.now().toDate();
+                                              final userData = (name: name,email: email,phone: phone,countrycode: countryCode,countryname: country,agreedtoterms: agreeToTerms,createdat: dateTime,type: 'customer');
                                             }
                                           },
                                           child: Container(
