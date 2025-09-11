@@ -180,11 +180,25 @@ class Myprovider extends ChangeNotifier {
   bool isLoadingstafflist = false;
   DocumentSnapshot? lastDocument;
   DocumentSnapshot? firstDocument;
+  bool loginform = true;
+  bool regform = false;
   Myprovider() {
     getdata();
     getaccessvel();
     countContestantsWithTotal();
     //deleteVoltaRegions();
+  }
+
+  showform(bool show,String type){
+    if(type=='login') {
+      loginform = true;
+      regform = false;
+    }
+    if(type=='signup'){
+      regform = true;
+      loginform = false;
+    }
+    notifyListeners();
   }
    deleteVoltaRegions() async {
     // Query all docs where region == "Volta"

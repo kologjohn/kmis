@@ -51,6 +51,7 @@ import 'myprovider.dart';
 class Routes {
 
   static const registercontestant = "/registercontestant";
+  static const term = "/term";
   static const registerzone = "/registerzone";
   static const regstaff = "/regstaff";
   static const revenuetype = "/revenuetype";
@@ -230,5 +231,6 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.testvote, builder: (c, s) => Testvote()),
     GoRoute(path: Routes.rawvote, builder: (c, s) => Rawvote()),
     GoRoute(path: Routes.terminalreport, builder: (c, s) => ReportSheet()),
+    GoRoute(path: Routes.term, builder: (c, s) => Term()),
   ],
 );
