@@ -75,6 +75,30 @@ class CustomDrawer extends StatelessWidget {
                               style: TextStyle(color: Colors.white),
                             ),
                             children: [
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'Term',
+                                  onTap: () =>
+                                      context.go(Routes.term),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'Depart',
+                                  onTap: () =>
+                                      context.go(Routes.depart),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'Class',
+                                  onTap: () =>
+                                      context.go(Routes.classes),
+                                ),
+                              ),
                               _drawerTile(
                                 icon: Icons.assignment,
                                 title: 'Students Data',
@@ -86,6 +110,7 @@ class CustomDrawer extends StatelessWidget {
                                 onTap: () =>
                                     context.go(Routes.levelreg),
                               ),
+
                               _drawerTile(
                                 icon: Icons.military_tech,
                                 title: 'Region Registration',

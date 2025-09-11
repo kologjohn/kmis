@@ -1,29 +1,36 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class TermModel {
+class SubjectModel {
   final String id;
   final String name;
   final String? companyid;
+  final String? code;
+  final String? level;
   final DateTime timestamp;
 
-  TermModel({
+  SubjectModel({
     required this.id,
     required this.name,
     this.companyid,
+    this.code,
+    this.level,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
+  // Convert to Map for Firestore
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
       'companyid': companyid,
+      'code': code,
+      'level': level,
       'timestamp': Timestamp.fromDate(timestamp),
     };
   }
 
   // Create from Map (when reading data)
-  factory TermModel.fromMap(Map<String, dynamic> map, String docId) {
+  factory SubjectModel.fromMap(Map<String, dynamic> map, String docId) {
     DateTime parsedTime;
 
     final ts = map['timestamp'];
@@ -37,10 +44,12 @@ class TermModel {
       parsedTime = DateTime.now();
     }
 
-    return TermModel(
+    return SubjectModel(
       id: docId,
       name: map['name'] ?? '',
       companyid: map['companyid'],
+      code: map['code'],
+      level: map['level'],
       timestamp: parsedTime,
     );
   }

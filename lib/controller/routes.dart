@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
 import 'package:ksoftsms/screen/signup.dart';
 import 'package:provider/provider.dart';
 // imports
@@ -6,6 +7,8 @@ import '../components/dashboard.dart';
 import '../screen/accesscomponent.dart';
 import '../screen/acceslist.dart';
 import '../screen/adminresults.dart';
+import '../screen/class.dart';
+import '../screen/department.dart';
 import '../screen/judgelandingpage.dart';
 import '../screen/autoform2.dart';
 import '../screen/bestcriteria.dart';
@@ -33,8 +36,12 @@ import '../screen/registerzone.dart';
 import '../screen/regstaff.dart';
 import '../screen/seasonreg.dart';
 import '../screen/sexreg.dart';
+import '../screen/term.dart';
 import '../screen/terminalreport.dart';
+import '../screen/termlist.dart';
 import '../screen/testvote.dart';
+import '../screen/viewclass.dart';
+import '../screen/viewdepartment.dart';
 import '../screen/viewmarks.dart';
 import '../screen/viewscores.dart';
 import '../screen/viewstaff.dart';
@@ -43,15 +50,29 @@ import '../screen/votinglist.dart';
 import '../screen/weekreg.dart';
 import '../screen/weeklysheet.dart';
 import 'dbmodels/contestantsmodel.dart';
+import 'dbmodels/departmodel.dart';
 import 'dbmodels/levelmodel.dart';
 import 'dbmodels/regionmodel.dart';
 import 'dbmodels/staffmodel.dart';
+import 'dbmodels/termmodel.dart';
 import 'myprovider.dart';
 
 class Routes {
 
   static const registercontestant = "/registercontestant";
   static const term = "/term";
+  static const depart = "/depart";
+  static const classes = "/classes";
+  static const viewterm = "/viewterm";
+  static const viewdepart = "/viewdepart";
+  static const viewclass = "/viewclass";
+
+
+
+
+
+
+
   static const registerzone = "/registerzone";
   static const regstaff = "/regstaff";
   static const revenuetype = "/revenuetype";
@@ -231,6 +252,29 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.testvote, builder: (c, s) => Testvote()),
     GoRoute(path: Routes.rawvote, builder: (c, s) => Rawvote()),
     GoRoute(path: Routes.terminalreport, builder: (c, s) => ReportSheet()),
-    GoRoute(path: Routes.term, builder: (c, s) => Term()),
+    GoRoute(
+      path: Routes.term,
+      builder: (context, state) {
+        final term = state.extra as TermModel?;
+        return Term(term: term);
+      },
+    ),
+    GoRoute(
+      path: Routes.depart,
+      builder: (context, state) {
+        final depart = state.extra as DepartmentModel?;
+        return Department(depart: depart);
+      },
+    ),
+    GoRoute(
+      path: Routes.classes,
+      builder: (context, state) {
+        final classes = state.extra as ClassModel?;
+        return ClassScreen(classes: classes);
+      },
+    ),
+    GoRoute(path: Routes.viewterm, builder: (c, s) => Viewterms()),
+    GoRoute(path: Routes.viewdepart, builder: (c, s) => Viewdepartment()),
+    GoRoute(path: Routes.viewclass, builder: (c, s) => Viewclass()),
   ],
 );

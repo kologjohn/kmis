@@ -3,36 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../controller/dbmodels/termmodel.dart';
+import '../controller/dbmodels/departmodel.dart';
 import '../controller/myprovider.dart';
 import '../controller/routes.dart';
 
-class Term extends StatefulWidget {
-  final TermModel? term;
-  const Term({super.key, this.term});
+class Department extends StatefulWidget {
+  final DepartmentModel? depart;
+  const Department({super.key, this.depart});
 
   @override
-  State<Term> createState() => _TermState();
+  State<Department> createState() => _DepartmentState();
 }
 
-class _TermState extends State<Term> {
-  final termname = TextEditingController();
+class _DepartmentState extends State<Department> {
+  final departController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
-    final data = widget.term;
+    final data = widget.depart;
     if (data != null) {
-      termname.text = data.name;
+      departController.text = data.name;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final inputFill = const Color(0xFF2C2C3C);
-    final isEdit = widget.term != null;
-    final docId = widget.term?.id;
+    final isEdit = widget.depart != null;
 
     return ProgressHUD(
       child: Builder(
@@ -47,7 +46,7 @@ class _TermState extends State<Term> {
                     onPressed: () => context.go(Routes.dashboard),
                   ),
                   title: Text(
-                    isEdit ? 'Edit Term' : 'Register Term',
+                    isEdit ? 'Edit Department' : 'Register Department',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -75,10 +74,10 @@ class _TermState extends State<Term> {
                             children: [
                               const SizedBox(height: 20),
                               TextFormField(
-                                controller: termname,
+                                controller: departController,
                                 decoration: InputDecoration(
-                                  labelText: "Term Name",
-                                  hintText: "Enter Term Name",
+                                  labelText: "Department Name",
+                                  hintText: "Enter Department Name",
                                   labelStyle: const TextStyle(color: Colors.white),
                                   hintStyle: const TextStyle(color: Colors.grey),
                                   border: OutlineInputBorder(
@@ -103,10 +102,10 @@ class _TermState extends State<Term> {
                                   filled: true,
                                   fillColor: inputFill,
                                 ),
-                                style: const TextStyle(fontSize: 16),
+                                style: const TextStyle(fontSize: 16, color: Colors.white),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Term name cannot be empty';
+                                    return 'Department name cannot be empty';
                                   }
                                   return null;
                                 },
@@ -121,16 +120,16 @@ class _TermState extends State<Term> {
                                         final progress = ProgressHUD.of(context);
                                         progress!.show();
 
-                                        String term = termname.text.trim();
-                                        String id = term.replaceAll(RegExp(r'\s+'), '').toLowerCase();
-                                        final data = TermModel(
-                                          id: term.toLowerCase(),
-                                          name: term,
+                                        String departmentName = departController.text.trim();
+                                        String id = departmentName.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                        final data = DepartmentModel(
+                                          id: departmentName.toLowerCase(),
+                                          name: departmentName,
                                           timestamp: DateTime.now(),
                                         ).toMap();
 
                                         await value.db
-                                            .collection('terms')
+                                            .collection('department')
                                             .doc(id)
                                             .set(data, SetOptions(merge: true));
 
@@ -139,15 +138,15 @@ class _TermState extends State<Term> {
                                           SnackBar(
                                             content: Text(
                                               isEdit
-                                                  ? 'Term updated successfully'
-                                                  : 'Term registered successfully',
+                                                  ? 'Department updated successfully'
+                                                  : 'Department registered successfully',
                                             ),
                                             backgroundColor: Colors.green,
                                           ),
                                         );
 
                                         if (!isEdit) {
-                                          termname.clear();
+                                          departController.clear();
                                         }
                                       }
                                     },
@@ -155,7 +154,7 @@ class _TermState extends State<Term> {
                                       isEdit ? Icons.update : Icons.save,
                                     ),
                                     label: Text(
-                                      isEdit ? 'Update Term' : 'Register Term',
+                                      isEdit ? 'Update Department' : 'Register Department',
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blueAccent,
@@ -174,14 +173,14 @@ class _TermState extends State<Term> {
                                   const SizedBox(width: 20),
                                   ElevatedButton.icon(
                                     onPressed: () {
-                                      context.go(Routes.viewterm);
+                                      context.go(Routes.viewdepart);
                                     },
                                     icon: const Icon(
                                       Icons.list,
                                       color: Colors.white,
                                     ),
                                     label: const Text(
-                                      'View Terms',
+                                      'View Departments',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     style: ElevatedButton.styleFrom(

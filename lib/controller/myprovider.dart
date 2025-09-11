@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:ksoftsms/controller/dbmodels/termmodel.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,6 +20,7 @@ import '../components/voteplusjudgescoresheet.dart';
 import '../components/weeklysheetprinter.dart';
 import 'dbmodels/componentmodel.dart';
 import 'dbmodels/contestantsmodel.dart';
+import 'dbmodels/departmodel.dart';
 import 'dbmodels/episodeModel.dart';
 import 'dbmodels/judgemodel.dart';
 import 'dbmodels/levelmodel.dart';
@@ -35,6 +37,16 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Myprovider extends ChangeNotifier {
+  List<TermModel> terms = [];
+  List<DepartmentModel> departments = [];
+  List<DepartmentModel> classdata = [];
+  bool loadterms =false;
+  bool loaddepart =false;
+  bool loadclassdata =false;
+
+
+
+
   int evictedCount= 0;
   int evictnumber= 0;
   int totalrecords = 0;
@@ -188,6 +200,88 @@ class Myprovider extends ChangeNotifier {
     countContestantsWithTotal();
     //deleteVoltaRegions();
   }
+  Future<void> fetchterms() async {
+    try {
+      loadterms = true;
+      notifyListeners();
+
+      final snapshot = await db.collection("terms").get();
+
+      terms = snapshot.docs.map((doc) {
+        return TermModel.fromMap(doc.data(), doc.id);
+      }).toList();
+
+      loadterms = false;
+      print(terms);
+      notifyListeners();
+    } catch (e) {
+      loadterms = false;
+      notifyListeners();
+      print("Failed to fetch terms: $e");
+    }
+  }
+  Future<void> fetchdepart() async {
+    try {
+      loaddepart = true;
+      notifyListeners();
+      final snapshot = await db.collection("department").get();
+      departments = snapshot.docs.map((doc) {
+        return DepartmentModel.fromMap(doc.data(), doc.id);
+      }).toList();
+
+      loaddepart = false;
+      notifyListeners();
+    } catch (e) {
+      loaddepart = false;
+      notifyListeners();
+      print("Failed to fetch departments: $e");
+    }
+  }
+  Future<void> fetchclass() async {
+    try {
+      loadclassdata = true;
+      notifyListeners();
+      final snapshot = await db.collection("classes").get();
+      classdata = snapshot.docs.map((doc) {
+        return DepartmentModel.fromMap(doc.data(), doc.id);
+      }).toList();
+
+      loadclassdata = false;
+      notifyListeners();
+    } catch (e) {
+      loadclassdata = false;
+      notifyListeners();
+      print("Failed to fetch class: $e");
+    }
+  }
+  Future<void> deleteData(String collection, String documentId) async {
+    try {
+      loadata();
+      fetchterms();
+      fetchdepart();
+      fetchclass();
+      notifyListeners();
+      await db.collection(collection).doc(documentId).delete();
+      debugPrint('Document $documentId deleted from $collection.');
+    } on FirebaseException catch (e) {
+      print('Firebase error: ${e.message}');
+      rethrow;
+    } catch (e) {
+      print('Unexpected error: $e');
+      rethrow;
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
 
   showform(bool show,String type){
     if(type=='login') {
@@ -371,6 +465,7 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch levels: $e");
     }
   }
+
   Future<void> contestantdata() async {
     try {
       isLoading = true;
@@ -4034,20 +4129,7 @@ class Myprovider extends ChangeNotifier {
       debugPrint("Error deleting access component: $e");
     }
   }
-  Future<void> deleteData(String collection, String documentId) async {
-    try {
-      loadata();
-      notifyListeners();
-      await db.collection(collection).doc(documentId).delete();
-      debugPrint('Document $documentId deleted from $collection.');
-    } on FirebaseException catch (e) {
-      print('Firebase error: ${e.message}');
-      rethrow;
-    } catch (e) {
-      print('Unexpected error: $e');
-      rethrow;
-    }
-  }
+
   addsex(String name) async {
     final data = {"name": name};
     await db.collection("sex").doc(name.toString()).set(data);

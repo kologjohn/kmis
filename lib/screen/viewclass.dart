@@ -3,19 +3,20 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import '../controller/routes.dart';
-class Viewterms extends StatefulWidget {
-  const Viewterms({super.key});
+
+class Viewclass extends StatefulWidget {
+  const Viewclass({super.key});
 
   @override
-  State<Viewterms> createState() => _ViewtermsState();
+  State<Viewclass> createState() => _ViewclassState();
 }
 
-class _ViewtermsState extends State<Viewterms> {
+class _ViewclassState extends State<Viewclass> {
   @override
   void initState() {
     super.initState();
     Future.microtask(
-          () => Provider.of<Myprovider>(context, listen: false).fetchterms(),
+          () => Provider.of<Myprovider>(context, listen: false).fetchclass(),
     );
   }
 
@@ -25,7 +26,7 @@ class _ViewtermsState extends State<Viewterms> {
       builder: (BuildContext context, Myprovider provider, Widget? child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('All Terms', style: TextStyle(color: Colors.white)),
+            title: const Text('All Classes', style: TextStyle(color: Colors.white)),
             backgroundColor: const Color(0xFF2D2F45),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -33,22 +34,22 @@ class _ViewtermsState extends State<Viewterms> {
             ),
           ),
           backgroundColor: const Color(0xFF1F1F2C),
-          body: provider.loadterms
+          body: provider.loadclassdata
               ? const Center(
             child: CircularProgressIndicator(color: Colors.white),
           )
-              : provider.terms.isEmpty
+              : provider.classdata.isEmpty
               ? const Center(
             child: Text(
-              "No terms found",
+              "No classes found",
               style: TextStyle(color: Colors.white),
             ),
           )
               : ListView.separated(
-            itemCount: provider.terms.length,
+            itemCount: provider.classdata.length,
             separatorBuilder: (_, __) => const Divider(color: Colors.grey),
             itemBuilder: (context, index) {
-              final term = provider.terms[index];
+              final classes = provider.classdata[index];
 
               return ListTile(
                 leading: CircleAvatar(
@@ -59,7 +60,7 @@ class _ViewtermsState extends State<Viewterms> {
                   ),
                 ),
                 title: Text(
-                  term.name.toUpperCase(),
+                  classes.name.toUpperCase(),
                   style: const TextStyle(color: Colors.white, fontSize: 16),
                 ),
                 trailing: Row(
@@ -68,19 +69,19 @@ class _ViewtermsState extends State<Viewterms> {
                     IconButton(
                       icon: const Icon(Icons.edit, color: Colors.blueAccent),
                       onPressed: () {
-                        context.go(Routes.term, extra: term);
+                        context.go(Routes.classes, extra: classes);
                       },
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
-                      tooltip: 'Delete ${term.name}',
+                      tooltip: 'Delete ${classes.name}',
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
                             title: const Text("Confirm Delete"),
                             content: Text(
-                                "Are you sure you want to delete '${term.name}'?"),
+                                "Are you sure you want to delete '${classes.name}'?"),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(context, false),
@@ -98,12 +99,12 @@ class _ViewtermsState extends State<Viewterms> {
                         );
 
                         if (confirm == true) {
-                          await provider.deleteData("terms", term.id);
+                          await provider.deleteData("classes", classes.id);
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text(
-                                "Term deleted successfully",
+                                "Class deleted successfully",
                                 textAlign: TextAlign.center,
                               ),
                               backgroundColor: Colors.red,
@@ -122,5 +123,3 @@ class _ViewtermsState extends State<Viewterms> {
     );
   }
 }
-
-

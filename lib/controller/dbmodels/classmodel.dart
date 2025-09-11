@@ -1,18 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class TermModel {
+class ClassModel {
   final String id;
   final String name;
   final String? companyid;
   final DateTime timestamp;
 
-  TermModel({
+  ClassModel({
     required this.id,
     required this.name,
     this.companyid,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
+  // Convert to Map for storage
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -23,7 +24,7 @@ class TermModel {
   }
 
   // Create from Map (when reading data)
-  factory TermModel.fromMap(Map<String, dynamic> map, String docId) {
+  factory ClassModel.fromMap(Map<String, dynamic> map, String docId) {
     DateTime parsedTime;
 
     final ts = map['timestamp'];
@@ -37,7 +38,7 @@ class TermModel {
       parsedTime = DateTime.now();
     }
 
-    return TermModel(
+    return ClassModel(
       id: docId,
       name: map['name'] ?? '',
       companyid: map['companyid'],
