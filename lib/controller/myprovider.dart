@@ -25,8 +25,11 @@ import 'dbmodels/episodeModel.dart';
 import 'dbmodels/judgemodel.dart';
 import 'dbmodels/levelmodel.dart';
 import 'dbmodels/regionmodel.dart';
+import 'dbmodels/schoolmodel.dart';
+import 'dbmodels/scoremodel.dart';
 import 'dbmodels/seasonModel.dart';
 import 'dbmodels/staffmodel.dart';
+import 'dbmodels/subjectmodel.dart';
 import 'dbmodels/weekmodel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pdf/pdf.dart';
@@ -40,9 +43,24 @@ class Myprovider extends ChangeNotifier {
   List<TermModel> terms = [];
   List<DepartmentModel> departments = [];
   List<DepartmentModel> classdata = [];
+  List<SubjectModel> subjectList = [];
+  List<StudentModel> studentlist = [];
+  List<SchoolModel> schoollist = [];
+  List<Staff> staffList = [];
+  List<RegionModel> regionList = [];
+  List<ScoremodelConfig> scoreconfig = [];
   bool loadterms =false;
   bool loaddepart =false;
   bool loadclassdata =false;
+  bool loadsubject =false;
+  bool isLoadingRegions =false;
+  bool loadStudent =false;
+  bool loadschool =false;
+  bool loadstaff =false;
+  bool loadingsconfig = true;
+  String companyid="ksoo1";
+  String currentschool="lamp";
+
 
 
 
@@ -81,7 +99,7 @@ class Myprovider extends ChangeNotifier {
   bool loadingJudge = true;
   List<String> regs = [];
   List<String> judges = [];
-  List<Staff> staffList = [];
+
   List<Map<String, dynamic>> pendingeviction = [];
   List<String> components = [];
   List<String> judgeLevels = [];
@@ -178,10 +196,10 @@ class Myprovider extends ChangeNotifier {
   List<WeekModel> weeks = [];
   List<LevelModel> levelss = [];
   List<SeasonModel> seasons = [];
-  List<RegionModel> regionList = [];
+
   List<EpisodeModel> episodesp = [];
   List<EpisodeModel> episodes = [];
-  List<ContestantModel> contestant = [];
+
   final Set<String> _selectedEpisodes = {};
   bool isLoadingMore =true;
   DocumentSnapshot? lastFetchedDoc;
@@ -254,12 +272,141 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch class: $e");
     }
   }
+  Future<void> fetchsubjects() async {
+    try {
+      loadsubject = true;
+      notifyListeners();
+      final snapshot = await db.collection("subjects").get();
+      subjectList = snapshot.docs.map((doc) {
+        return SubjectModel.fromMap(doc.data(), doc.id);
+      }).toList();
+
+      loadsubject = false;
+      notifyListeners();
+    } catch (e) {
+      loadsubject = false;
+      notifyListeners();
+      print("Failed to fetch class: $e");
+    }
+  }
+  Future<void> fetchstudents() async {
+    try {
+      loadStudent = true;
+      notifyListeners();
+
+      final snapshot = await db.collection("students").get();
+
+      studentlist = snapshot.docs.map((doc) {
+        final data = doc.data();
+        // inject Firestore docId into the map (in case it's missing)
+        data['id'] = doc.id;
+        return StudentModel.fromMap(data);
+      }).toList();
+
+      loadStudent = false;
+      notifyListeners();
+    } catch (e) {
+      loadStudent = false;
+      notifyListeners();
+      print("Failed to fetch students: $e");
+    }
+  }
+  Future<void> fetchschool() async {
+    try {
+      loadschool = true;
+      notifyListeners();
+
+      final snapshot = await db.collection("schools").get();
+
+      schoollist = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return SchoolModel.fromMap(data, doc.id);
+      }).toList();
+
+      loadschool = false;
+      notifyListeners();
+    } catch (e) {
+      loadschool = false;
+      notifyListeners();
+      print("Failed to fetch schools: $e");
+    }
+  }
+  Future<void> fetchstaff() async {
+    try {
+      loadstaff=true;
+      notifyListeners();
+      final snap = await db.collection('staff').get();
+      staffList = snap.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return Staff.fromMap(data, doc.id); // Use fromMap constructor
+      }).toList();
+      loadstaff =false;
+      notifyListeners();
+    } catch (e) {
+      print("Error fetching staff: $e");
+    }
+  }
+  Future<void> fetchScoreConfig() async {
+    try {
+      loadingsconfig = true;
+      notifyListeners();
+      final snap = await db.collection('scoringconfi').get();
+      scoreconfig = snap.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return ScoremodelConfig.fromFirestore(data, doc.id);
+      }).toList();
+      loadingsconfig = false;
+      notifyListeners();
+    } catch (e) {
+      print("Error fetching score config: $e");
+    }
+  }
+
+
+  Future<void> getfetchRegions() async {
+    try {
+      isLoadingRegions = true;
+      notifyListeners();
+
+      //fetch all regions (no restriction)
+      QuerySnapshot querySnapshot = await db.collection("regions").get();
+
+      regionList = querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+
+        DateTime? parsedTime;
+        if (data['timestamp'] != null) {
+          if (data['timestamp'] is Timestamp) {
+            parsedTime = (data['timestamp'] as Timestamp).toDate();
+          } else {
+            parsedTime = DateTime.tryParse(data['timestamp'].toString());
+          }
+        }
+
+        return RegionModel(
+          id: doc.id,
+          regionname: data['name'] ?? '',
+          time: parsedTime ?? DateTime.now(),
+        );
+      }).toList();
+
+      print("Regions fetched: ${regionList.length}");
+
+      isLoadingRegions = false;
+      notifyListeners();
+    } catch (e) {
+      isLoadingRegions = false;
+      print("Failed to fetch regions: $e");
+      notifyListeners();
+    }
+  }
   Future<void> deleteData(String collection, String documentId) async {
     try {
-      loadata();
+      fetchstaff();
       fetchterms();
       fetchdepart();
       fetchclass();
+      fetchsubjects();
       notifyListeners();
       await db.collection(collection).doc(documentId).delete();
       debugPrint('Document $documentId deleted from $collection.');
@@ -466,6 +613,7 @@ class Myprovider extends ChangeNotifier {
     }
   }
 
+  /*
   Future<void> contestantdata() async {
     try {
       isLoading = true;
@@ -533,6 +681,7 @@ class Myprovider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  */
   getfetchSeasons() async {
     try {
       isLoading=true;
@@ -2249,55 +2398,7 @@ class Myprovider extends ChangeNotifier {
 
     }
   }
-  bool isLoadingRegions =false;
-  getfetchRegions() async {
-    try {
-      isLoadingRegions;
-      notifyListeners();
-      QuerySnapshot querySnapshot;
 
-      if (accesslevel == "Admin") {
-        querySnapshot = await db
-            .collection("regions")
-            .where('name', isEqualTo: regionName)
-            .get();
-      } else if (accesslevel == "Super Admin") {
-        querySnapshot = await db.collection("regions").get();
-      } else {
-        querySnapshot = await db
-            .collection("regions")
-            .where('region', isEqualTo: '')
-            .get();
-      }
-
-      regionList = querySnapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-
-        DateTime? parsedTime;
-        if (data['timestamp'] != null) {
-          if (data['timestamp'] is Timestamp) {
-            parsedTime = (data['timestamp'] as Timestamp).toDate();
-          } else {
-            parsedTime = DateTime.tryParse(data['timestamp'].toString());
-          }
-        }
-
-        return RegionModel(
-          id: doc.id,
-          regionname: data['name'] ?? '',
-          season: data['season'] ?? '',
-          week: data['week'] ?? '',
-          zone: data['zone'] ?? '',
-          episode: data['episode'] ?? '',
-          time: parsedTime ?? DateTime.now(),
-        );
-      }).toList();
-      isLoadingRegions;
-      notifyListeners();
-    } catch (e) {
-      print("Failed to fetch regions: $e");
-    }
-  }
   Future<void> fetchVotescoringDataevp() async {
     isLoadingjudgevoteevp = true;
     notifyListeners();
@@ -4141,68 +4242,7 @@ class Myprovider extends ChangeNotifier {
   int? loadingRegionId;
   List<dynamic> fetchedPolls = [];
   List<Map<String, dynamic>> regionsvote = [];
-  loadata() async {
-    try {
 
-      isLoadingstafflist = true;
-      notifyListeners();
-
-      QuerySnapshot snap;
-
-      if (accesslevel == "Super Admin") {
-        snap = await db.collection('staff').get();
-      }
-      else if (accesslevel == "Admin") {
-        snap = await db.collection('staff').where('region', isEqualTo: regionName).get();
-      }
-      else if (accesslevel == "Judge") {
-        staffList = [];
-        isLoadingstafflist = false;
-        notifyListeners();
-        return;
-      }
-      else {
-        staffList = [];
-        isLoadingstafflist = false;
-        notifyListeners();
-        return;
-      }
-
-      if (snap.docs.isEmpty) {
-        print("No staff found");
-        staffList = [];
-        isLoadingstafflist = false;
-        notifyListeners();
-        return;
-      }
-
-      staffList = snap.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return Staff(
-          id: doc.id,
-          name: data['name'] ?? '',
-          accessLevel: data['accessLevel']?.toString() ?? '',
-          phone: data['phone']?.toString() ?? '',
-          email: data['email']?.toString() ?? '',
-          sex: data['sex']?.toString() ?? '',
-          region: data['region']?.toString() ?? '',
-          zone: data['zone']?.toString() ?? '',
-          week: data['week']?.toString() ?? '',
-          episode: data['episode']?.toString() ?? '',
-          level: data['level']?.toString() ?? '',
-          status: data['status']?.toString() ?? '0',
-        );
-      }).toList();
-
-      isLoadingstafflist = false;
-      notifyListeners();
-
-    } catch (e) {
-      print("Error loading staff: $e");
-      isLoadingstafflist = false;
-      notifyListeners();
-    }
-  }
   Future<void> fetchJudgeslist({int limit = 10, bool reset = false, bool nextPage = true,}) async {try {
     isLoadingjudgelist = true;
     notifyListeners();

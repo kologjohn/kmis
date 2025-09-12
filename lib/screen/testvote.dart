@@ -68,8 +68,7 @@ class _TestvoteState extends State<Testvote> {
                     setState(() {
                       selectedRegionModel = region;
                       selectedRegion = region.regionname;
-                      episodeInt = region.episode;
-                      season = region.season;
+
                     });
 
                     // 🔹 Fetch available dates using mapped regionId

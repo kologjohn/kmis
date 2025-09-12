@@ -252,9 +252,7 @@ class _JudgeSetupPageState extends State<JudgeSetupPage> {
                               setState(() {
                                 selectedRegionModel = region;
                                 selectedRegion = region.regionname;
-                                selectedZone = region.zone;
-                                episodeInt = region.episode;
-                                season = region.season;
+
                               });
                             },
                         ),

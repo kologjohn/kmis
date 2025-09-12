@@ -1,49 +1,3 @@
-// class Staff {
-//   final String? id;
-//   final String name;
-//   final String accessLevel;
-//   final String phone;
-//   final String email;
-//   final String sex;
-//   final String region;
-//   final String zone;
-//   final String week;
-//   final String episode;
-//   final String level;
-//   final String status;
-//
-//   Staff({
-//     this.id,
-//     required this.name,
-//     required this.accessLevel,
-//     required this.phone,
-//     required this.email,
-//     required this.sex,
-//     required this.region,
-//     required this.zone,
-//     required this.week,
-//     required this.episode,
-//     required this.level,
-//     this.status = "0",
-//   });
-//
-//   Map<String, dynamic> toMap() {
-//     return {
-//       "id": id ?? "",
-//       "name": name,
-//       "accessLevel": accessLevel,
-//       "phone": phone,
-//       "email": email,
-//       "sex": sex,
-//       "region": region,
-//       "zone": zone,
-//       "week": week,
-//       "episode": episode,
-//       "level": level,
-//       "status": status,
-//     };
-//   }
-// }
 class Staff {
   final String? id;
   final String name;
@@ -52,9 +6,6 @@ class Staff {
   final String email;
   final String sex;
   final String region;
-  final String zone;
-  final String week;
-  final String episode;
   final String level;
   final String status;
 
@@ -66,14 +17,11 @@ class Staff {
     required this.email,
     required this.sex,
     required this.region,
-    required this.zone,
-    required this.week,
-    required this.episode,
     required this.level,
     this.status = "0",
   });
 
-  // Map for registration (status included)
+  /// Convert model to Firestore map (for registration)
   Map<String, dynamic> toMapForRegister() {
     return {
       "id": id ?? "",
@@ -83,15 +31,12 @@ class Staff {
       "email": email,
       "sex": sex,
       "region": region,
-      "zone": zone,
-      "week": week,
-      "episode": episode,
       "level": level,
       "status": status,
     };
   }
 
-  /// Map for update (status excluded, only non-empty fields written)
+  /// Convert model to Firestore map (for update)
   Map<String, dynamic> toMapForUpdate() {
     final Map<String, dynamic> data = {};
     void addIfNotEmpty(String key, String? value) {
@@ -107,13 +52,23 @@ class Staff {
     addIfNotEmpty("email", email);
     addIfNotEmpty("sex", sex);
     addIfNotEmpty("region", region);
-    addIfNotEmpty("zone", zone);
-    addIfNotEmpty("week", week);
-    addIfNotEmpty("episode", episode);
     addIfNotEmpty("level", level);
 
     return data;
   }
+
+  /// Factory constructor for creating Staff from Firestore document
+  factory Staff.fromMap(Map<String, dynamic> map, String id) {
+    return Staff(
+      id: id,
+      name: map["name"] ?? "",
+      accessLevel: map["accessLevel"] ?? "",
+      phone: map["phone"] ?? "",
+      email: map["email"] ?? "",
+      sex: map["sex"] ?? "",
+      region: map["region"] ?? "",
+      level: map["level"] ?? "",
+      status: map["status"] ?? "0",
+    );
+  }
 }
-
-
