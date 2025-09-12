@@ -13,7 +13,6 @@ import '../screen/judgelandingpage.dart';
 import '../screen/autoform2.dart';
 import '../screen/bestcriteria.dart';
 import '../screen/clearscores.dart';
-import '../screen/contestantlist.dart';
 import '../screen/contestantsetup.dart';
 import '../screen/episodereg.dart';
 import '../screen/episodelistpage.dart';
@@ -31,11 +30,15 @@ import '../screen/printcontestantscoresheet.dart';
 import '../screen/rawvote.dart';
 import '../screen/regionreg.dart';
 import '../screen/regionreglistpage.dart';
+import '../screen/registerschool.dart';
 import '../screen/registerstudents.dart';
 import '../screen/registerzone.dart';
 import '../screen/regstaff.dart';
+import '../screen/scoreconfig.dart';
 import '../screen/seasonreg.dart';
 import '../screen/sexreg.dart';
+import '../screen/studentlist.dart';
+import '../screen/subject.dart';
 import '../screen/term.dart';
 import '../screen/terminalreport.dart';
 import '../screen/termlist.dart';
@@ -43,8 +46,10 @@ import '../screen/testvote.dart';
 import '../screen/viewclass.dart';
 import '../screen/viewdepartment.dart';
 import '../screen/viewmarks.dart';
+import '../screen/viewschool.dart';
 import '../screen/viewscores.dart';
 import '../screen/viewstaff.dart';
+import '../screen/viewsubject.dart';
 import '../screen/viewvotes.dart';
 import '../screen/votinglist.dart';
 import '../screen/weekreg.dart';
@@ -53,20 +58,29 @@ import 'dbmodels/contestantsmodel.dart';
 import 'dbmodels/departmodel.dart';
 import 'dbmodels/levelmodel.dart';
 import 'dbmodels/regionmodel.dart';
+import 'dbmodels/schoolmodel.dart';
+import 'dbmodels/scoremodel.dart';
 import 'dbmodels/staffmodel.dart';
+import 'dbmodels/subjectmodel.dart';
 import 'dbmodels/termmodel.dart';
 import 'myprovider.dart';
 
 class Routes {
 
-  static const registercontestant = "/registercontestant";
+  static const registerstudent = "/registerstudent";
   static const term = "/term";
   static const depart = "/depart";
   static const classes = "/classes";
+  static const subjects = "/subjects";
+  static const school = "/school";
+  static const scoreconfig = "/scoreconfig";
+  static const viewconfig = "/viewconfig";
   static const viewterm = "/viewterm";
   static const viewdepart = "/viewdepart";
   static const viewclass = "/viewclass";
-
+  static const viewsubjects = "/viewsubjects";
+  static const viewstudentlist = "/viewstudentlist";
+  static const viewschool = "/viewschool";
 
 
 
@@ -84,7 +98,7 @@ class Routes {
   static const seasonreg = "/seasonreg";
   static const episodereg = "/episodereg";
   static const marks = "/marks";
-  static const contestantlist = "/contestantlist";
+
   static const weekreg = "/weekreg";
   static const scoresheet = "/scoresheet";
   static const viewstaff = "/viewstaff";
@@ -179,10 +193,10 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
     GoRoute(
-      path: Routes.registercontestant,
+      path: Routes.registerstudent,
       builder: (context, state) {
-        final item = state.extra as ContestantModel?;
-        return RegisterContestants(contestantData: item);
+        final item = state.extra as StudentModel?;
+        return RegisterStudent(studentData: item);
       },
     ),
     GoRoute(path: Routes.registerzone, builder: (c, s) => RegisterZone()),
@@ -207,7 +221,7 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.seasonreg, builder: (c, s) => SeasonRegistration()),
     GoRoute(path: Routes.episodereg, builder: (c, s) => EpisodeRegistration()),
     GoRoute(path: Routes.marks, builder: (c, s) => EvictionScreen()),
-    GoRoute(path: Routes.contestantlist, builder: (c, s) => ContestantsListScreen()),
+    GoRoute(path: Routes.viewstudentlist, builder: (c, s) => StudentListScreen()),
     GoRoute(path: Routes.weekreg, builder: (c, s) => WeekRegistration()),
     GoRoute(path: Routes.scoresheet, builder: (c, s) => GenerateScoreSheet()),
     GoRoute(path: Routes.viewstaff, builder: (c, s) => StaffListScreen()),
@@ -273,8 +287,32 @@ final GoRouter router = GoRouter(
         return ClassScreen(classes: classes);
       },
     ),
+    GoRoute(
+      path: Routes.subjects,
+      builder: (context, state) {
+        final subject = state.extra is SubjectModel ? state.extra as SubjectModel : null;
+        return SubjectRegistration(subject: subject);
+      },
+    ),
+    GoRoute(
+      path: Routes.school,
+      builder: (context, state) {
+        final school = state.extra is SchoolModel ? state.extra as SchoolModel : null;
+        return RegisterSchool(school: school);
+      },
+    ),
+    GoRoute(
+      path: Routes.scoreconfig,
+      builder: (context, state) {
+        final config = state.extra as ScoremodelConfig?;
+        return ScoreConfigPage(config: config);
+      },
+    ),
     GoRoute(path: Routes.viewterm, builder: (c, s) => Viewterms()),
     GoRoute(path: Routes.viewdepart, builder: (c, s) => Viewdepartment()),
     GoRoute(path: Routes.viewclass, builder: (c, s) => Viewclass()),
+    GoRoute(path: Routes.viewsubjects, builder: (c, s) => ViewSubjectPage()),
+    GoRoute(path: Routes.viewschool, builder: (c, s) => ViewSchoolPage()),
+    GoRoute(path: Routes.viewconfig, builder: (c, s) => ViewSchoolPage()),
   ],
 );

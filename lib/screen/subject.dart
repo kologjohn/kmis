@@ -30,7 +30,7 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<Myprovider>(context, listen: false);
-      provider.fetchClasses(); // 🔹 load levels from ClassModel
+      provider.fetchclass();
     });
 
     final data = widget.subject;
@@ -106,10 +106,10 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
                         border: OutlineInputBorder(),
                       ),
                       value: selectedLevel,
-                      items: value.classes
+                      items: value.classdata
                           .map((cls) => DropdownMenuItem(
-                        value: cls.classname,
-                        child: Text(cls.classname),
+                        value: cls.name,
+                        child: Text(cls.name),
                       ))
                           .toList(),
                       onChanged: (val) => setState(() => selectedLevel = val),
@@ -128,8 +128,10 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
                               final progress = ProgressHUD.of(context);
                               progress!.show();
 
+                              final id = "${subjectController.text.trim()}${value.companyid.trim()}".replaceAll(" ", "") .toLowerCase();
+
                               final subjectData = SubjectModel(
-                                id: subjectController.text.trim(),
+                                id:id,
                                 name: subjectController.text.trim(),
                                 code: codeController.text.trim(),
                                 level: selectedLevel ?? '',
@@ -137,13 +139,10 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
                                 timestamp: DateTime.now(),
                               ).toMap();
 
-                              final docId = "${subjectController.text.trim()}${codeController.text.trim()}"
-                                  .replaceAll(" ", "")
-                                  .toLowerCase();
 
                               await value.db
                                   .collection("subjects")
-                                  .doc(docId)
+                                  .doc(id)
                                   .set(subjectData, SetOptions(merge: true));
 
                               progress.dismiss();
@@ -170,7 +169,7 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
                         ),
                         const SizedBox(width: 16),
                         ElevatedButton.icon(
-                          onPressed: () => context.go(Routes.subjectlist),
+                          onPressed: () => context.go(Routes.viewsubjects),
                           icon: const Icon(Icons.list),
                           label: const Text("View Subjects"),
                         ),

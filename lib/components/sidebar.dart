@@ -99,43 +99,40 @@ class CustomDrawer extends StatelessWidget {
                                       context.go(Routes.classes),
                                 ),
                               ),
-                              _drawerTile(
-                                icon: Icons.assignment,
-                                title: 'Students Data',
-                                onTap: () => context.go(Routes.registercontestant,),
-                              ),
-                              _drawerTile(
-                                icon: Icons.military_tech,
-                                title: 'Level Registration',
-                                onTap: () =>
-                                    context.go(Routes.levelreg),
-                              ),
-
-                              _drawerTile(
-                                icon: Icons.military_tech,
-                                title: 'Region Registration',
-                                onTap: () => context.go(Routes.regionreg),
-                              ),
-                              _drawerTile(
-                                icon: Icons.schedule,
-                                title: 'Season Registration',
-                                onTap: () => context.go(
-                                  Routes.seasonreg,
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'subject',
+                                  onTap: () =>
+                                      context.go(Routes.subjects),
                                 ),
                               ),
-                              _drawerTile(
-                                icon: Icons.movie,
-                                title: 'Episode Registration',
-                                onTap: () => context.go(Routes.episodereg),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.assignment,
+                                  title: 'Students ',
+                                  onTap: () => context.go(Routes.registerstudent,),
+                                ),
                               ),
-                              _drawerTile(
-                                icon: Icons.movie,
-                                title: 'Week Registration',
-                                onTap: () => context.go(Routes.weekreg)),
-                              _drawerTile(
-                                icon: Icons.assignment,
-                                title: 'Zone Registration',
-                                onTap: () => context.go(Routes.registerzone,
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'Region Registration',
+                                  onTap: () => context.go(Routes.regionreg),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'school',
+                                  onTap: () => context.go(Routes.school),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'score config',
+                                  onTap: () => context.go(Routes.scoreconfig),
                                 ),
                               ),
                               _drawerTile(
@@ -165,7 +162,7 @@ class CustomDrawer extends StatelessWidget {
                             icon: Icons.vpn_key,
                             title: 'Contestants List',
                             onTap: () async{
-                              context.go(Routes.contestantlist);
+                              context.go(Routes.viewstudentlist);
                             }
                           ),
                         ),

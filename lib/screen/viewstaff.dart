@@ -27,12 +27,7 @@ class _StaffListScreenState extends State<StaffListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_)  {
       final value = context.read<Myprovider>();
-      // value.getfetchRegions();
-      // value.getfetchLevels();
-      // value.getfetchEpisodes();
-      // value.getfetchZones();
-      // value.getfetchWeeks();
-       value.loadata();
+       value.fetchstaff();
     });
     _searchController.addListener(() {
       setState(() {
@@ -124,7 +119,7 @@ class _StaffListScreenState extends State<StaffListScreen> {
               ),
             ),
           ),
-          body: value.isLoadingstafflist
+          body: value.loadstaff
               ? const Center(child: CircularProgressIndicator())
               : SingleChildScrollView(
             padding: const EdgeInsets.all(8.0),

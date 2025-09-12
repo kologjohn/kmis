@@ -1,4 +1,3 @@
-
 import 'package:ksoftsms/controller/routes.dart';
 import 'package:ksoftsms/screen/registerstudents.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -6,17 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+
 import '../controller/dbmodels/contestantsmodel.dart';
 import '../controller/myprovider.dart';
 
-class ContestantsListScreen extends StatefulWidget {
-  const ContestantsListScreen({super.key});
+class StudentListScreen extends StatefulWidget {
+  const StudentListScreen({super.key});
 
   @override
-  State<ContestantsListScreen> createState() => _ContestantsListScreenState();
+  State<StudentListScreen> createState() => _StudentListScreenState();
 }
 
-class _ContestantsListScreenState extends State<ContestantsListScreen> {
+class _StudentListScreenState extends State<StudentListScreen> {
   final TextEditingController _searchController = TextEditingController();
 
   int _rowsPerPage = 10;
@@ -28,7 +28,7 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<Myprovider>().contestantdata();
+      context.read<Myprovider>().fetchstudents();
     });
   }
 
@@ -38,24 +38,22 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
     super.dispose();
   }
 
-  List<ContestantModel> _applySearchAndSort(List<ContestantModel> list) {
-    //search
+  List<StudentModel> _applySearchAndSort(List<StudentModel> list) {
     final query = _searchController.text.trim().toLowerCase();
     var filtered = query.isEmpty
-        ? List<ContestantModel>.from(list)
-        : list.where((c) {
-      return c.name.toLowerCase().contains(query) ||
-          c.contestantId.toLowerCase().contains(query) ||
-          c.region.toLowerCase().contains(query) ||
-          c.level.toLowerCase().contains(query);
+        ? List<StudentModel>.from(list)
+        : list.where((s) {
+      return s.name.toLowerCase().contains(query) ||
+          s.studentid.toLowerCase().contains(query) ||
+          s.region.toLowerCase().contains(query) ||
+          s.level.toLowerCase().contains(query) ||
+          s.phone.toLowerCase().contains(query);
     }).toList();
 
-    // Apply sort
-    int Function(ContestantModel a, ContestantModel b) compare;
+    int Function(StudentModel a, StudentModel b) compare;
     switch (_sortColumn) {
-      case "contestantId":
-        compare = (a, b) =>
-            a.contestantId.compareTo(b.contestantId);
+      case "studentid":
+        compare = (a, b) => a.studentid.compareTo(b.studentid);
         break;
       case "level":
         compare = (a, b) => a.level.compareTo(b.level);
@@ -67,9 +65,7 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
         compare = (a, b) => a.name.compareTo(b.name);
     }
 
-    filtered.sort((a, b) =>
-    _isAscending ? compare(a, b) : compare(b, a));
-
+    filtered.sort((a, b) => _isAscending ? compare(a, b) : compare(b, a));
     return filtered;
   }
 
@@ -93,19 +89,15 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
 
     return Consumer<Myprovider>(
       builder: (context, value, child) {
-        final contestants = value.contestant;
-        final filteredContestants = _applySearchAndSort(contestants);
+        final students = value.studentlist;
+        final filteredStudents = _applySearchAndSort(students);
 
-        // Pagination
         int startIndex = _currentPage * _rowsPerPage;
         int endIndex = (startIndex + _rowsPerPage).clamp(
           0,
-          filteredContestants.length,
+          filteredStudents.length,
         );
-        final pageItems = filteredContestants.sublist(
-          startIndex,
-          endIndex,
-        );
+        final pageItems = filteredStudents.sublist(startIndex, endIndex);
 
         return Scaffold(
           backgroundColor: const Color(0xFF1B1D2A),
@@ -116,7 +108,7 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
             ),
             backgroundColor: const Color(0xFF2D2F45),
             title: const Text(
-              "Contestants List",
+              "Students List",
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -124,11 +116,20 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
               ),
             ),
           ),
+
+          // 🔹 Floating Action Button to add a new student
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.blueAccent,
+            onPressed: () {
+              context.push(Routes.registerstudent); // no extra = new registration
+            },
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
+
           body: value.isLoading
               ? const Center(child: CircularProgressIndicator())
               : Column(
             children: [
-              // Search bar
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: SizedBox(
@@ -139,7 +140,7 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                       _currentPage = 0;
                     }),
                     decoration: InputDecoration(
-                      labelText: "Search Contestants",
+                      labelText: "Search Students",
                       prefixIcon: const Icon(Icons.search),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
@@ -161,7 +162,6 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
               ),
               const SizedBox(height: 16),
 
-              // DataTable
               Expanded(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
@@ -173,7 +173,7 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                       columnSpacing: colSpacing,
                       sortColumnIndex: {
                         "name": 1,
-                        "contestantId": 2,
+                        "studentid": 2,
                         "level": 4,
                         "region": 5,
                       }[_sortColumn],
@@ -184,19 +184,14 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                               style: TextStyle(color: Colors.white)),
                         ),
                         DataColumn(
-                          label: const Text('Contestant Name',
+                          label: const Text('Student Name',
                               style: TextStyle(color: Colors.white)),
                           onSort: (_, __) => _toggleSort("name"),
                         ),
                         DataColumn(
-                          label: const Text('Vote Name',
+                          label: const Text('Student ID',
                               style: TextStyle(color: Colors.white)),
-                          onSort: (_, __) => _toggleSort("vote name"),
-                        ),
-                        DataColumn(
-                          label: const Text('Contestant Code',
-                              style: TextStyle(color: Colors.white)),
-                          onSort: (_, __) => _toggleSort("contestantId"),
+                          onSort: (_, __) => _toggleSort("studentid"),
                         ),
                         const DataColumn(
                           label: Text('Photo',
@@ -212,6 +207,11 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                               style: TextStyle(color: Colors.white)),
                           onSort: (_, __) => _toggleSort("region"),
                         ),
+                        DataColumn(
+                          label: const Text('Status',
+                              style: TextStyle(color: Colors.white)),
+                          onSort: (_, __) => _toggleSort("status"),
+                        ),
                         const DataColumn(
                           label: Text('Action',
                               style: TextStyle(color: Colors.white)),
@@ -219,31 +219,28 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                       ],
                       rows: pageItems.asMap().entries.map((entry) {
                         final index = entry.key + startIndex;
-                        final ContestantModel item = entry.value;
+                        final StudentModel item = entry.value;
 
                         return DataRow(
                           cells: [
                             DataCell(Text('${index + 1}',
-                                style: const TextStyle(
-                                    color: Colors.white))),
+                                style:
+                                const TextStyle(color: Colors.white))),
                             DataCell(Text(item.name,
-                                style: const TextStyle(
-                                    color: Colors.white))),
-                            DataCell(Text(item.votename.toUpperCase(),
-                                style: const TextStyle(
-                                    color: Colors.white))),
-                            DataCell(Text(item.contestantId,
-                                style: const TextStyle(
-                                    color: Colors.white))),
+                                style:
+                                const TextStyle(color: Colors.white))),
+                            DataCell(Text(item.studentid,
+                                style:
+                                const TextStyle(color: Colors.white))),
                             DataCell(
-                              item.photoUrl.isNotEmpty
+                              item.photourl.isNotEmpty
                                   ? CircleAvatar(
                                 radius: 20,
                                 backgroundColor:
                                 Colors.grey.shade200,
                                 child: ClipOval(
                                   child: CachedNetworkImage(
-                                    imageUrl: item.photoUrl,
+                                    imageUrl: item.photourl,
                                     fit: BoxFit.cover,
                                     width: 40,
                                     height: 40,
@@ -262,11 +259,14 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                                   color: Colors.grey),
                             ),
                             DataCell(Text(item.level,
-                                style: const TextStyle(
-                                    color: Colors.white))),
+                                style:
+                                const TextStyle(color: Colors.white))),
                             DataCell(Text(item.region,
-                                style: const TextStyle(
-                                    color: Colors.white))),
+                                style:
+                                const TextStyle(color: Colors.white))),
+                            DataCell(Text(item.status,
+                                style:
+                                const TextStyle(color: Colors.white))),
                             DataCell(
                               Row(
                                 children: [
@@ -275,7 +275,7 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                                         color: Colors.blueAccent),
                                     onPressed: () {
                                       context.push(
-                                        Routes.registercontestant,
+                                        Routes.registerstudent,
                                         extra: item,
                                       );
                                     },
@@ -319,7 +319,7 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                                       );
                                       if (confirm == true) {
                                         await value.deleteData(
-                                            "contestant", item.id);
+                                            "students", item.id);
                                       }
                                     },
                                   ),
@@ -334,7 +334,6 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                 ),
               ),
 
-              // Pagination
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -346,11 +345,11 @@ class _ContestantsListScreenState extends State<ContestantsListScreen> {
                         color: Colors.white),
                   ),
                   Text(
-                    "Page ${_currentPage + 1} of ${( (filteredContestants.length - 1) / _rowsPerPage ).floor() + 1}",
+                    "Page ${_currentPage + 1} of ${((filteredStudents.length - 1) / _rowsPerPage).floor() + 1}",
                     style: const TextStyle(color: Colors.white),
                   ),
                   IconButton(
-                    onPressed: endIndex < filteredContestants.length
+                    onPressed: endIndex < filteredStudents.length
                         ? () => setState(() => _currentPage++)
                         : null,
                     icon: const Icon(Icons.chevron_right,

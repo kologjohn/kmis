@@ -97,8 +97,8 @@ class CSAT extends StatelessWidget {
                                     }
 
                                     Navigator.pop(context);
-                                    Navigator.pushNamed(
-                                        context, Routes.contestantlist);
+                                    // Navigator.pushNamed(
+                                    //     context, Routes.contestantlist);
                                   } catch (e) {
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(

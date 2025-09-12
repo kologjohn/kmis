@@ -1,11 +1,9 @@
 import 'package:ksoftsms/controller/myprovider.dart';
-import 'package:ksoftsms/screen/subjectreg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../controller/routes.dart';
-import '../controller/dbmodels/subjectmodel.dart';
 
 class ViewSubjectPage extends StatefulWidget {
   const ViewSubjectPage({super.key});
@@ -24,7 +22,7 @@ class _ViewSubjectPageState extends State<ViewSubjectPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = Provider.of<Myprovider>(context, listen: false);
-      await provider.fetchSubjects();
+      await provider.fetchsubjects();
     });
   }
 
@@ -112,6 +110,11 @@ class _ViewSubjectPageState extends State<ViewSubjectPage> {
                                     (states) =>
                                 const Color(0xFF2D2F45)),
                             columns: [
+                              const DataColumn(
+                                label: Text("#",
+                                    style:
+                                    TextStyle(color: Colors.white)),
+                              ),
                               DataColumn(
                                 label: const Text("Subject",
                                     style:
@@ -143,9 +146,17 @@ class _ViewSubjectPageState extends State<ViewSubjectPage> {
                                     TextStyle(color: Colors.white)),
                               ),
                             ],
-                            rows: filteredSubjects.map((subj) {
+                            rows: filteredSubjects
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                              final index = entry.key + 1;
+                              final subj = entry.value;
                               return DataRow(
                                 cells: [
+                                  DataCell(Text("$index",
+                                      style: const TextStyle(
+                                          color: Colors.white70))),
                                   DataCell(Text(subj.name,
                                       style: const TextStyle(
                                           color: Colors.white70))),
@@ -159,15 +170,11 @@ class _ViewSubjectPageState extends State<ViewSubjectPage> {
                                     children: [
                                       /// EDIT BUTTON
                                       IconButton(
-                                        icon: const Icon(Icons.edit,
-                                            color: Colors.amber),
+                                        icon: const Icon(Icons.edit, color: Colors.amber),
                                         onPressed: () {
                                           context.go(
-                                            Routes.subjectreg,
-                                            extra: {
-                                              "subject": subj,
-                                              "isEdit": true,
-                                            },
+                                            Routes.subjects,
+                                            extra: subj, // pass the SubjectModel directly
                                           );
                                         },
                                       ),
@@ -180,52 +187,52 @@ class _ViewSubjectPageState extends State<ViewSubjectPage> {
                                           final confirm =
                                           await showDialog<bool>(
                                             context: context,
-                                            builder: (ctx) => AlertDialog(
-                                              backgroundColor:
-                                              const Color(
-                                                  0xFF2D2F45),
-                                              title: const Text(
-                                                "Delete Subject",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              content: const Text(
-                                                "Are you sure you want to delete this subject?",
-                                                style: TextStyle(
-                                                    color:
-                                                    Colors.white70),
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                          ctx, false),
-                                                  child: const Text(
-                                                    "Cancel",
+                                            builder: (ctx) =>
+                                                AlertDialog(
+                                                  backgroundColor:
+                                                  const Color(0xFF2D2F45),
+                                                  title: const Text(
+                                                    "Delete Subject",
                                                     style: TextStyle(
-                                                        color: Colors
-                                                            .white70),
+                                                        color: Colors.white),
                                                   ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                          ctx, true),
-                                                  child: const Text(
-                                                    "Delete",
+                                                  content: const Text(
+                                                    "Are you sure you want to delete this subject?",
                                                     style: TextStyle(
-                                                        color: Colors
-                                                            .redAccent),
+                                                        color:
+                                                        Colors.white70),
                                                   ),
+                                                  actions: [
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              ctx, false),
+                                                      child: const Text(
+                                                        "Cancel",
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .white70),
+                                                      ),
+                                                    ),
+                                                    TextButton(
+                                                      onPressed: () =>
+                                                          Navigator.pop(
+                                                              ctx, true),
+                                                      child: const Text(
+                                                        "Delete",
+                                                        style: TextStyle(
+                                                            color: Colors
+                                                                .redAccent),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ],
-                                            ),
                                           );
 
                                           if (confirm == true) {
                                             try {
-                                              await provider.deleteSubject(
-                                                  subj.id);
+                                              await provider.deleteData(
+                                                  "subjects", subj.id);
                                               if (mounted) {
                                                 ScaffoldMessenger.of(
                                                     context)

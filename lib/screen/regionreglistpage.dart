@@ -1,12 +1,11 @@
 import 'package:ksoftsms/controller/myprovider.dart';
-import 'package:ksoftsms/screen/regionreg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../controller/routes.dart';
-import '../controller/dbmodels/regionmodel.dart';
+
 
 class RegionListPage extends StatefulWidget {
   const RegionListPage({super.key});
@@ -42,11 +41,7 @@ class _RegionListPageState extends State<RegionListPage> {
           final regions = provider.regionList;
           final filteredRegions = regions.where((region) {
             final query = searchQuery.toLowerCase();
-            return region.regionname.toLowerCase().contains(query) ||
-                (region.zone ?? "").toLowerCase().contains(query) ||
-                (region.season ?? "").toLowerCase().contains(query) ||
-                (region.week ?? "").toLowerCase().contains(query) ||
-                (region.episode ?? "").toLowerCase().contains(query);
+            return region.regionname.toLowerCase().contains(query);
           }).toList();
 
           return Scaffold(
@@ -76,7 +71,7 @@ class _RegionListPageState extends State<RegionListPage> {
                         child: TextField(
                           decoration: InputDecoration(
                             hintText:
-                            "Search region, zone, season, week, or episode...",
+                            "Search region",
                             prefixIcon: const Icon(Icons.search),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -135,26 +130,6 @@ class _RegionListPageState extends State<RegionListPage> {
                                 },
                               ),
                               const DataColumn(
-                                label: Text("Zone",
-                                    style:
-                                    TextStyle(color: Colors.white)),
-                              ),
-                              const DataColumn(
-                                label: Text("Season",
-                                    style:
-                                    TextStyle(color: Colors.white)),
-                              ),
-                              const DataColumn(
-                                label: Text("Week",
-                                    style:
-                                    TextStyle(color: Colors.white)),
-                              ),
-                              const DataColumn(
-                                label: Text("Episode",
-                                    style:
-                                    TextStyle(color: Colors.white)),
-                              ),
-                              const DataColumn(
                                 label: Text("Actions",
                                     style:
                                     TextStyle(color: Colors.white)),
@@ -163,139 +138,127 @@ class _RegionListPageState extends State<RegionListPage> {
                             rows: filteredRegions.map((region) {
                               return DataRow(
                                 cells: [
-                                  DataCell(Text(region.regionname,
+                                  DataCell(
+                                    Text(
+                                      region.regionname,
                                       style: const TextStyle(
-                                          color: Colors.white70))),
-                                  DataCell(Text(region.zone ?? "-",
-                                      style: const TextStyle(
-                                          color: Colors.white70))),
-                                  DataCell(Text(region.season ?? "-",
-                                      style: const TextStyle(
-                                          color: Colors.white70))),
-                                  DataCell(Text(region.week ?? "",
-                                      style: const TextStyle(
-                                          color: Colors.white70))),
-                                  DataCell(Text(region.episode ?? "",
-                                      style: const TextStyle(
-                                          color: Colors.white70))),
-                                  DataCell(Row(
-                                    children: [
-                                      /// EDIT BUTTON
-                                      IconButton(
-                                        icon: const Icon(Icons.edit,
-                                            color: Colors.amber),
-                                        onPressed: () {
-                                          print(
-                                              "📝 EDIT CLICKED → Region: ${region.regionname}, "
-                                                  "Zone: ${region.zone}, "
-                                                  "Season: ${region.season}, "
-                                                  "Week: ${region.week}, "
-                                                  "Episode: ${region.episode}");
-                                          context.go(
-                                            Routes.regionreg,
-                                            extra: {
-                                              "region": region,
-                                              "isEdit": true,
-                                            },
-                                          );
-                                        },
-                                      ),
+                                          color: Colors.white70),
+                                    ),
+                                  ),
+                                  DataCell(
+                                    Row(
+                                      children: [
+                                        /// EDIT BUTTON
+                                        IconButton(
+                                          icon: const Icon(Icons.edit,
+                                              color: Colors.amber),
+                                          onPressed: () {
+                                            context.go(
+                                              Routes.regionreg,
+                                              extra: {
+                                                "region": region,
+                                                "isEdit": true,
+                                              },
+                                            );
+                                          },
+                                        ),
 
-                                      /// DELETE BUTTON
-                                      IconButton(
-                                        icon: const Icon(Icons.delete,
-                                            color: Colors.red),
-                                        onPressed: () async {
-                                          print(
-                                              "🗑 DELETE CLICKED → Region: ${region.regionname} (id: ${region.id})");
+                                        /// DELETE BUTTON
+                                        IconButton(
+                                          icon: const Icon(Icons.delete,
+                                              color: Colors.red),
+                                          onPressed: () async {
+                                            print(
+                                                "DELETE CLICKED → Region: ${region.regionname} (id: ${region.id})");
 
-                                          final confirm =
-                                          await showDialog<bool>(
-                                            context: context,
-                                            builder: (ctx) =>
-                                                AlertDialog(
-                                                  backgroundColor:
-                                                  const Color(
-                                                      0xFF2D2F45),
-                                                  title: const Text(
-                                                    "Delete Region",
-                                                    style: TextStyle(
-                                                        color:
-                                                        Colors.white),
-                                                  ),
-                                                  content: const Text(
-                                                    "Are you sure you want to delete this region?",
-                                                    style: TextStyle(
-                                                        color: Colors
-                                                            .white70),
-                                                  ),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              ctx, false),
-                                                      child: const Text(
-                                                        "Cancel",
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .white70),
-                                                      ),
-                                                    ),
-                                                    TextButton(
-                                                      onPressed: () =>
-                                                          Navigator.pop(
-                                                              ctx, true),
-                                                      child: const Text(
-                                                        "Delete",
-                                                        style: TextStyle(
-                                                            color: Colors
-                                                                .redAccent),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                          );
-
-                                          if (confirm == true) {
-                                            try {
-                                              await provider
-                                                  .deleteRegion(
-                                                  region.id);
-                                              if (mounted) {
-                                                print(
-                                                    "✅ Deleted Region successfully: ${region.regionname}");
-                                                ScaffoldMessenger.of(
-                                                    context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                        "Region deleted successfully"),
+                                            final confirm =
+                                            await showDialog<bool>(
+                                              context: context,
+                                              builder: (ctx) =>
+                                                  AlertDialog(
                                                     backgroundColor:
-                                                    Colors.green,
+                                                    const Color(
+                                                        0xFF2D2F45),
+                                                    title: const Text(
+                                                      "Delete Region",
+                                                      style: TextStyle(
+                                                          color:
+                                                          Colors.white),
+                                                    ),
+                                                    content: const Text(
+                                                      "Are you sure you want to delete this region?",
+                                                      style: TextStyle(
+                                                          color: Colors
+                                                              .white70),
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                ctx, false),
+                                                        child: const Text(
+                                                          "Cancel",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .white70),
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () =>
+                                                            Navigator.pop(
+                                                                ctx, true),
+                                                        child: const Text(
+                                                          "Delete",
+                                                          style: TextStyle(
+                                                              color: Colors
+                                                                  .redAccent),
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
-                                                );
-                                              }
-                                            } catch (e) {
-                                              if (mounted) {
-                                                print(
-                                                    "❌ Failed to delete Region: $e");
-                                                ScaffoldMessenger.of(
-                                                    context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        "Failed to delete region: $e"),
-                                                    backgroundColor:
-                                                    Colors.red,
-                                                  ),
-                                                );
+                                            );
+
+                                            if (confirm == true) {
+                                              try {
+                                                await provider
+                                                    .deleteRegion(
+                                                    region.id);
+                                                if (mounted) {
+                                                  print(
+                                                      "✅ Deleted Region successfully: ${region.regionname}");
+                                                  ScaffoldMessenger.of(
+                                                      context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          "Region deleted successfully"),
+                                                      backgroundColor:
+                                                      Colors.green,
+                                                    ),
+                                                  );
+                                                }
+                                              } catch (e) {
+                                                if (mounted) {
+                                                  print(
+                                                      "❌ Failed to delete Region: $e");
+                                                  ScaffoldMessenger.of(
+                                                      context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          "Failed to delete region: $e"),
+                                                      backgroundColor:
+                                                      Colors.red,
+                                                    ),
+                                                  );
+                                                }
                                               }
                                             }
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  )),
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               );
                             }).toList(),

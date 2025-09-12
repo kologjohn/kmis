@@ -23,9 +23,7 @@ class _RegionregistrationState extends State<Regionregistration> {
   final inputFill = const Color(0xFF2C2C3C);
 
   String? selectedSeason;
-  String? selectedWeek;
-  String? selectedZone;
-  String? selectedEpisode;
+
 
   @override
   void initState() {
@@ -33,21 +31,13 @@ class _RegionregistrationState extends State<Regionregistration> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<Myprovider>(context, listen: false);
-      provider.getfetchZones();
-      provider.getfetchSeasons();
-      provider.getfetchWeeks();
-      provider.getfetchEpisodes();
+
     });
 
     final data = widget.region;
     if (data != null) {
-      print("✅ Editing Region: ${data.toMap()}");
-
+      print("Editing Region: ${data.toMap()}");
       regioncontroller.text = data.regionname;
-      selectedSeason = data.season;
-      selectedWeek = data.week;
-      selectedZone = data.zone;
-      selectedEpisode = data.episode;
     } else {
       print("🆕 Registering new Region");
     }
@@ -100,83 +90,6 @@ class _RegionregistrationState extends State<Regionregistration> {
                     ),
                     const SizedBox(height: 20),
 
-                    /// season dropdown
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: "Select Season",
-                        border: OutlineInputBorder(),
-                      ),
-                      value: selectedSeason,
-                      items: value.seasons
-                          .map((s) => DropdownMenuItem(
-                        value: s.seasonname,
-                        child: Text(s.seasonname),
-                      ))
-                          .toList(),
-                      onChanged: (val) => setState(() => selectedSeason = val),
-                      validator: (val) =>
-                      val == null ? "Please select a season" : null,
-                    ),
-                    const SizedBox(height: 20),
-
-                    /// week dropdown
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: "Select Week",
-                        border: OutlineInputBorder(),
-                      ),
-                      value: selectedWeek,
-                      items: value.weeks
-                          .map((w) => DropdownMenuItem(
-                        value: w.weekname,
-                        child: Text(w.weekname),
-                      ))
-                          .toList(),
-                      onChanged: (val) => setState(() => selectedWeek = val),
-                      validator: (val) =>
-                      val == null ? "Please select a week" : null,
-                    ),
-                    const SizedBox(height: 20),
-
-                    /// zone dropdown
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: "Select Zone",
-                        border: OutlineInputBorder(),
-                      ),
-                      value: selectedZone,
-                      items: value.zones
-                          .map((z) => DropdownMenuItem(
-                        value: z.zonename,
-                        child: Text(z.zonename),
-                      ))
-                          .toList(),
-                      onChanged: (val) => setState(() => selectedZone = val),
-                      validator: (val) =>
-                      val == null ? "Please select a zone" : null,
-                    ),
-                    const SizedBox(height: 20),
-
-                    /// episode dropdown
-                    DropdownButtonFormField<String>(
-                      decoration: const InputDecoration(
-                        labelText: "Select Episode",
-                        border: OutlineInputBorder(),
-                      ),
-                      value: selectedEpisode,
-                      items: value.episodes
-                          .map((e) => DropdownMenuItem(
-                        value: e.episodename,
-                        child: Text(e.episodename),
-                      ))
-                          .toList(),
-                      onChanged: (val) =>
-                          setState(() => selectedEpisode = val),
-                      validator: (val) =>
-                      val == null ? "Please select an episode" : null,
-                    ),
-                    const SizedBox(height: 20),
-
                     /// buttons
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
@@ -187,23 +100,20 @@ class _RegionregistrationState extends State<Regionregistration> {
                               final progress = ProgressHUD.of(context);
                               progress!.show();
 
-                              final regionData = RegionModel(
-                                id: regioncontroller.text.trim(),
-                                regionname: regioncontroller.text.trim(),
-                                season: selectedSeason ?? '',
-                                week: selectedWeek ?? '',
-                                zone: selectedZone ?? '',
-                                episode: selectedEpisode ?? '',
-                                time: DateTime.now(),
-                              ).toMap();
-                              final docId = "${regioncontroller.text.trim()}${selectedSeason ?? ''}"
+                              final id = "${regioncontroller.text.trim()}${value.companyid}"
                                   .replaceAll(" ", "")
                                   .toLowerCase();
+
+                              final regionData = RegionModel(
+                                id: id,
+                                regionname: regioncontroller.text.trim(),
+                                time: DateTime.now(),
+                              ).toMap();
 
 
                               await value.db
                                   .collection("regions")
-                                  .doc(docId)
+                                  .doc(id)
                                   .set(regionData, SetOptions(merge: true));
 
                               progress.dismiss();
