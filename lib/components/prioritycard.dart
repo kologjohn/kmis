@@ -10,7 +10,7 @@ class PriorityDonutChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Map<String, int>>(
-      future: context.read<StatsProvider>().getLevelDistribution(),
+      future: null,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           // Show placeholder container while waiting for data

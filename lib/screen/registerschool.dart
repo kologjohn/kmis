@@ -206,7 +206,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                               String schoolIdTxt = schoolId.text.trim();
 
                               // Upload image if new one was picked
-                              await value.uploadImage(prefixTxt);
+                              //await value.uploadImage(prefixTxt);
 
                               final school = SchoolModel(
                                 id: widget.school?.id ?? prefixTxt,
@@ -325,7 +325,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
 
   Widget _buildLogoPicker(Myprovider value) {
     return InkWell(
-      onTap: () => value.pickImageFromGallery(context),
+      onTap: () =>null, //value.pickImageFromGallery(context),
       borderRadius: BorderRadius.circular(50),
       child: SizedBox(
         width: 100,

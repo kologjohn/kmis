@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Kologsoft MIS',
       // theme: ThemeData.dark().copyWith(
+      //   scaffoldBackgroundColor: const Color(0xFF1E1E2C),
       //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber.shade900),
       // ),
       routerConfig: router, //use GoRouter defined in routes.dart

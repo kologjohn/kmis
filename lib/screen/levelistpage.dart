@@ -1,14 +1,9 @@
-import 'package:ksoftsms/screen/episodereg.dart';
-import 'package:ksoftsms/screen/registerzone.dart';
-import 'package:ksoftsms/screen/seasonreg.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
-
 import '../controller/routes.dart';
-import 'levelreg.dart';
 
 class LevelListPage extends StatefulWidget {
   const LevelListPage({super.key});
@@ -21,9 +16,9 @@ class _LevelListPageState extends State<LevelListPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => Provider.of<Myprovider>(context, listen: false).getfetchLevels(),
-    );
+    // Future.microtask(
+    //       () => Provider.of<Myprovider>(context, listen: false).getfetchLevels(),
+    // );
   }
 
   @override
@@ -74,10 +69,10 @@ class _LevelListPageState extends State<LevelListPage> {
                       icon: const Icon(Icons.delete, color: Colors.red),
                       tooltip: 'Delete ${level.levelname}',
                       onPressed: () async {
-                        await provider.deleteData(
-                          "level",
-                          level.id,
-                        );
+                        // await provider.deleteData(
+                        //   "level",
+                        //   level.id,
+                        // );
                       },
                     ),
                   ],

@@ -90,8 +90,8 @@ class CSAT extends StatelessWidget {
                                     );
 
                                     try {
-                                      value.setSelectedRegion(doc['region']);
-                                       value.studentdata();
+                                      // value.setSelectedRegion(doc['region']);
+                                      //  value.studentdata();
                                     } catch (e) {
                                       print(e);
                                     }
