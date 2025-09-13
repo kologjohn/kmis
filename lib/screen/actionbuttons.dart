@@ -10,7 +10,7 @@ List<Widget> actionButtons(Myprovider value, BuildContext context) {
       icon: const Icon(Icons.person_pin),
       onSelected: (String selected) async{
         if (selected == 'Logout') {
-          await value.logout(context);
+         // await value.logout(context);
         } else if (selected == 'viewScores') {
          context.go(Routes.viewmarks);
         }else if (selected == 'finalize') {

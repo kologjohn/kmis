@@ -211,6 +211,10 @@ class Myprovider extends ChangeNotifier {
       print("Error fetching score config: $e");
     }
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a0ee9b7f41095e797406fa169f58c05135908b9c
   Future<void> getfetchRegions() async {
     try {
       isLoadingRegions = true;
@@ -266,6 +270,10 @@ class Myprovider extends ChangeNotifier {
       rethrow;
     }
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a0ee9b7f41095e797406fa169f58c05135908b9c
   showform(bool show,String type){
     if(type=='login') {
       loginform = true;
@@ -277,4 +285,8 @@ class Myprovider extends ChangeNotifier {
     }
     notifyListeners();
   }
+<<<<<<< HEAD
+=======
+
+>>>>>>> a0ee9b7f41095e797406fa169f58c05135908b9c
 }

@@ -56,6 +56,8 @@ dependencies:
   go_router: ^16.2.1
   http: ^1.5.0
   carousel_slider: ^5.1.1
+  webview_flutter: ^4.13.0
+  webview_flutter_android: ^4.10.1
 
 
 dev_dependencies:
