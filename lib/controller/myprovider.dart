@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:core';
 import 'dart:io';
 import 'package:ksoftsms/controller/dbmodels/termmodel.dart';
 import 'package:ksoftsms/controller/routes.dart';
@@ -60,6 +62,14 @@ class Myprovider extends ChangeNotifier {
   bool loadingsconfig = true;
   String companyid="ksoo1";
   String currentschool="lamp";
+  Staff? usermodel;
+
+  String schoolid = "";
+  String accesslevel = "";
+  String phone = "";
+  String name = "";
+  List<SchoolModel> schoolList = [];
+  String schooldomain = "kologsoftsmiscom.com";
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
 
@@ -211,6 +221,7 @@ class Myprovider extends ChangeNotifier {
       print("Error fetching score config: $e");
     }
   }
+
   Future<void> getfetchRegions() async {
     try {
       isLoadingRegions = true;
@@ -266,6 +277,7 @@ class Myprovider extends ChangeNotifier {
       rethrow;
     }
   }
+
   showform(bool show,String type){
     if(type=='login') {
       loginform = true;
@@ -277,4 +289,66 @@ class Myprovider extends ChangeNotifier {
     }
     notifyListeners();
   }
+  login(String email, String password, BuildContext context) async {
+    try {
+      final loginhere = await auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (loginhere.user != null) {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('useremail', email);
+        final detail = await db
+            .collection("staff")
+            .where('email', isEqualTo: email)
+            .get();
+        int numberofdocs = detail.docs.length;
+        if (numberofdocs > 1) {
+          schoolList = detail.docs.map((doc) {
+            return SchoolModel.fromMap(doc.data(), doc.id);
+          }).toList();
+
+        } else {
+          final userData = detail.docs.first.data();
+          usermodel = Staff.fromMap(userData, detail.docs.first.id);
+          String emailTxt = usermodel?.email ?? '';
+          String nameTxt = usermodel?.name ?? '';
+          String roleTxt = usermodel?.accessLevel ?? '';
+          String phoneTxt = usermodel?.phone ?? '';
+          String schoolTxt = usermodel?.schoolname ?? '';
+          String scchoolIdTxt = usermodel?.schoolId ?? '';
+
+          prefs.setString("school", schoolTxt);
+          prefs.setString("email", emailTxt);
+          prefs.setString("name", nameTxt);
+          prefs.setString("role", roleTxt);
+          prefs.setString("phone", phoneTxt);
+          prefs.setString("schoolid", scchoolIdTxt);
+          await getdata();
+          auth.currentUser!.updateDisplayName(nameTxt);
+
+          context.go(Routes.nextpage);
+          print(usermodel?.schoolId);
+          print("Single user.");
+          notifyListeners();
+        }
+
+        //useremail=email;
+        notifyListeners();
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  getdata() async {
+    final prefs = await SharedPreferences.getInstance();
+    schoolid = prefs.getString('schoolid') ?? '';
+    currentschool = prefs.getString('school') ?? '';
+    phone = prefs.getString('phone') ?? '';
+    accesslevel = prefs.getString('role') ?? '';
+    name = prefs.getString('name') ?? '';
+    notifyListeners();
+  }
+
 }

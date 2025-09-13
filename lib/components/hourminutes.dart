@@ -34,7 +34,7 @@ class HourMinutes extends StatelessWidget {
                     fontWeight: FontWeight.bold),),
                 SizedBox(height: 50),
                 Center(
-                  child: Text('${value.evictedCount}/${value.totalcontestants}', style: TextStyle(
+                  child: Text('${0}/${0}', style: TextStyle(
                       fontSize: 24, fontWeight: FontWeight.w700)),
                 ),
               ],

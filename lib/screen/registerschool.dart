@@ -187,7 +187,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                             ],
                           ),
                           const SizedBox(height: 20),
-                          _buildLogoPicker(value),
+                         // _buildLogoPicker(value),
                           const SizedBox(height: 20),
                           ElevatedButton.icon(
                             onPressed: () async {
@@ -206,7 +206,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                               String schoolIdTxt = schoolId.text.trim();
 
                               // Upload image if new one was picked
-                              await value.uploadImage(prefixTxt);
+                              //await value.uploadImage(prefixTxt);
 
                               final school = SchoolModel(
                                 id: widget.school?.id ?? prefixTxt,
@@ -215,8 +215,8 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                                 address: addressTxt,
                                 email: emailTxt,
                                 phone: phoneTxt,
-                                logoUrl: value.imageUrl.isNotEmpty
-                                    ? value.imageUrl
+                                logoUrl: "dd".isNotEmpty
+                                    ? ""
                                     : _uploadedLogoUrl ?? "",
                                 createdAt: DateTime.now(),
                                 countryName: countryNameTxt,
@@ -242,23 +242,23 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                                 ),
                               );
 
-                              value.imagefile = null;
+                              // value.imagefile = null;
 
-                              if (!isEdit) {
-                                setState(() {
-                                  value.imageUrl = "";
-                                  _uploadedLogoUrl = "";
-                                  agreedToTerms = true;
-                                });
-                                schoolName.clear();
-                                prefix.clear();
-                                address.clear();
-                                email.clear();
-                                phone.clear();
-                                countryName.clear();
-                                countryCode.clear();
-                                schoolId.clear();
-                              }
+                              // if (!isEdit) {
+                              //   setState(() {
+                              //     value.imageUrl = "";
+                              //     _uploadedLogoUrl = "";
+                              //     agreedToTerms = true;
+                              //   });
+                              //   schoolName.clear();
+                              //   prefix.clear();
+                              //   address.clear();
+                              //   email.clear();
+                              //   phone.clear();
+                              //   countryName.clear();
+                              //   countryCode.clear();
+                              //   schoolId.clear();
+                              // }
                             },
                             icon: Icon(isEdit ? Icons.update : Icons.save),
                             label: Text(isEdit ? 'Update School' : 'Register School'),
@@ -323,40 +323,35 @@ class _RegisterSchoolState extends State<RegisterSchool> {
     );
   }
 
-  Widget _buildLogoPicker(Myprovider value) {
-    return InkWell(
-      onTap: () => value.pickImageFromGallery(context),
-      borderRadius: BorderRadius.circular(50),
-      child: SizedBox(
-        width: 100,
-        height: 100,
-        child: ClipOval(
-            child: kIsWeb
-                ? (value.imagefile != null
-                ? Image.network(value.imagefile!.path, fit: BoxFit.cover)
-                : (_uploadedLogoUrl != null && _uploadedLogoUrl!.isNotEmpty
-                ? CachedNetworkImage(
-              imageUrl: _uploadedLogoUrl!,
-              fit: BoxFit.cover,
-              placeholder: (_, __) =>
-              const Center(child: CircularProgressIndicator()),
-              errorWidget: (_, __, ___) =>
-              const Icon(Icons.broken_image, size: 40, color: Colors.white),
-            )
-                : const Icon(Icons.school, size: 40, color: Colors.white54)))
-                : (value.imagefile != null
-                ? Image.file(File(value.imagefile!.path), fit: BoxFit.cover)
-                : (_uploadedLogoUrl != null && _uploadedLogoUrl!.isNotEmpty
-                ? CachedNetworkImage(
-              imageUrl: _uploadedLogoUrl!,
-              fit: BoxFit.cover,
-              placeholder: (_, __) =>
-              const Center(child: CircularProgressIndicator()),
-              errorWidget: (_, __, ___) =>
-              const Icon(Icons.broken_image, size: 40, color: Colors.white),
-            )
-                : const Icon(Icons.school, size: 40, color: Colors.white54)))),
-      ),
-    );
-  }
+  // Widget _buildLogoPicker(Myprovider value) {
+  //   return InkWell(
+  //     onTap: () =>null, //value.pickImageFromGallery(context),
+  //     borderRadius: BorderRadius.circular(50),
+  //     child: SizedBox(
+  //       width: 100,
+  //       height: 100,
+  //       child: ClipOval(
+  //           child: CachedNetworkImage(
+  //             imageUrl: _uploadedLogoUrl!,
+  //             fit: BoxFit.cover,
+  //             placeholder: (_, __) =>
+  //             const Center(child: CircularProgressIndicator()),
+  //             errorWidget: (_, __, ___) =>
+  //             const Icon(Icons.broken_image, size: 40, color: Colors.white),
+  //           )
+  //
+  //               ? Image.file(File(value.imagefile!.path), fit: BoxFit.cover)
+  //               : (_uploadedLogoUrl != null && _uploadedLogoUrl!.isNotEmpty
+  //               ? CachedNetworkImage(
+  //             imageUrl: _uploadedLogoUrl!,
+  //             fit: BoxFit.cover,
+  //             placeholder: (_, __) =>
+  //             const Center(child: CircularProgressIndicator()),
+  //             errorWidget: (_, __, ___) =>
+  //             const Icon(Icons.broken_image, size: 40, color: Colors.white),
+  //           )
+  //               : const Icon(Icons.school, size: 40, color: Colors.white54)))),
+  //     ),
+  //   );
+  // }
 }

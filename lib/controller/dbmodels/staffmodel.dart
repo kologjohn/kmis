@@ -8,6 +8,8 @@ class Staff {
   final String region;
   final String level;
   final String status;
+  final String schoolname;
+  final String schoolId;
 
   Staff({
     this.id,
@@ -18,6 +20,8 @@ class Staff {
     required this.sex,
     required this.region,
     required this.level,
+    required this.schoolId,
+    required this.schoolname,
     this.status = "0",
   });
 
@@ -60,7 +64,6 @@ class Staff {
   /// Factory constructor for creating Staff from Firestore document
   factory Staff.fromMap(Map<String, dynamic> map, String id) {
     return Staff(
-      id: id,
       name: map["name"] ?? "",
       accessLevel: map["accessLevel"] ?? "",
       phone: map["phone"] ?? "",
@@ -69,6 +72,8 @@ class Staff {
       region: map["region"] ?? "",
       level: map["level"] ?? "",
       status: map["status"] ?? "0",
+      schoolId:  map["schoolid"] ?? "",
+      schoolname:  map["school"] ?? "",
     );
   }
 }

@@ -16,7 +16,7 @@ class CSAT extends StatelessWidget {
           future: (value.accesslevel == "Admin")
               ? FirebaseFirestore.instance
               .collection('regionLevelCounts')
-              .where('region', isEqualTo: value.regionName)
+              .where('region', isEqualTo: '')
               .get()
               : FirebaseFirestore.instance
               .collection('regionLevelCounts')
@@ -90,8 +90,8 @@ class CSAT extends StatelessWidget {
                                     );
 
                                     try {
-                                      value.setSelectedRegion(doc['region']);
-                                       value.studentdata();
+                                      // value.setSelectedRegion(doc['region']);
+                                      //  value.studentdata();
                                     } catch (e) {
                                       print(e);
                                     }

@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../controller/routes.dart';
-import '../screen/judgelistpage.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -447,7 +446,7 @@ class CustomDrawer extends StatelessWidget {
                             icon: Icons.logout,
                             title: 'Logout',
                             onTap: () async {
-                             await value.logout(context);
+                            // await value.logout(context);
                             },
                           ),
                         ),

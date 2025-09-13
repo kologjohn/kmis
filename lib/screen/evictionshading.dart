@@ -87,7 +87,7 @@ class _EvictionshadingState extends State<Evictionshading> {
 
                   // Show saved mark
                   Text(
-                    "Eviction Number: ${markProvider.evictnumber}",
+                    "Eviction Number: ${0}",
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,

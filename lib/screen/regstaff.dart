@@ -145,7 +145,7 @@ class _RegstaffState extends State<Regstaff> {
                                 // Access Level
                                 DropdownButtonFormField<String>(
                                   value: _selectedAccessLevel,
-                                  items: value.accessLevels.map((level) {
+                                  items: [""].map((level) {
                                     return DropdownMenuItem(value: level, child: Text(level));
                                   }).toList(),
                                   onChanged: (val) => setState(() => _selectedAccessLevel = val),
@@ -172,6 +172,8 @@ class _RegstaffState extends State<Regstaff> {
                                             sex: _selectedSex ?? "",
                                             region: myRegion ?? "",
                                             level: '',
+                                            schoolId: value.schoolid,
+                                            schoolname: value.currentschool,
                                           );
 
                                           final data = isEdit ? staff.toMapForUpdate() : staff.toMapForRegister();
