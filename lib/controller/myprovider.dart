@@ -38,7 +38,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-class Myprovider extends ChangeNotifier {
+import 'loginprovider.dart';
+
+class Myprovider extends LoginProvider {
   List<TermModel> terms = [];
   List<DepartmentModel> departments = [];
   List<DepartmentModel> classdata = [];
