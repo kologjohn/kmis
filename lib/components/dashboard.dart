@@ -31,16 +31,21 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   int totalTickets = 0;
   double totalvotes = 0;
   String topCollector = '';
+  String schoolname = '';
   List<Map<String, dynamic>> topCollectors = [];
   @override
   void initState()  {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<Myprovider>().getdata();
+      print(context.read<Myprovider>().currentschool);
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
      final provider= context.read<Myprovider>();
       provider.getdata();
+      setState(() {
+        schoolname=provider.currentschool;
+      });
      print(provider.phone);
     });
 
@@ -63,7 +68,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             appBar: AppBar(
               iconTheme: IconThemeData(color: Colors.white),
               backgroundColor: const Color(0xFF2A2D3E),
-              title: Text(value.phone.toUpperCase(), style: TextStyle(color: Colors.white)),
+              title: Text(schoolname.toUpperCase(), style: TextStyle(color: Colors.white)),
               actions: const [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
