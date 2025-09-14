@@ -1,12 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:ksoftsms/controller/dbmodels/staffmodel.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:provider/provider.dart';
-import 'forgot_password.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class SpacerSignUpPage extends StatefulWidget {
   const SpacerSignUpPage({super.key});
@@ -16,7 +14,6 @@ class SpacerSignUpPage extends StatefulWidget {
 }
 
 class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
-  bool _isVisible = true;
 
   // Helper for package card
   Widget _buildPackageCard({
@@ -636,7 +633,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                 
                                                 String school = _schoolController.text.trim();
                                                 String name = _nameController.text.trim();
-                                                String email = _emailController.text.trim();
+                                                String email = _emailController.text.trim().toString().toLowerCase();
                                                 String password = _passwordController.text;
                                                 String phone = _phoneController.text.trim();
                                                 String countryCode = selectedDialCode.toString();
@@ -650,23 +647,12 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                 int count_exist=result_count.docs.length;
                                                 int new_count=count_exist+1;
                                                 String schoolid='KS${new_count.toString().padLeft(4, '0')}';
-                                                final Map<String, dynamic> userData = {
-                                                  'name': name,
-                                                  'email': email,
-                                                  'phone': phone,
-                                                  'countrycode': countryCode,
-                                                  'countryname': country,
-                                                  'agreedtoterms': agreeToTerms,
-                                                  'createdat': dateTime,
-                                                  'type': 'customer',
-                                                  'school': school,
-                                                  'schoolid': schoolid,
-                                                };
+                                                final Map<String,dynamic>  staffdata=Staff(name: name, accessLevel: "admin", phone: phone, email: email, sex: "", region: "", schoolId: schoolid, schoolname: school, createdAt: dateTime).toMap();
+
                                                 try{
                                                   if(result.docs.isEmpty){
-                                                    await value.db.collection("schools").doc(schoolid).set(userData);
-                                                    await value.db.collection("staff").doc(schoolid).set(userData);
-                                                    String emailTxt="$schoolid@${value.schooldomain}";
+                                                    await value.db.collection("schools").doc(email).set(staffdata);
+                                                    await value.db.collection("staff").doc(email).set(staffdata);
                                                     await value.auth.createUserWithEmailAndPassword(email: email, password: password);
                                                     await value.auth.currentUser!.sendEmailVerification();
                                                     String message='Welcome to KologSoft MIS, $name. Your school ID is $schoolid. Please verify your email to complete the registration process.';
@@ -693,6 +679,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                 }catch(e){
                                                   print(e);
                                                   progress?.dismiss();
+
                                                 }
                 
                 
@@ -869,13 +856,13 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                       InkWell(
                                         onTap: () async {
                                           if (_formKey.currentState!.validate()) {
+
                                             final email = _emailController.text.trim();
                                             final password = _passwordController.text.trim();
                                             final progress = ProgressHUD.of(context);
                                             progress?.show();
                                             await value.login(email, password,context);
                                             progress?.dismiss();
-
                                           }
                                         },
                                         child: Container(
@@ -930,28 +917,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                               ),
                                             ),
                                             // Facebook Icon Button
-                                            /*
-                                                            InkWell(
-                                onTap: ()async{
-                                 await value.signInWithFacebook();
-                                  // handle Facebook sign-up
-                                },
-                                child: Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color:Colors.grey.shade300,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Image.asset(
-                                    "assets/images/facebook.png",
-                                    height: 28,
-                                    width: 28,
-                                  ),
-                                ),
-                                                            ),
-                                                            */
+
                                           ],
                                         ),
                                       ),

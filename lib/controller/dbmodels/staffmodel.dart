@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Staff {
   final String? id;
   final String name;
@@ -6,10 +8,10 @@ class Staff {
   final String email;
   final String sex;
   final String region;
-  final String level;
   final String status;
   final String schoolname;
   final String schoolId;
+  final DateTime createdAt;
 
   Staff({
     this.id,
@@ -19,9 +21,9 @@ class Staff {
     required this.email,
     required this.sex,
     required this.region,
-    required this.level,
     required this.schoolId,
     required this.schoolname,
+    required this.createdAt,
     this.status = "0",
   });
 
@@ -35,8 +37,10 @@ class Staff {
       "email": email,
       "sex": sex,
       "region": region,
-      "level": level,
       "status": status,
+      "schoolid": schoolId,
+      "school": schoolname,
+      "createdAt": Timestamp.fromDate(createdAt),
     };
   }
 
@@ -56,7 +60,8 @@ class Staff {
     addIfNotEmpty("email", email);
     addIfNotEmpty("sex", sex);
     addIfNotEmpty("region", region);
-    addIfNotEmpty("level", level);
+    addIfNotEmpty("schoolid", schoolId);
+    addIfNotEmpty("school", schoolname);
 
     return data;
   }
@@ -64,16 +69,36 @@ class Staff {
   /// Factory constructor for creating Staff from Firestore document
   factory Staff.fromMap(Map<String, dynamic> map, String id) {
     return Staff(
+      id: id,
       name: map["name"] ?? "",
       accessLevel: map["accessLevel"] ?? "",
       phone: map["phone"] ?? "",
       email: map["email"] ?? "",
       sex: map["sex"] ?? "",
       region: map["region"] ?? "",
-      level: map["level"] ?? "",
       status: map["status"] ?? "0",
-      schoolId:  map["schoolid"] ?? "",
-      schoolname:  map["school"] ?? "",
+      schoolId: map["schoolid"] ?? "",
+      schoolname: map["school"] ?? "",
+      createdAt: (map["createdAt"] is Timestamp)
+          ? (map["createdAt"] as Timestamp).toDate()
+          : (map["createdAt"] ?? DateTime.now()),
     );
+  }
+
+  /// Convert Staff object to Firestore map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'accessLevel': accessLevel,
+      'phone': phone,
+      'email': email,
+      'sex': sex,
+      'region': region,
+      'status': status,
+      'schoolId': schoolId,
+      'schoolname': schoolname,
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
   }
 }
