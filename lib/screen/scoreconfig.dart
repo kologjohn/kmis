@@ -130,10 +130,10 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                               .toLowerCase();
 
                                       final scoreConfig = ScoremodelConfig(
-                                        id: id,
+                                        id: id.toString(),
                                         companyid: provider.companyid,
-                                        continuous: continuous,
-                                        exam: exam,
+                                        continuous: continuous.toString(),
+                                        exam: exam.toString(),
                                       ).toMap();
 
                                       await provider.db

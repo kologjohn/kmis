@@ -36,7 +36,7 @@ class CustomDrawer extends StatelessWidget {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        'Bookworm',
+                        'KMIS',
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -85,6 +85,14 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.military_tech,
+                                  title: 'Component',
+                                  onTap: () =>
+                                      context.go(Routes.accesscomponent),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
                                   title: 'Depart',
                                   onTap: () =>
                                       context.go(Routes.depart),
@@ -96,6 +104,14 @@ class CustomDrawer extends StatelessWidget {
                                   title: 'Class',
                                   onTap: () =>
                                       context.go(Routes.classes),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'Grading system',
+                                  onTap: () =>
+                                      context.go(Routes.gradingsystem),
                                 ),
                               ),
                               SizedBox(
@@ -168,7 +184,7 @@ class CustomDrawer extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
                           child: Text(
-                            "JUDGE SETUP",
+                            "Teacher Setup",
                             style: TextStyle(
                               color: Colors.white60,
                               fontSize: 12,
@@ -176,6 +192,7 @@ class CustomDrawer extends StatelessWidget {
                             ),
                           ),
                         ),
+
                         Card(
                           color: Colors.transparent,
                           elevation: 0,
@@ -184,7 +201,7 @@ class CustomDrawer extends StatelessWidget {
                             iconColor: Colors.white,
                             leading: Icon(Icons.people, color: Colors.white),
                             title: Text(
-                              'Judge Data',
+                              'Assessment Data',
                               style: TextStyle(color: Colors.white),
                             ),
                             children: [
@@ -192,10 +209,10 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.person_add,
-                                  title: 'Judge set up',
+                                  title: 'Teacher set up',
                                   onTap: () async {
                                     try {
-                                      context.go(Routes.judgesetup,
+                                      context.go(Routes.setupteacher,
                                       );
                                     } catch (e) {
                                       print(e);
@@ -207,7 +224,7 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.person_add,
-                                  title: 'View Judges',
+                                  title: 'View Teachers',
                                   onTap: () async {
                                     try {
                                       context.go(Routes.judgelist,
@@ -221,7 +238,7 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.person_add,
-                                  title: 'Contestant set up',
+                                  title: 'Student set up',
                                   onTap: () async {
                                     try {
                                       context.go(Routes.contestantsetup,
