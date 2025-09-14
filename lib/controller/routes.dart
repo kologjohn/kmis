@@ -127,13 +127,13 @@ final GoRouter router = GoRouter(
 
   routes: [
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
-    GoRoute(
-      path: Routes.regstaff,
-      builder: (context, state) {
-        final item = state.extra as Staff?;
-        return Regstaff(staffData: item);
-      },
-    ),
+    // GoRoute(
+    //   path: Routes.regstaff,
+    //   builder: (context, state) {
+    //     final item = state.extra as Staff?;
+    //     return Regstaff(staffData: item);
+    //   },
+    // ),
 
     GoRoute(
     path: Routes.levelreg,
@@ -193,8 +193,8 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.viewdepart, builder: (c, s) => Viewdepartment()),
     GoRoute(path: Routes.viewclass, builder: (c, s) => Viewclass()),
     GoRoute(path: Routes.viewsubjects, builder: (c, s) => ViewSubjectPage()),
-    GoRoute(path: Routes.viewschool, builder: (c, s) => ViewSchoolPage()),
-    GoRoute(path: Routes.viewconfig, builder: (c, s) => ViewSchoolPage()),
+    //GoRoute(path: Routes.viewschool, builder: (c, s) => ViewSchoolPage()),
+   // GoRoute(path: Routes.viewconfig, builder: (c, s) => ViewSchoolPage()),
     GoRoute(path: Routes.accesscomponent, builder: (c, s) => AccessComponent()),
     GoRoute(path: Routes.accesslist, builder: (c, s) => AccessList()),
     GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),

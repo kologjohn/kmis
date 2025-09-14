@@ -46,9 +46,9 @@ class Myprovider extends LoginProvider {
   List<DepartmentModel> classdata = [];
   List<SubjectModel> subjectList = [];
   List<StudentModel> studentlist = [];
-  List<SchoolModel> schoollist = [];
+  //List<SchoolModel> schoollist = [];
   List<Staff> staffList = [];
-  List<RegionModel> regionList = [];
+ // List<RegionModel> regionList = [];
   List<ScoremodelConfig> scoreconfig = [];
   List<ComponentModel> accessComponents = [];
   bool loadterms = false;
@@ -100,7 +100,6 @@ class Myprovider extends LoginProvider {
       print("Failed to fetch terms: $e");
     }
   }
-
   Future<void> fetchdepart() async {
     try {
       loaddepart = true;
@@ -118,7 +117,6 @@ class Myprovider extends LoginProvider {
       print("Failed to fetch departments: $e");
     }
   }
-
   Future<void> fetchclass() async {
     try {
       loadclassdata = true;
@@ -136,7 +134,6 @@ class Myprovider extends LoginProvider {
       print("Failed to fetch class: $e");
     }
   }
-
   Future<void> fetchsubjects() async {
     try {
       loadsubject = true;
@@ -154,7 +151,6 @@ class Myprovider extends LoginProvider {
       print("Failed to fetch class: $e");
     }
   }
-
   Future<void> fetchstudents() async {
     try {
       loadStudent = true;
@@ -177,7 +173,7 @@ class Myprovider extends LoginProvider {
       print("Failed to fetch students: $e");
     }
   }
-
+/*
   Future<void> fetchschool() async {
     try {
       loadschool = true;
@@ -198,6 +194,7 @@ class Myprovider extends LoginProvider {
       print("Failed to fetch schools: $e");
     }
   }
+  */
 
   Future<void> fetchstaff() async {
     try {
@@ -230,7 +227,7 @@ class Myprovider extends LoginProvider {
       print("Error fetching score config: $e");
     }
   }
-
+/*
   Future<void> getfetchRegions() async {
     try {
       isLoadingRegions = true;
@@ -268,10 +265,10 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
-
+  */
   Future<void> deleteData(String collection, String documentId) async {
     try {
-      fetchstaff();
+    //  fetchstaff();
       fetchterms();
       fetchdepart();
       fetchclass();
@@ -298,7 +295,6 @@ class Myprovider extends LoginProvider {
     }
     notifyListeners();
   }
-
   login(String email, String password, BuildContext context) async {
     try {
       final loginhere = await auth.signInWithEmailAndPassword(
@@ -512,7 +508,7 @@ class Myprovider extends LoginProvider {
         if (writes > 0) await batch.commit();
       }
     } catch (e, stack) {
-      debugPrint("❌ Error in saveTeacherSetupMulti: $e");
+      debugPrint("Error in saveTeacherSetupMulti: $e");
       debugPrintStack(stackTrace: stack);
       rethrow;
     } finally {
@@ -520,11 +516,6 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
-
-
-
-
-
 
 
 
