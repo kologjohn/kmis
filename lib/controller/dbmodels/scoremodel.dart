@@ -1,8 +1,8 @@
 class ScoremodelConfig {
   final String? id;
   final String companyid;
-  final double continuous;
-  final double exam;
+  final String continuous;
+  final String exam;
 
   ScoremodelConfig({
     this.id,
