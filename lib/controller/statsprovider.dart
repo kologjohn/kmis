@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:ksoftsms/controller/loginprovider.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 import 'dbmodels/staffmodel.dart';
 
-class StatsProvider extends Myprovider {
+class StatsProvider extends LoginProvider {
   final db = FirebaseFirestore.instance;
  int totaltempaltes=0;
  int totalscored=0;
@@ -20,10 +21,7 @@ class StatsProvider extends Myprovider {
   bool adminshow=false;
   bool superadminshow=false;
   bool judgeshow=false;
-  StatsProvider(){
-
-  }
-
+  
   List<Staff> staffList = [];
   final TextEditingController searchController = TextEditingController();
 

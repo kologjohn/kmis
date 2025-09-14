@@ -1,25 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Staff {
-  final String? id; // Firestore document ID
-  final String authUid;
+  final String? id;
   final String name;
   final String accessLevel;
   final String phone;
   final String email;
   final String sex;
   final String region;
-  final String schoolId;
+  final String status;
   final String schoolname;
-  final String password;
-  final String status; // default "0"
-
-  final DateTime? accountCreatedAt;
-  final DateTime? createdAt;
+  final String schoolId;
+  final DateTime createdAt;
 
   Staff({
     this.id,
-    required this.authUid,
     required this.name,
     required this.accessLevel,
     required this.phone,
@@ -28,82 +23,82 @@ class Staff {
     required this.region,
     required this.schoolId,
     required this.schoolname,
-    required this.password,
-    this.accountCreatedAt,
-    this.createdAt,
+    required this.createdAt,
     this.status = "0",
   });
 
-  /// Convert to Firestore map (for registration)
+  /// Convert model to Firestore map (for registration)
   Map<String, dynamic> toMapForRegister() {
     return {
-      "authUid": authUid,
+      "id": id ?? "",
       "name": name,
       "accessLevel": accessLevel,
       "phone": phone,
       "email": email,
       "sex": sex,
       "region": region,
-      "schoolId": schoolId,
-      "schoolname": schoolname,
-      "password": password,
       "status": status,
-      "accountCreatedAt": accountCreatedAt,
-      "createdAt": createdAt,
+      "schoolid": schoolId,
+      "school": schoolname,
+      "createdAt": Timestamp.fromDate(createdAt),
     };
   }
 
-  /// Convert to Firestore map (for update)
+  /// Convert model to Firestore map (for update)
   Map<String, dynamic> toMapForUpdate() {
     final Map<String, dynamic> data = {};
-    void addIfNotEmpty(String key, dynamic value) {
-      if (value != null && value.toString().trim().isNotEmpty) {
+    void addIfNotEmpty(String key, String? value) {
+      if (value != null && value.trim().isNotEmpty) {
         data[key] = value;
       }
     }
 
-    addIfNotEmpty("authUid", authUid);
+    addIfNotEmpty("id", id);
     addIfNotEmpty("name", name);
     addIfNotEmpty("accessLevel", accessLevel);
     addIfNotEmpty("phone", phone);
     addIfNotEmpty("email", email);
     addIfNotEmpty("sex", sex);
     addIfNotEmpty("region", region);
-    addIfNotEmpty("schoolId", schoolId);
+    addIfNotEmpty("schoolid", schoolId);
     addIfNotEmpty("schoolname", schoolname);
-    addIfNotEmpty("password", password);
-    addIfNotEmpty("status", status);
-    if (accountCreatedAt != null) {
-      data["accountCreatedAt"] = accountCreatedAt;
-    }
-    if (createdAt != null) {
-      data["createdAt"] = createdAt;
-    }
 
     return data;
   }
 
-  /// Factory constructor to create Staff from Firestore document
+  /// Factory constructor for creating Staff from Firestore document
   factory Staff.fromMap(Map<String, dynamic> map, String id) {
     return Staff(
       id: id,
-      authUid: map["authUid"] ?? "",
       name: map["name"] ?? "",
       accessLevel: map["accessLevel"] ?? "",
       phone: map["phone"] ?? "",
       email: map["email"] ?? "",
       sex: map["sex"] ?? "",
       region: map["region"] ?? "",
-      schoolId: map["schoolId"] ?? "",
-      schoolname: map["schoolname"] ?? "",
-      password: map["password"] ?? "",
       status: map["status"] ?? "0",
-      accountCreatedAt: map["accountCreatedAt"] != null
-          ? (map["accountCreatedAt"] as Timestamp).toDate()
-          : null,
-      createdAt: map["createdAt"] != null
+      schoolId: map["schoolid"] ?? "",
+      schoolname: map["schoolname"] ?? "",
+      createdAt: (map["createdAt"] is Timestamp)
           ? (map["createdAt"] as Timestamp).toDate()
-          : null,
+          : (map["createdAt"] ?? DateTime.now()),
     );
+  }
+
+  /// Convert Staff object to Firestore map
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'name': name,
+      'accessLevel': accessLevel,
+      'phone': phone,
+      'email': email,
+      'sex': sex,
+      'region': region,
+      'status': status,
+      'schoolId': schoolId,
+      'schoolname': schoolname,
+      'createdAt': Timestamp.fromDate(createdAt),
+    };
   }
 }

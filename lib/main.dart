@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ksoftsms/controller/loginprovider.dart';
 import 'package:provider/provider.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:ksoftsms/controller/routes.dart';
@@ -22,6 +23,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (context) => Myprovider()),
         ChangeNotifierProvider(create: (context) => StatsProvider()),
+        ChangeNotifierProvider(create: (context) => LoginProvider()),
       ],
       child: MyApp(),
     ),
@@ -34,10 +36,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Kologsoft MIS',
-      // theme: ThemeData.dark().copyWith(
-      //   scaffoldBackgroundColor: const Color(0xFF1E1E2C),
-      //   colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber.shade900),
-      // ),
+      theme: ThemeData.dark().copyWith(
+        scaffoldBackgroundColor: const Color(0xFF1E1E2C),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber.shade900),
+      ),
       routerConfig: router, //use GoRouter defined in routes.dart
     );
   }

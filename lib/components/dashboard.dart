@@ -1,4 +1,5 @@
 import 'package:ksoftsms/components/scoresheet.dart';
+import 'package:ksoftsms/controller/loginprovider.dart';
 import 'package:ksoftsms/controller/statsprovider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -34,6 +35,15 @@ class _DashboardLayoutState extends State<DashboardLayout> {
   @override
   void initState()  {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<Myprovider>().getdata();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+     final provider= context.read<Myprovider>();
+      provider.getdata();
+     print(provider.phone);
+    });
+
   }
   String todayDate() {
     final now = DateTime.now();
@@ -53,7 +63,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
             appBar: AppBar(
               iconTheme: IconThemeData(color: Colors.white),
               backgroundColor: const Color(0xFF2A2D3E),
-              title: Text("BOOKWORM ${value.phone} ${value.accesslevel.toLowerCase()}", style: TextStyle(color: Colors.white)),
+              title: Text(value.phone.toUpperCase(), style: TextStyle(color: Colors.white)),
               actions: const [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),

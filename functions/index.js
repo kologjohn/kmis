@@ -1,26 +1,20 @@
-const { onRequest, onCall } = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-const fetch = require('node-fetch');
+// === Imports ===
+const { onRequest } = require("firebase-functions/v2/https");
 const { onDocumentWritten } = require("firebase-functions/v2/firestore");
-const admin = require('firebase-admin');
-const functions = require('firebase-functions');
-const nodemailer = require('nodemailer');
-const { FieldValue } = require('firebase-admin').firestore;
+const logger = require("firebase-functions/logger");
+const fetch = require("node-fetch");
+const admin = require("firebase-admin");
+
 if (!admin.apps.length) admin.initializeApp();
 
-const WHATSAPP_TOKEN = 'EAAJ5UzelaX8BO7eSHIpv1NNZAlgYxw0caPjzHyRPGdc2YUSOfeC6XmXxeUZCBZBV77pNeKj6J2i7bLyRRvqWLM9qk24lhOhThXvr6h0VZAf158SyIqIRNB47dBlYac8WKLXFcMHCGSTJJzCDbKhMHKwFOkLfSlD7B1idnAPaF5YqiHZAHZCqTy8fXsC8VJyGdwYAZDZD';
-const PHONE_NUMBER_ID = '607972565731740';
-const VERIFY_TOKEN = 'your_custom_verify_token'; // Set this to your chosen token
+// === Constants (move secrets to env config in production) ===
+const WHATSAPP_TOKEN = "EAAJ5UzelaX8BO7eSHIpv1NNZAlgYxw0caPjzHyRPGdc2YUSOfeC6XmXxeUZCBZBV77pNeKj6J2i7bLyRRvqWLM9qk24lhOhThXvr6h0VZAf158SyIqIRNB47dBlYac8WKLXFcMHCGSTJJzCDbKhMHKwFOkLfSlD7B1idnAPaF5YqiHZAHZCqTy8fXsC8VJyGdwYAZDZD";
+const PHONE_NUMBER_ID = "607972565731740";
+const VERIFY_TOKEN = "your_custom_verify_token";
+const SMS_API_KEY = "SXlMVlJCcmlTV1dwVGRyZkVneUs"; // Replace with your actual API key
 
-
-exports.metanotification = onRequest(async (req, res) => {
-  // Accept POST with JSON body: { phone: "...", template: "...", messageText: "..." }
-  const { phone, template, messageText } = req.body;
-  if (!phone || !template || !messageText) {
-    res.status(400).json({ error: "Missing phone, template, or messageText" });
-    return;
-  }
-
+// === Helpers ===
+async function sendWhatsappMessage(phone, template, messageText, url = "https://kologsoft.com") {
   const payload = {
     messaging_product: "whatsapp",
     to: phone,
@@ -32,238 +26,219 @@ exports.metanotification = onRequest(async (req, res) => {
         {
           type: "body",
           parameters: [
-            { type: "text", text: "John Doe" },      // This will replace {{1}}
-            { type: "text", text: "123456" }         // This will replace {{2}}
+            { type: "text", text: "John Doe" }, // {{1}}
+            { type: "text", text: messageText } // {{2}}
           ]
         },
         {
           type: "button",
           sub_type: "url",
           index: 0,
-          parameters: [
-            { type: "text", text: "https://your-verification-link.com" } // URL for the button
-          ]
+          parameters: [{ type: "text", text: url }]
         }
       ]
     }
   };
 
-  try {
-    const response = await fetch(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, {
-      method: 'POST',
+  const response = await fetch(
+    `https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`,
+    {
+      method: "POST",
       body: JSON.stringify(payload),
       headers: {
-        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+        "Content-Type": "application/json"
       }
-    });
-    const result = await response.json();
-    res.status(response.status).json(result);
+    }
+  );
+  return response.json();
+}
+
+async function sendSms(phone, senderId, message) {
+  const url = `https://sms.kologsoft.com/sms/api?action=send-sms&api_key=${encodeURIComponent(
+    SMS_API_KEY
+  )}&to=${encodeURIComponent(phone)}&from=${encodeURIComponent(
+    senderId
+  )}&sms=${encodeURIComponent(message)}`;
+
+  const response = await fetch(url, { method: "GET" });
+  return response.text();
+}
+
+// Helper to generate password: email + random 6 digits
+function generateEmailPassword(email) {
+  const randomDigits = Math.floor(100000 + Math.random() * 900000).toString();
+  return `${email}${randomDigits}`;
+}
+
+// Convert phone number to E.164 format
+function toE164(phone) {
+  // If phone starts with '+', assume it's already E.164
+  if (typeof phone === 'string' && phone.startsWith('+')) return phone;
+  // Example: Ghana local numbers (replace '233' with your country code)
+  if (typeof phone === 'string') {
+    // Remove leading zeros and non-digit characters
+    const cleaned = phone.replace(/[^\d]/g, '').replace(/^0+/, '');
+    return '+233' + cleaned;
+  }
+  return phone;
+}
+
+// === HTTP Functions ===
+
+// Send WhatsApp notification
+exports.metanotification = onRequest(async (req, res) => {
+  const { phone, template, messageText } = req.body;
+  if (!phone || !template || !messageText) {
+    return res.status(400).json({ error: "Missing phone, template, or messageText" });
+  }
+
+  try {
+    const result = await sendWhatsappMessage(phone, template, messageText);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-
-
-
-// Firestore trigger: Send SMS using kologsoft API when a document is created in 'smsQueue' collection
-exports.sendSmsOnCreate = onDocumentWritten({document: 'smsQueue/{smsId}'}, async (event) => {
-  // Only send SMS on create
-  if (!event.data || event.data.before.exists) return;
-  const data = event.data.after.data();
-  const phone = data.phone;
-  const senderId = data.senderId;
-  const message = data.message;
-  const smsId = event.params.smsId;
-  if (!phone || !senderId || !message) return;
-  // Kologsoft SMS API details
-  const apiKey = 'SXlMVlJCcmlTV1dwVGRyZkVneUs'; // Replace with your actual API key
-  const url = `https://sms.kologsoft.com/sms/api?action=send-sms&api_key=${encodeURIComponent(apiKey)}&to=${encodeURIComponent(phone)}&from=${encodeURIComponent(senderId)}&sms=${encodeURIComponent(message)}`;
-  let apiResponse = null;
-  let apiError = null;
-  try {
-    const response = await fetch(url, { method: 'GET' });
-    apiResponse = await response.text();
-    logger.info('SMS sent', { phone, senderId, message, apiResponse });
-  } catch (error) {
-    apiError = error.message;
-    logger.error('SMS send error', { error: apiError, phone, senderId });
-  }
-  // Store the API response (or error) in the smsQueue document
-  try {
-    await admin.firestore().collection('smsQueue').doc(smsId).update({
-      smsApiResponse: apiResponse,
-      smsApiError: apiError,
-      smsSentAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-  } catch (e) {
-    logger.error('Failed to update smsQueue doc with API response', { error: e.message, smsId });
-  }
-});
-
-// Firestore trigger: Send WhatsApp message using WhatsApp Cloud API when a document is created in 'whatsappQueue' collection
-exports.sendWhatsappOnCreate = onDocumentWritten({document: 'whatsappQueue/{waId}'}, async (event) => {
-  // Only send WhatsApp message on create
-  if (!event.data || event.data.before.exists) return;
-  const data = event.data.after.data();
-  const phone = data.phone;
-  const template = data.template;
-  const messageText = data.messageText;
-  const waId = event.params.waId;
-  if (!phone || !template || !messageText) return;
-
-  const payload = {
-    messaging_product: "whatsapp",
-    to: phone,
-    type: "template",
-    template: {
-      name: template,
-      language: { code: "en_US" },
-      components: [
-        {
-          type: "body",
-          parameters: [
-            { type: "text", text: "John Doe" },      // This will replace {{1}}
-            { type: "text", text: "123456" }         // This will replace {{2}}
-          ]
-        },
-        {
-          type: "button",
-          sub_type: "url",
-          index: 0,
-          parameters: [
-            { type: "text", text: "https://your-verification-link.com" } // URL for the button
-          ]
-        }
-      ]
-    }
-  };
-
-  let apiResponse = null;
-  let apiError = null;
-  try {
-    const response = await fetch(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    apiResponse = await response.json();
-    logger.info('WhatsApp sent', { phone, template, messageText, apiResponse });
-  } catch (error) {
-    apiError = error.message;
-    logger.error('WhatsApp send error', { error: apiError, phone, template });
-  }
-  // Store the API response (or error) in the whatsappQueue document
-  try {
-    await admin.firestore().collection('whatsappQueue').doc(waId).update({
-      whatsappApiResponse: apiResponse,
-      whatsappApiError: apiError,
-      whatsappSentAt: admin.firestore.FieldValue.serverTimestamp(),
-    });
-  } catch (e) {
-    logger.error('Failed to update whatsappQueue doc with API response', { error: e.message, waId });
-  }
-});
-
-
-
-// Firestore trigger: Verify WhatsApp webhook subscription
+// Verify WhatsApp webhook
 exports.metaWhatsappVerify = onRequest((req, res) => {
-  if (req.method === 'GET') {
-    const mode = req.query['hub.mode'];
-    const token = req.query['hub.verify_token'];
-    const challenge = req.query['hub.challenge'];
+  if (req.method !== "GET") return res.status(405).send("Method Not Allowed");
 
-    if (mode && token && mode === 'subscribe' && token === VERIFY_TOKEN) {
-      res.status(200).send(challenge);
-    } else {
-      res.status(403).send('Verification failed');
-    }
+  const { ["hub.mode"]: mode, ["hub.verify_token"]: token, ["hub.challenge"]: challenge } =
+    req.query;
+
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    res.status(200).send(challenge);
   } else {
-    res.status(405).send('Method Not Allowed');
+    res.status(403).send("Verification failed");
   }
 });
 
-// HTTP function: Send account verification code via WhatsApp
+// Send account verification via WhatsApp
 exports.sendAccountVerification = onRequest(async (req, res) => {
   const { phone, code } = req.body;
   if (!phone || !code) {
-    res.status(400).json({ error: "Missing phone or code" });
-    return;
+    return res.status(400).json({ error: "Missing phone or code" });
   }
-  const payload = {
-    messaging_product: "whatsapp",
-    to: phone,
-    type: "template",
-    template: {
-      name: "verifaction", // Replace with your actual template name
-      language: { code: "en_US" },
-     components: [
-  {
-    type: "body",
-    parameters: [
-      { type: "text", text: "John Doe" },      // {{1}}
-      { type: "text", text: "123456" }         // {{2}}
-    ]
-  },
-  {
-    type: "button",
-    sub_type: "url",
-    index: 0,
-    parameters: [
-      { type: "text", text: "https://kologsoft.com" } // The required URL
-    ]
-  }
-]
-    }
-  };
+
   try {
-    const response = await fetch(`https://graph.facebook.com/v19.0/${PHONE_NUMBER_ID}/messages`, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Authorization': `Bearer ${WHATSAPP_TOKEN}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    const result = await response.json();
-    res.status(response.status).json(result);
+    const result = await sendWhatsappMessage(phone, "verifaction", code);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-/// Configure transporter with Gmail
-const mailTransport = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.GMAIL_EMAIL || "", // fallback in case config not set
-    pass: process.env.GMAIL_PASSWORD || "",
-  },
-});
+// === Firestore Triggers ===
 
-// Send email function
-exports.sendMail = onCall(async (request) => {
-  const { to, subject, text, html } = request.data;
+// SMS Queue
+exports.sendSmsOnCreate = onDocumentWritten("smsQueue/{smsId}", async (event) => {
+  if (!event.data || event.data.before.exists) return;
 
-  const mailOptions = {
-    from: `"KologSoft" <${process.env.GMAIL_EMAIL}>`,
-    to,
-    subject,
-    text,
-    html: html || `<p>${text}</p>`,
-  };
+  const { phone, senderId, message } = event.data.after.data();
+  const smsId = event.params.smsId;
+  if (!phone || !senderId || !message) return;
 
   try {
-    await mailTransport.sendMail(mailOptions);
-    return { success: true, message: "Email sent successfully" };
+    const apiResponse = await sendSms(phone, senderId, message);
+    await admin.firestore().collection("smsQueue").doc(smsId).update({
+      smsApiResponse: apiResponse,
+      smsSentAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    logger.info("SMS sent", { phone, senderId, message });
   } catch (error) {
-    logger.error("Error sending email:", error);
-    return { success: false, error: error.message };
+    await admin.firestore().collection("smsQueue").doc(smsId).update({
+      smsApiError: error.message
+    });
+    logger.error("SMS send error", { error: error.message, phone, senderId });
   }
 });
 
+// WhatsApp Queue
+exports.sendWhatsappOnCreate = onDocumentWritten("whatsappQueue/{waId}", async (event) => {
+  if (!event.data || event.data.before.exists) return;
+
+  const { phone, template, messageText } = event.data.after.data();
+  const waId = event.params.waId;
+  if (!phone || !template || !messageText) return;
+
+  try {
+    const apiResponse = await sendWhatsappMessage(phone, template, messageText);
+    await admin.firestore().collection("whatsappQueue").doc(waId).update({
+      whatsappApiResponse: apiResponse,
+      whatsappSentAt: admin.firestore.FieldValue.serverTimestamp()
+    });
+    logger.info("WhatsApp sent", { phone, template, messageText });
+  } catch (error) {
+    await admin.firestore().collection("whatsappQueue").doc(waId).update({
+      whatsappApiError: error.message
+    });
+    logger.error("WhatsApp send error", { error: error.message, phone, template });
+  }
+});
+
+// Firestore trigger: Create Firebase Auth user when new staff is added
+exports.createStaffAuthAccount = onDocumentWritten("staff/{staffId}", async (event) => {
+  // Only run on new document creation
+  if (!event.data || event.data.before.exists) return;
+
+  const staffData = event.data.after.data();
+  const staffId = event.params.staffId;
+
+  const { email, phone, displayName } = staffData;
+  const password = generateEmailPassword(email);
+  const phoneE164 = toE164(phone);
+
+  if (!email || !phoneE164) {
+    logger.error("Missing required staff fields", { staffId, email, phone });
+    return;
+  }
+
+  try {
+    // Create Firebase Auth user
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+      phoneNumber: phoneE164,
+      displayName: displayName || email.split("@")[0],
+      disabled: false,
+    });
+
+    // Update staff doc with Auth UID and password (optional, for admin reference)
+    await admin.firestore().collection("staff").doc(staffId).update({
+      authUid: userRecord.uid,
+      accountCreatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      password: password // Optional: remove if you don't want to store
+    });
+
+    // Add SMS queue message with password
+    await admin.firestore().collection("smsQueue").add({
+      phone: phoneE164,
+      message: `Welcome! Your login password is ${password}`,
+      senderId: "KologSoft",
+      createdat: admin.firestore.FieldValue.serverTimestamp(),
+      status: "pending",
+    });
+
+    logger.info("Staff account created and SMS queued", {
+      staffId,
+      authUid: userRecord.uid,
+      email,
+      phone: phoneE164,
+      password,
+    });
+  } catch (error) {
+    logger.error("Failed to create staff Auth account", {
+      error: error.message,
+      staffId,
+      email,
+    });
+
+    // Store error info in Firestore for debugging
+    await admin.firestore().collection("staff").doc(staffId).update({
+      authError: error.message,
+      accountCreatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  }
+});
