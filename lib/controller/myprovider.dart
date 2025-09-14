@@ -51,33 +51,33 @@ class Myprovider extends ChangeNotifier {
   List<Staff> staffList = [];
   List<RegionModel> regionList = [];
   List<ScoremodelConfig> scoreconfig = [];
-  bool loadterms =false;
-  bool loaddepart =false;
-  bool loadclassdata =false;
-  bool loadsubject =false;
-  bool isLoadingRegions =false;
-  bool loadStudent =false;
-  bool loadschool =false;
-  bool loadstaff =false;
+  bool loadterms = false;
+  bool loaddepart = false;
+  bool loadclassdata = false;
+  bool loadsubject = false;
+  bool isLoadingRegions = false;
+  bool loadStudent = false;
+  bool loadschool = false;
+  bool loadstaff = false;
   bool loadingsconfig = true;
-  String companyid="ksoo1";
-  String currentschool="lamp";
+  String companyid = "ksoo1";
+  String currentschool = "lamp";
   Staff? usermodel;
-
+  List<String> staffSchoolIds=[];
+  List<String> schoolnames=[];
   String schoolid = "";
   String accesslevel = "";
   String phone = "";
   String name = "";
   List<SchoolModel> schoolList = [];
+  List<Staff> staffschools = [];
   String schooldomain = "kologsoftsmiscom.com";
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
 
   bool loginform = true;
   bool regform = false;
-  Myprovider() {
-
-  }
+  Myprovider() {}
   Future<void> fetchterms() async {
     try {
       loadterms = true;
@@ -98,6 +98,7 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch terms: $e");
     }
   }
+
   Future<void> fetchdepart() async {
     try {
       loaddepart = true;
@@ -115,6 +116,7 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch departments: $e");
     }
   }
+
   Future<void> fetchclass() async {
     try {
       loadclassdata = true;
@@ -132,6 +134,7 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch class: $e");
     }
   }
+
   Future<void> fetchsubjects() async {
     try {
       loadsubject = true;
@@ -149,6 +152,7 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch class: $e");
     }
   }
+
   Future<void> fetchstudents() async {
     try {
       loadStudent = true;
@@ -171,6 +175,7 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch students: $e");
     }
   }
+
   Future<void> fetchschool() async {
     try {
       loadschool = true;
@@ -191,21 +196,23 @@ class Myprovider extends ChangeNotifier {
       print("Failed to fetch schools: $e");
     }
   }
+
   Future<void> fetchstaff() async {
     try {
-      loadstaff=true;
+      loadstaff = true;
       notifyListeners();
       final snap = await db.collection('staff').get();
       staffList = snap.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return Staff.fromMap(data, doc.id); // Use fromMap constructor
       }).toList();
-      loadstaff =false;
+      loadstaff = false;
       notifyListeners();
     } catch (e) {
       print("Error fetching staff: $e");
     }
   }
+
   Future<void> fetchScoreConfig() async {
     try {
       loadingsconfig = true;
@@ -259,6 +266,7 @@ class Myprovider extends ChangeNotifier {
       notifyListeners();
     }
   }
+
   Future<void> deleteData(String collection, String documentId) async {
     try {
       fetchstaff();
@@ -278,17 +286,18 @@ class Myprovider extends ChangeNotifier {
     }
   }
 
-  showform(bool show,String type){
-    if(type=='login') {
+  showform(bool show, String type) {
+    if (type == 'login') {
       loginform = true;
       regform = false;
     }
-    if(type=='signup'){
+    if (type == 'signup') {
       regform = true;
       loginform = false;
     }
     notifyListeners();
   }
+
   login(String email, String password, BuildContext context) async {
     try {
       final loginhere = await auth.signInWithEmailAndPassword(
@@ -303,27 +312,32 @@ class Myprovider extends ChangeNotifier {
             .where('email', isEqualTo: email)
             .get();
         int numberofdocs = detail.docs.length;
+        final userData = detail.docs.first.data();
+        usermodel = Staff.fromMap(userData, detail.docs.first.id);
+        String emailTxt = usermodel?.email ?? '';
+        String nameTxt = usermodel?.name ?? '';
+        String roleTxt = usermodel?.accessLevel ?? '';
+        String phoneTxt = usermodel?.phone ?? '';
+        String schoolTxt = usermodel?.schoolname ?? '';
+        String scchoolIdTxt = usermodel?.schoolId ?? '';
+
+        prefs.setString("school", schoolTxt);
+        prefs.setString("email", emailTxt);
+        prefs.setString("name", nameTxt);
+        prefs.setString("role", roleTxt);
+        prefs.setString("phone", phoneTxt);
+        prefs.setString("schoolid", scchoolIdTxt);
         if (numberofdocs > 1) {
-          schoolList = detail.docs.map((doc) {
-            return SchoolModel.fromMap(doc.data(), doc.id);
+          staffschools = detail.docs.map((doc) {
+            return Staff.fromMap(doc.data(), doc.id);
           }).toList();
-
+          prefs.setStringList("staffschools", staffschools.map((e) => e.schoolId).toList());
+          prefs.setStringList("schoolnames", staffschools.map((e) => e.schoolname).toList());
+          print(schoolList);
+          await getdata();
+          context.go(Routes.nextpage);
+          notifyListeners();
         } else {
-          final userData = detail.docs.first.data();
-          usermodel = Staff.fromMap(userData, detail.docs.first.id);
-          String emailTxt = usermodel?.email ?? '';
-          String nameTxt = usermodel?.name ?? '';
-          String roleTxt = usermodel?.accessLevel ?? '';
-          String phoneTxt = usermodel?.phone ?? '';
-          String schoolTxt = usermodel?.schoolname ?? '';
-          String scchoolIdTxt = usermodel?.schoolId ?? '';
-
-          prefs.setString("school", schoolTxt);
-          prefs.setString("email", emailTxt);
-          prefs.setString("name", nameTxt);
-          prefs.setString("role", roleTxt);
-          prefs.setString("phone", phoneTxt);
-          prefs.setString("schoolid", scchoolIdTxt);
           await getdata();
           auth.currentUser!.updateDisplayName(nameTxt);
 
@@ -348,7 +362,10 @@ class Myprovider extends ChangeNotifier {
     phone = prefs.getString('phone') ?? '';
     accesslevel = prefs.getString('role') ?? '';
     name = prefs.getString('name') ?? '';
+    // staffschools is a List<Staff>, but prefs.getStringList returns List<String>
+    // If you want to keep the school IDs, use a separate variable:
+    staffSchoolIds = prefs.getStringList("staffschools") ?? [];
+    schoolnames = prefs.getStringList("schoolnames") ?? [];
     notifyListeners();
   }
-
 }

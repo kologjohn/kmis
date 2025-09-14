@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SchoolModel {
   final String id;
-  final String name;
+  final String schoolname;
   final String prefix;
   final String address;
   final String email;
@@ -19,7 +19,7 @@ class SchoolModel {
 
   SchoolModel({
     required this.id,
-    required this.name,
+    required this.schoolname,
     required this.prefix,
     required this.address,
     required this.email,
@@ -35,7 +35,7 @@ class SchoolModel {
 
   Map<String, dynamic> toMap() => {
     "id": id,
-    "name": name,
+    "name": schoolname,
     "prefix": prefix,
     "address": address,
     "email": email,
@@ -54,7 +54,7 @@ class SchoolModel {
   factory SchoolModel.fromMap(Map<String, dynamic> map, String id) {
     return SchoolModel(
       id: id,
-      name: map["name"] ?? "",
+      schoolname: map["name"] ?? "",
       prefix: map["prefix"] ?? "",
       address: map["address"] ?? "",
       email: map["email"] ?? "",

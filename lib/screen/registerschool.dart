@@ -37,7 +37,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
     super.initState();
     final data = widget.school;
     if (data != null) {
-      schoolName.text = data.name;
+      schoolName.text = data.schoolname;
       prefix.text = data.prefix;
       address.text = data.address;
       email.text = data.email;
@@ -210,7 +210,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
 
                               final school = SchoolModel(
                                 id: widget.school?.id ?? prefixTxt,
-                                name: schoolNameTxt,
+                                schoolname: schoolNameTxt,
                                 prefix: prefixTxt,
                                 address: addressTxt,
                                 email: emailTxt,

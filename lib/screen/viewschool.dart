@@ -326,7 +326,7 @@ class _ViewSchoolPageState extends State<ViewSchoolPage> {
           final schools = provider.schoollist;
           final filteredSchools = schools.where((school) {
             final query = searchQuery.toLowerCase();
-            return school.name.toLowerCase().contains(query) ||
+            return school.schoolname.toLowerCase().contains(query) ||
                 school.prefix.toLowerCase().contains(query) ||
                 school.countryName.toLowerCase().contains(query);
           }).toList();
@@ -411,8 +411,8 @@ class _ViewSchoolPageState extends State<ViewSchoolPage> {
                                     isAscending = ascending;
                                     filteredSchools.sort((a, b) =>
                                     ascending
-                                        ? a.name.compareTo(b.name)
-                                        : b.name.compareTo(a.name));
+                                        ? a.schoolname.compareTo(b.schoolname)
+                                        : b.schoolname.compareTo(a.schoolname));
                                   });
                                 },
                               ),
@@ -453,7 +453,7 @@ class _ViewSchoolPageState extends State<ViewSchoolPage> {
                                   DataCell(Text("$index",
                                       style: const TextStyle(
                                           color: Colors.white70))),
-                                  DataCell(Text(school.name,
+                                  DataCell(Text(school.schoolname,
                                       style: const TextStyle(
                                           color: Colors.white70))),
                                   DataCell(Text(school.prefix,
