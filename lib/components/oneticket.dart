@@ -20,21 +20,21 @@ class OneTicket extends StatelessWidget {
           width: cwidth,
           height: 400,
           decoration: BoxDecoration(
-            color: Color(0xFF1C1D2A),
-            boxShadow: [
-              BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
-            ],
+            color: Color(0xFFffffff),
+            // boxShadow: [
+            //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
+            // ],
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Season Total Votes ', style: TextStyle(fontSize: 15)),
+                Text('Season Total Votes ', style: TextStyle(fontSize: 15, color: Color(0xFF00273a))),
                 SizedBox(height: 100.0),
                 Center(
                   child: Text(totalvotes,
-                    style: TextStyle(fontSize: 80, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 80, fontWeight: FontWeight.w700, color: Color(0xFFdc3545)),
                   ),
                 ),
                 Center(

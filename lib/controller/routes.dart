@@ -13,6 +13,7 @@ import '../screen/gradingsystem.dart';
 import '../screen/judgeui.dart';
 
 import '../screen/levelreg.dart';
+import '../screen/multipleschools.dart';
 import '../screen/registerschool.dart';
 import '../screen/regstaff.dart';
 import '../screen/scoreconfig.dart';
@@ -143,7 +144,7 @@ final GoRouter router = GoRouter(
     },),
 
     GoRoute(path: Routes.dashboard, builder: (c, s) => DashboardLayout()),
-    //GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
+    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
 
     GoRoute(path: Routes.jscore, builder: (c, s) => JudgeGroundScreen()),
     GoRoute(

@@ -36,8 +36,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Kologsoft MIS',
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF1E1E2C),
+      theme: ThemeData.light().copyWith(
+        scaffoldBackgroundColor: const Color(0xFFf3f4ff),
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber.shade900),
       ),
       routerConfig: router, //use GoRouter defined in routes.dart

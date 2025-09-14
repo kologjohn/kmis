@@ -15,10 +15,10 @@ class SummaryDonutChart extends StatelessWidget {
       width: cwidth,
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFF1C1D2A),
-        boxShadow: [
-          BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
-        ],
+        color: Color(0xFFffffff),
+        // boxShadow: [
+        //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
+        // ],
       ),
       child: Center(
         child: Padding(
@@ -33,8 +33,8 @@ class SummaryDonutChart extends StatelessWidget {
                   lineWidth: 10.0,
                   percent: 0.7,
                   circularStrokeCap: CircularStrokeCap.round,
-                  backgroundColor: Colors.grey.shade900,
-                  progressColor: Colors.blueAccent,
+                  backgroundColor: Color(0xFFfb7d5b).withOpacity(0.3),
+                  progressColor: Color(0xFFdc3545),
                   center: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -43,12 +43,12 @@ class SummaryDonutChart extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 24.0,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Color(0xFF00273a),
                         ),
                       ),
                       Text(
                         "of 100%",
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
+                        style: TextStyle(color: Color(0xFF00496d), fontSize: 14),
                       ),
                     ],
                   ),
@@ -56,16 +56,19 @@ class SummaryDonutChart extends StatelessWidget {
               ),
               SizedBox(height: 10),
               Container(
-                decoration: BoxDecoration(color: Colors.grey.shade900),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    SummaryItem(label: "Cal", value: "305"),
-                    SummaryItem(label: "Steps", value: "10983"),
-                    SummaryItem(label: "Distance", value: "7km"),
-                    SummaryItem(label: "Sleep", value: "7hr"),
-                  ],
+                decoration: BoxDecoration(color: Color(0xFF00496d)),
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      SummaryItem(label: "Cal", value: "305"),
+                      SummaryItem(label: "Steps", value: "10983"),
+                      SummaryItem(label: "Distance", value: "7km"),
+                      SummaryItem(label: "Sleep", value: "7hr"),
+                    ],
+                  ),
                 ),
               ),
             ],

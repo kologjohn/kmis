@@ -26,7 +26,7 @@ class ResponseTimeGauge extends StatelessWidget {
                 axisLineStyle: AxisLineStyle(
                   thickness: 0.2,
                   cornerStyle: CornerStyle.bothCurve,
-                  color: Colors.grey[800],
+                  color: Color(0xFFfb7d5b),
                   thicknessUnit: GaugeSizeUnit.factor,
                 ),
                 pointers: <GaugePointer>[
@@ -57,7 +57,7 @@ class ResponseTimeGauge extends StatelessWidget {
           ),
         ),
         SizedBox(height: 4),
-        Text('Scored', style: TextStyle(color: Colors.grey[300], fontSize: 14)),
+        Text('Scored', style: TextStyle(color: Color(0xFF00273a), fontSize: 14)),
       ],
     );
   }

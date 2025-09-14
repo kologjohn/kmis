@@ -20,24 +20,24 @@ class DuplicateContainer extends StatelessWidget {
       width: containerwidth,
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFF1C1D2A),
-        boxShadow: [
-          BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 0.5),
-        ],
+        color: Color(0xFFffffff),
+        // boxShadow: [
+        //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 0.5),
+        // ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(heading, style: TextStyle(fontSize: 18)),
+            Text(heading, style: TextStyle(fontSize: 18, color: Color(0xFF00273a))),
             Center(
               child: Text(
                 number,
-                style: TextStyle(fontSize: 70, fontWeight: FontWeight.w700),
+                style: TextStyle(fontSize: 70, fontWeight: FontWeight.w700, color: Color(0xFFdc3545)),
               ),
             ),
-            Center(child: Text(value, style: TextStyle(fontSize: 20))),
+            Center(child: Text(value, style: TextStyle(fontSize: 20, color: Color(0xFF00273a)))),
           ],
         ),
       ),

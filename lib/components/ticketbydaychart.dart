@@ -11,10 +11,10 @@ class TicketsByDayChart extends StatelessWidget {
       width: cwidth,
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFF1C1D2A),
-        boxShadow: [
-          BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
-        ],
+        color: Color(0xFFffffff),
+        // boxShadow: [
+        //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
+        // ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -23,7 +23,7 @@ class TicketsByDayChart extends StatelessWidget {
           children: [
             Text(
               'Score Sheet Performance',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+              style: TextStyle(color: Color(0xFF00273a), fontSize: 16),
             ),
             SizedBox(height: 8),
             SizedBox(
@@ -31,7 +31,7 @@ class TicketsByDayChart extends StatelessWidget {
               width: 650,
               child: LineChart(
                 LineChartData(
-                  backgroundColor: Color(0xFF1C1D2A),
+                  backgroundColor: Color(0xFFffffff),
                   titlesData: FlTitlesData(
                     bottomTitles: AxisTitles(
                       sideTitles: SideTitles(
@@ -51,7 +51,7 @@ class TicketsByDayChart extends StatelessWidget {
                           return Text(
                             days[value.toInt()],
                             style: TextStyle(
-                              color: Colors.white54,
+                              color: Color(0xFF00496d),
                               fontSize: 10,
                             ),
                           );
@@ -64,7 +64,7 @@ class TicketsByDayChart extends StatelessWidget {
                         showTitles: true,
                         getTitlesWidget: (value, _) => Text(
                           '${value.toInt()}',
-                          style: TextStyle(color: Colors.white54, fontSize: 10),
+                          style: TextStyle(color: Color(0xFF00496d), fontSize: 10),
                         ),
                         interval: 2,
                       ),
@@ -81,7 +81,7 @@ class TicketsByDayChart extends StatelessWidget {
                   lineBarsData: [
                     LineChartBarData(
                       isCurved: true,
-                      color: Colors.lightBlueAccent,
+                      color: Color(0xFFfb7d5b),
                       dotData: FlDotData(show: true),
                       spots: [
                         FlSpot(0, 1),
@@ -96,7 +96,7 @@ class TicketsByDayChart extends StatelessWidget {
                     ),
                     LineChartBarData(
                       isCurved: true,
-                      color: Colors.purpleAccent,
+                      color: Color(0xFFdc3545),
                       dotData: FlDotData(show: true),
                       spots: [
                         FlSpot(0, 1),
@@ -108,6 +108,10 @@ class TicketsByDayChart extends StatelessWidget {
                         FlSpot(6, 6),
                         FlSpot(7, 3),
                       ],
+                      belowBarData: BarAreaData(
+                        show: true,
+                        color: const Color(0xFFdc3545).withOpacity(0.1),
+                      ),
                     ),
                   ],
                 ),
@@ -117,9 +121,9 @@ class TicketsByDayChart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                LegendDot(color: Colors.lightBlueAccent, label: 'Created'),
+                LegendDot(color: Color(0xFFfb7d5b), label: 'Created',),
                 SizedBox(width: 20),
-                LegendDot(color: Colors.purpleAccent, label: 'Solved'),
+                LegendDot(color: Color(0xFFdc3545), label: 'Solved'),
               ],
             ),
           ],
@@ -145,7 +149,7 @@ class LegendDot extends StatelessWidget {
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         SizedBox(width: 4),
-        Text(label, style: TextStyle(color: Colors.white, fontSize: 12)),
+        Text(label, style: TextStyle(color: Color(0xFF00273a), fontSize: 12)),
       ],
     );
   }

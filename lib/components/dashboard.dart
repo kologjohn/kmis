@@ -67,12 +67,15 @@ class _DashboardLayoutState extends State<DashboardLayout> {
         return Scaffold(
             appBar: AppBar(
               iconTheme: IconThemeData(color: Colors.white),
-              backgroundColor: const Color(0xFF2A2D3E),
+              backgroundColor: const Color(0xFF00273a),
               title: Text(schoolname.toUpperCase(), style: TextStyle(color: Colors.white)),
               actions: const [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: CircleAvatar(child: Icon(Icons.person)),
+                  child: CircleAvatar(
+                    backgroundColor: Color(0xFF00496d),
+                      child: Icon(Icons.person, color: Colors.white54,)
+                  ),
                 ),
               ],
             ),
