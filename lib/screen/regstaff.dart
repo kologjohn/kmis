@@ -153,7 +153,6 @@ class _RegstaffState extends State<Regstaff> {
                                   validator: (value) => value == null ? 'Please select access level' : null,
                                 ),
                                 const SizedBox(height: 30),
-
                                 // Buttons
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,

@@ -1,12 +1,15 @@
 import 'package:go_router/go_router.dart';
 import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
-import 'package:ksoftsms/screen/multipleschools.dart';
+
 import 'package:ksoftsms/screen/signup.dart';
 import '../components/dashboard.dart';
 
+import '../screen/acceslist.dart';
+import '../screen/accesscomponent.dart';
 import '../screen/class.dart';
 import '../screen/department.dart';
 
+import '../screen/gradingsystem.dart';
 import '../screen/judgeui.dart';
 
 import '../screen/levelreg.dart';
@@ -14,7 +17,13 @@ import '../screen/registerschool.dart';
 import '../screen/regstaff.dart';
 import '../screen/scoreconfig.dart';
 import '../screen/subject.dart';
+import '../screen/teachersetup.dart';
 import '../screen/term.dart';
+import '../screen/termlist.dart';
+import '../screen/viewclass.dart';
+import '../screen/viewdepartment.dart';
+import '../screen/viewschool.dart';
+import '../screen/viewsubject.dart';
 import 'dbmodels/departmodel.dart';
 import 'dbmodels/levelmodel.dart';
 import 'dbmodels/schoolmodel.dart';
@@ -97,6 +106,8 @@ class Routes {
   static const testvote = "/testvote";
   static const rawvote = "/rawvote";
   static const terminalreport = "/terminalreport";
+  static const gradingsystem = "/gradingsystem";
+  static const setupteacher = "/setupteacher";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
@@ -113,43 +124,7 @@ class Routes {
 final GoRouter router = GoRouter(
   initialLocation: Routes.login,
 
-  // redirect: (context, state) async {
-  //   final provider = Provider.of<Myprovider>(context, listen: false);
-  //
-  //   await provider.getdata();
-  //   await provider.getaccessvel();
-  //
-  //   final loggingIn = state.matchedLocation == '/login';
-  //
-  //   // Not logged in → send to login
-  //   if (provider.auth.currentUser == null) {
-  //     return loggingIn ? null : '/dashboard';
-  //   }
-  //
-  //   // If logged in & at /login → send to dashboard/home
-  //   if (loggingIn) {
-  //     if (provider.accesslevel == "Admin" || provider.accesslevel == "Super Admin") {
-  //       return Routes.dashboard; // or Routes.home
-  //     }
-  //     final allowed = Routes.roleAllowedRoutes[provider.accesslevel];
-  //     if (allowed != null && allowed.isNotEmpty) {
-  //       return allowed.first;
-  //     }
-  //     return '/login'; // fallback
-  //   }
-  //   // ✅ Allow Admin & Super Admin full access
-  //   if (provider.accesslevel == "Admin" || provider.accesslevel == "Super Admin") {
-  //     return null;
-  //   }
-  //
-  //   // Restrict Judge and others
-  //   final allowedRoutes = Routes.roleAllowedRoutes[provider.accesslevel] ?? [];
-  //   if (!allowedRoutes.contains(state.matchedLocation)) {
-  //     return allowedRoutes.isNotEmpty ? allowedRoutes.first : '/login';
-  //   }
-  //
-  //   return null; // Allow
-  // },
+
   routes: [
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
     GoRoute(
@@ -168,7 +143,7 @@ final GoRouter router = GoRouter(
     },),
 
     GoRoute(path: Routes.dashboard, builder: (c, s) => DashboardLayout()),
-    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
+    //GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
 
     GoRoute(path: Routes.jscore, builder: (c, s) => JudgeGroundScreen()),
     GoRoute(
@@ -213,6 +188,15 @@ final GoRouter router = GoRouter(
         return ScoreConfigPage(config: config);
       },
     ),
-
+    GoRoute(path: Routes.gradingsystem, builder: (c, s) => GradingSystemFormPage()),
+    GoRoute(path: Routes.viewterm, builder: (c, s) => Viewterms()),
+    GoRoute(path: Routes.viewdepart, builder: (c, s) => Viewdepartment()),
+    GoRoute(path: Routes.viewclass, builder: (c, s) => Viewclass()),
+    GoRoute(path: Routes.viewsubjects, builder: (c, s) => ViewSubjectPage()),
+    GoRoute(path: Routes.viewschool, builder: (c, s) => ViewSchoolPage()),
+    GoRoute(path: Routes.viewconfig, builder: (c, s) => ViewSchoolPage()),
+    GoRoute(path: Routes.accesscomponent, builder: (c, s) => AccessComponent()),
+    GoRoute(path: Routes.accesslist, builder: (c, s) => AccessList()),
+    GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),
   ],
 );

@@ -1,51 +1,60 @@
 import 'componentmodel.dart';
 
-class ScoringMark {
-  final String id;          // studentId_season_episode
+/// Model to store subject-based scoring for a student
+class SubjectScoring {
+  final String id;                // studentId_academicYear_term_subject
   final String studentId;
   final String studentName;
-  final String seasonId;
-  final String episodeId;
-  final String level;       // from contestant collection
-  final String zone;
+  final String academicYear;
+  final String term;
+  final String level;             // class/grade (e.g., JHS1)
   final String region;
+  final String schoolId;
   final String photoUrl;
-  final Map<String, dynamic> judgeData; // judgeId -> map of scores
-  final Map<String, String> scoredFlags; // "scored<judgeId>" -> yes/no
-  final Map<String, String> totalScores; // "total<judgeId>" -> total string
+
+  /// subjectId -> score details
+  final Map<String, dynamic> subjectData;
+
+  /// subjectId -> yes/no (whether scored)
+  final Map<String, String> scoredFlags;
+
+  /// subjectId -> total string
+  final Map<String, String> totalScores;
+
   final DateTime timestamp;
 
-  ScoringMark({
+  SubjectScoring({
     required this.id,
     required this.studentId,
     required this.studentName,
-    required this.seasonId,
-    required this.episodeId,
+    required this.academicYear,
+    required this.term,
     required this.level,
-    required this.zone,
     required this.region,
+    required this.schoolId,
     required this.photoUrl,
-    required this.judgeData,
+    required this.subjectData,
     required this.scoredFlags,
     required this.totalScores,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
-  /// Factory for a single judge assignment
-  factory ScoringMark.create({
+  /// Factory for initializing a subject record
+  factory SubjectScoring.create({
     required String studentId,
     required String studentName,
-    required String seasonId,
-    required String episodeId,
+    required String academicYear,
+    required String term,
     required String level,
-    required String zone,
     required String region,
+    required String schoolId,
     required String photoUrl,
-    required String judgeId,
-    required List<ComponentModel> components,
+    required String subjectId,
+    required List<ComponentModel> components, // e.g., Exams, Classwork, Homework
   }) {
-    final id = "${studentId}_${seasonId}_$episodeId";
+    final id = "${studentId}_${academicYear}_${term}_$subjectId";
 
+    // initialize components with "0" marks
     final Map<String, String> initialScores = {
       for (var c in components) c.name: "0"
     };
@@ -55,47 +64,49 @@ class ScoringMark {
           (sum, c) => sum + int.tryParse(c.totalMark)!,
     ).toString();
 
-    return ScoringMark(
+    return SubjectScoring(
       id: id,
       studentId: studentId,
       studentName: studentName,
-      seasonId: seasonId,
-      episodeId: episodeId,
+      academicYear: academicYear,
+      term: term,
       level: level,
-      zone: zone,
       region: region,
+      schoolId: schoolId,
       photoUrl: photoUrl,
-      judgeData: {
-        judgeId: {
+      subjectData: {
+        subjectId: {
           "criteriatotal": criteriaTotal,
-          "scores": initialScores,
-          "status": "1",
+          "scores": initialScores, // per component
+          "status": "pending",     // pending / in-progress / finalized
           "timestamp": DateTime.now(),
           "totalScore": "0",
+          "grade": "",             // to be assigned after scoring
+          "remark": "",            // e.g. Excellent / Good / Poor
         }
       },
       scoredFlags: {
-        "scored$judgeId": "no",
+        "scored$subjectId": "no",
       },
       totalScores: {
-        "total$judgeId": "0",
+        "total$subjectId": "0",
       },
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "episodeId": episodeId,
-      "episodeTitle": episodeId,
+      "academicYear": academicYear,
+      "term": term,
       "studentId": studentId,
       "studentName": studentName,
       "level": level,
+      "schoolId": schoolId,
       "photoUrl": photoUrl,
-      "zone": zone,
       "region": region,
       ...scoredFlags,
       ...totalScores,
-      ...judgeData,
+      ...subjectData,
       "timestamp": timestamp,
     };
   }
