@@ -61,7 +61,7 @@ class Staff {
     addIfNotEmpty("sex", sex);
     addIfNotEmpty("region", region);
     addIfNotEmpty("schoolid", schoolId);
-    addIfNotEmpty("school", schoolname);
+    addIfNotEmpty("schoolname", schoolname);
 
     return data;
   }
@@ -78,7 +78,7 @@ class Staff {
       region: map["region"] ?? "",
       status: map["status"] ?? "0",
       schoolId: map["schoolid"] ?? "",
-      schoolname: map["school"] ?? "",
+      schoolname: map["schoolname"] ?? "",
       createdAt: (map["createdAt"] is Timestamp)
           ? (map["createdAt"] as Timestamp).toDate()
           : (map["createdAt"] ?? DateTime.now()),

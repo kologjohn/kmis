@@ -55,20 +55,23 @@ class LoginProvider extends ChangeNotifier {
         prefs.setString("role", roleTxt);
         prefs.setString("phone", phoneTxt);
         prefs.setString("schoolid", scchoolIdTxt);
+        print(userData);
+        print(usermodel!.schoolname);
         if (numberofdocs > 1) {
           staffschools = detail.docs.map((doc) {
             return Staff.fromMap(doc.data(), doc.id);
           }).toList();
           prefs.setStringList("staffschools", staffschools.map((e) => e.schoolId).toList());
           prefs.setStringList("schoolnames", staffschools.map((e) => e.schoolname).toList());
-          print(schoolList);
           await getdata();
           context.go(Routes.nextpage);
           notifyListeners();
-        } else {
+        }
+        else {
           await getdata();
           auth.currentUser!.updateDisplayName(nameTxt);
-          context.go(Routes.dashboard);
+          print(currentschool);
+         context.go(Routes.dashboard);
           //print(usermodel?.schoolId);
           print("Single user.");
           notifyListeners();

@@ -67,8 +67,7 @@ class _RegstaffState extends State<Regstaff> {
                       context.go(Routes.dashboard);
                     },
                   ),
-                  title: Text(
-                    isEdit ? 'Edit Staff' : 'Register Staff',
+                  title: Text(value.schoolid,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
