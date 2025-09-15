@@ -69,7 +69,6 @@ class _SchoolListState extends State<SchoolList> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Top: user info
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,
@@ -126,9 +125,8 @@ class _SchoolListState extends State<SchoolList> {
                                   return InkWell(
                                     onTap: () async {
                                       await value.setSchool(schoolnameTxt,schoolidTxt);
-                                      print("${value.schoolid} selected");
-                                      print("${value.currentschool} selected");
-                                      context.go(Routes.dashboard);
+                                      await value.setSchool(schoolnameTxt, schoolidTxt);
+                                     context.go(Routes.dashboard);
 
                                     },
                                       child: _schoolCard(schoolnameTxt)

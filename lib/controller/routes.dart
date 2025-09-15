@@ -13,6 +13,7 @@ import '../screen/gradingsystem.dart';
 import '../screen/judgeui.dart';
 
 import '../screen/levelreg.dart';
+import '../screen/multipleschools.dart';
 import '../screen/registerschool.dart';
 import '../screen/regstaff.dart';
 import '../screen/scoreconfig.dart';
@@ -50,10 +51,6 @@ class Routes {
   static const viewstudentlist = "/viewstudentlist";
   static const viewschool = "/viewschool";
   static const nextpage = "/nextpage";
-
-
-
-
 
 
   static const registerzone = "/registerzone";
@@ -127,13 +124,13 @@ final GoRouter router = GoRouter(
 
   routes: [
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
-    // GoRoute(
-    //   path: Routes.regstaff,
-    //   builder: (context, state) {
-    //     final item = state.extra as Staff?;
-    //     return Regstaff(staffData: item);
-    //   },
-    // ),
+    GoRoute(
+      path: Routes.regstaff,
+      builder: (context, state) {
+        final item = state.extra as Staff?;
+        return Regstaff();
+      },
+    ),
 
     GoRoute(
     path: Routes.levelreg,
@@ -143,7 +140,7 @@ final GoRouter router = GoRouter(
     },),
 
     GoRoute(path: Routes.dashboard, builder: (c, s) => DashboardLayout()),
-    //GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
+    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
 
     GoRoute(path: Routes.jscore, builder: (c, s) => JudgeGroundScreen()),
     GoRoute(
