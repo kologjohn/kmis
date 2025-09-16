@@ -126,7 +126,7 @@ class CSAT extends StatelessWidget {
     child: Text(
       title,
       style: const TextStyle(
-        color: Color(0xFF00273a),
+        color: Color(0xFF00496d),
         fontSize: 14,
         fontWeight: FontWeight.w700,
       ),

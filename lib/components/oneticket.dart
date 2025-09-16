@@ -34,7 +34,7 @@ class OneTicket extends StatelessWidget {
                 SizedBox(height: 100.0),
                 Center(
                   child: Text(totalvotes,
-                    style: TextStyle(fontSize: 80, fontWeight: FontWeight.w700, color: Color(0xFFdc3545)),
+                    style: TextStyle(fontSize: 80, fontWeight: FontWeight.w700, color: Color(0xFFfb7d5b)),
                   ),
                 ),
                 Center(
