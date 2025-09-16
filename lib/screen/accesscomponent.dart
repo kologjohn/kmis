@@ -10,7 +10,9 @@ import '../controller/routes.dart';
 import 'dropdown.dart';
 
 class AccessComponent extends StatefulWidget {
-  const AccessComponent({super.key});
+  final ComponentModel? component;
+  const AccessComponent({super.key,this.component});
+
 
   @override
   State<AccessComponent> createState() => _RevenueGridPageState();
@@ -180,25 +182,21 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                             progress!.show();
 
                                             try {
-                                              String categoryName =
-                                              componentname.text.trim();
-                                              String totalMark =
-                                              totalmark.text.trim();
+                                              String categoryName =componentname.text.trim();
+                                              String totalMark = totalmark.text.trim();
+                                              String totalMar = totalmark.text.trim();
+                                              String id = "${value.schoolid}_${totalMar.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
 
                                               final data = ComponentModel(
                                                 name: categoryName,
                                                 totalMark: totalMark,
                                                 dateCreated: DateTime.now(),
+                                                schoolId: value.schoolid,
                                               );
 
-                                              // ✅ Save as Map
-                                              await value.db
-                                                  .collection("assesscomponent")
-                                                  .doc(componentname.text)
-                                                  .set(data.toJson());
-
+                                              // Save as Map
+                                              await value.db.collection("assesscomponent").doc(id).set(data.toJson());
                                               progress.dismiss();
-
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 const SnackBar(

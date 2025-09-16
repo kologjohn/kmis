@@ -3,13 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class DepartmentModel {
   final String id;
   final String name;
-  final String? companyid;
+  final String? schoolId;
   final DateTime timestamp;
 
   DepartmentModel({
     required this.id,
     required this.name,
-    this.companyid,
+    this.schoolId,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
@@ -18,7 +18,7 @@ class DepartmentModel {
     return {
       'id': id,
       'name': name,
-      'companyid': companyid,
+      'companyid': schoolId,
       'timestamp': Timestamp.fromDate(timestamp),
     };
   }
@@ -41,7 +41,7 @@ class DepartmentModel {
     return DepartmentModel(
       id: docId,
       name: map['name'] ?? '',
-      companyid: map['companyid'],
+      schoolId: map['companyid'],
       timestamp: parsedTime,
     );
   }

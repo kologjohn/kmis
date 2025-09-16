@@ -3,13 +3,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class TermModel {
   final String id;
   final String name;
-  final String? companyid;
+  final String? schoolId;
   final DateTime timestamp;
 
   TermModel({
     required this.id,
     required this.name,
-    this.companyid,
+    this.schoolId,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
@@ -17,7 +17,7 @@ class TermModel {
     return {
       'id': id,
       'name': name,
-      'companyid': companyid,
+      'schoolId': schoolId,
       'timestamp': Timestamp.fromDate(timestamp),
     };
   }
@@ -40,7 +40,7 @@ class TermModel {
     return TermModel(
       id: docId,
       name: map['name'] ?? '',
-      companyid: map['companyid'],
+      schoolId: map['schoolId'],
       timestamp: parsedTime,
     );
   }

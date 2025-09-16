@@ -135,7 +135,7 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
                                 name: subjectController.text.trim(),
                                 code: codeController.text.trim(),
                                 level: selectedLevel ?? '',
-                                companyid: value.schoolid,
+                                schoolId: value.schoolid,
                                 timestamp: DateTime.now(),
                               ).toMap();
 

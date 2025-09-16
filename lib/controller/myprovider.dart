@@ -167,15 +167,20 @@ class Myprovider extends LoginProvider {
           .where("schoolid", isEqualTo: schoolid)
           .get();
 
-      academicyears = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        return AcademicModel.fromMap(data, doc.id);
-      }).toList();
+      if (snapshot.docs.isNotEmpty) {
+        academicyears = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          return AcademicModel.fromMap(data, doc.id);
+        }).toList();
+      } else {
+        academicyears = []; // explicitly set empty
+      }
 
       loadacademicyear = false;
       notifyListeners();
     } catch (e) {
       loadacademicyear = false;
+      academicyears = [];
       notifyListeners();
       print("Failed to fetch academic years: $e");
     }
@@ -218,6 +223,7 @@ class Myprovider extends LoginProvider {
         return RegionModel(
           id: doc.id,
           regionname: data['name'] ?? '',
+          schoolId: data['schoolId'] ?? '',
           time: parsedTime ?? DateTime.now(),
         );
       }).toList();
@@ -315,7 +321,7 @@ class Myprovider extends LoginProvider {
           final teacherSetup = TeacherSetup(
             staffid: teacherId,
             staffname: "",
-            schoolid: schoolId,
+            schoolId: schoolId,
             academicyear: academicYear,
             term: term,
             levels: levels,

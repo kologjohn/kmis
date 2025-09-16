@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../components/academicyrmodel.dart';
+
 import '../controller/myprovider.dart';
 import '../controller/routes.dart';
 
@@ -16,9 +16,9 @@ class _ViewAcademicyrState extends State<ViewAcademicyr> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-          () => Provider.of<Myprovider>(context, listen: false).fetchacademicyear(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<Myprovider>(context, listen: false).fetchacademicyear();
+    });
   }
 
   @override
@@ -27,8 +27,10 @@ class _ViewAcademicyrState extends State<ViewAcademicyr> {
       builder: (BuildContext context, Myprovider provider, Widget? child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('All Academic Years',
-                style: TextStyle(color: Colors.white)),
+            title: const Text(
+              'All Academic Years',
+              style: TextStyle(color: Colors.white),
+            ),
             backgroundColor: const Color(0xFF2D2F45),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -78,8 +80,7 @@ class _ViewAcademicyrState extends State<ViewAcademicyr> {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete,
-                          color: Colors.red),
+                      icon: const Icon(Icons.delete, color: Colors.red),
                       tooltip: 'Delete ${year.name}',
                       onPressed: () async {
                         final confirm = await showDialog<bool>(
@@ -87,7 +88,8 @@ class _ViewAcademicyrState extends State<ViewAcademicyr> {
                           builder: (context) => AlertDialog(
                             title: const Text("Confirm Delete"),
                             content: Text(
-                                "Are you sure you want to delete '${year.name}'?"),
+                              "Are you sure you want to delete '${year.name}'?",
+                            ),
                             actions: [
                               TextButton(
                                 onPressed: () =>
@@ -109,7 +111,9 @@ class _ViewAcademicyrState extends State<ViewAcademicyr> {
 
                         if (confirm == true) {
                           await provider.deleteData(
-                              "academicYears", year.id);
+                            "academicyears",
+                            year.id,
+                          );
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
@@ -133,5 +137,3 @@ class _ViewAcademicyrState extends State<ViewAcademicyr> {
     );
   }
 }
-
-

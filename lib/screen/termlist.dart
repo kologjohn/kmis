@@ -49,7 +49,6 @@ class _ViewtermsState extends State<Viewterms> {
             separatorBuilder: (_, __) => const Divider(color: Colors.grey),
             itemBuilder: (context, index) {
               final term = provider.terms[index];
-
               return ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.blueAccent,

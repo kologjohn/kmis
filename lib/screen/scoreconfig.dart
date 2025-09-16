@@ -131,7 +131,7 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
 
                                       final scoreConfig = ScoremodelConfig(
                                         id: id.toString(),
-                                        companyid: provider.schoolid,
+                                        schoolId: provider.schoolid,
                                         continuous: continuous.toString(),
                                         exam: exam.toString(),
                                       ).toMap();

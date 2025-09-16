@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class SubjectModel {
   final String id;
   final String name;
-  final String? companyid;
+  final String? schoolId;
   final String? code;
   final String? level;
   final DateTime timestamp;
@@ -11,7 +11,7 @@ class SubjectModel {
   SubjectModel({
     required this.id,
     required this.name,
-    this.companyid,
+    this.schoolId,
     this.code,
     this.level,
     DateTime? timestamp,
@@ -22,7 +22,7 @@ class SubjectModel {
     return {
       'id': id,
       'name': name,
-      'companyid': companyid,
+      'schoolId': schoolId,
       'code': code,
       'level': level,
       'timestamp': Timestamp.fromDate(timestamp),
@@ -47,7 +47,7 @@ class SubjectModel {
     return SubjectModel(
       id: docId,
       name: map['name'] ?? '',
-      companyid: map['companyid'],
+      schoolId: map['schoolId'],
       code: map['code'],
       level: map['level'],
       timestamp: parsedTime,

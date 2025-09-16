@@ -122,10 +122,11 @@ class _TermState extends State<Term> {
                                         progress!.show();
 
                                         String term = termname.text.trim();
-                                        String id = term.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                        String id = "${value.schoolid}_${term.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
                                         final data = TermModel(
-                                          id: term.toLowerCase(),
+                                          id: id,
                                           name: term,
+                                          schoolId: value.schoolid,
                                           timestamp: DateTime.now(),
                                         ).toMap();
 
@@ -133,7 +134,11 @@ class _TermState extends State<Term> {
                                             .collection('terms')
                                             .doc(id)
                                             .set(data, SetOptions(merge: true));
-
+                                        await value.db.collection('schools').doc(value.schoolid)
+                                            .update({
+                                          "term": term,
+                                          "updatedAt": DateTime.now(),
+                                        });
                                         progress.dismiss();
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(

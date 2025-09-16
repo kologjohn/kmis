@@ -2,12 +2,12 @@ import 'componentmodel.dart';
 
 /// Model to store subject-based scoring for a student
 class SubjectScoring {
-  final String id;                // studentId_academicYear_term_subject
+  final String id;
   final String studentId;
   final String studentName;
   final String academicYear;
   final String term;
-  final String level;             // class/grade (e.g., JHS1)
+  final String level;
   final String region;
   final String schoolId;
   final String photoUrl;
@@ -50,7 +50,7 @@ class SubjectScoring {
     required String schoolId,
     required String photoUrl,
     required String subjectId,
-    required List<ComponentModel> components, // e.g., Exams, Classwork, Homework
+    required List<ComponentModel> components,
   }) {
     final id = "${studentId}_${academicYear}_${term}_$subjectId";
 
@@ -77,12 +77,12 @@ class SubjectScoring {
       subjectData: {
         subjectId: {
           "criteriatotal": criteriaTotal,
-          "scores": initialScores, // per component
-          "status": "pending",     // pending / in-progress / finalized
+          "scores": initialScores,
+          "status": "pending",
           "timestamp": DateTime.now(),
           "totalScore": "0",
-          "grade": "",             // to be assigned after scoring
-          "remark": "",            // e.g. Excellent / Good / Poor
+          "grade": "",
+          "remark": "",
         }
       },
       scoredFlags: {

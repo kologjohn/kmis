@@ -129,12 +129,11 @@ class _AcademicYrState extends State<AcademicYr> {
                                           schoolid: value.schoolid,
                                           timestamp: DateTime.now(),
                                         ).toMap();
-
-                                        await value.db
-                                            .collection('academicyears')
-                                            .doc(id)
-                                            .set(data, SetOptions(merge: true));
-
+                                        await value.db.collection('academicyears').doc(id).set(data, SetOptions(merge: true));
+                                        await value.db.collection('schools').doc(value.schoolid).update({
+                                          "academicyr": year,
+                                          "updatedAt": DateTime.now(),
+                                        });
                                         progress.dismiss();
                                         ScaffoldMessenger.of(context).showSnackBar(
                                           SnackBar(
@@ -172,7 +171,7 @@ class _AcademicYrState extends State<AcademicYr> {
                                       elevation: 5,
                                     ),
                                   ),
-                                  const SizedBox(width: 20),
+                                  const SizedBox(width: 10),
                                   ElevatedButton.icon(
                                     onPressed: () {
                                       context.go(Routes.viewacademicyr);

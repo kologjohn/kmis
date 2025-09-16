@@ -1,12 +1,12 @@
 class ScoremodelConfig {
   final String? id;
-  final String companyid;
+  final String schoolId;
   final String continuous;
   final String exam;
 
   ScoremodelConfig({
     this.id,
-    required this.companyid,
+    required this.schoolId,
     required this.continuous,
     required this.exam,
   }) {
@@ -19,7 +19,7 @@ class ScoremodelConfig {
   factory ScoremodelConfig.fromFirestore(Map<String, dynamic> map, String id) {
     return ScoremodelConfig(
       id: id,
-      companyid: map['companyid'] ?? "",
+      schoolId: map['schoolId'] ?? "",
       continuous: (map['continuous'] ?? 50).toDouble(),
       exam: (map['exam'] ?? 50).toDouble(),
     );
@@ -29,7 +29,7 @@ class ScoremodelConfig {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
-      "companyid": companyid,
+      "schoolId": schoolId,
       "continuous": continuous,
       "exam": exam,
     };

@@ -5,7 +5,7 @@ import 'departmodel.dart';
 class TeacherSetup {
   final String staffid;
   final String staffname;
-  final String schoolid;
+  final String schoolId;
   final String academicyear;
   final String term;
   final String? classid;
@@ -21,7 +21,7 @@ class TeacherSetup {
   TeacherSetup({
     required this.staffid,
     required this.staffname,
-    required this.schoolid,
+    required this.schoolId,
     required this.academicyear,
     required this.term,
     this.classid,
@@ -39,7 +39,7 @@ class TeacherSetup {
     return {
       "staffid": staffid,
       "staffname": staffname,
-      "schoolid": schoolid,
+      "schoolId": schoolId,
       "academicyear": academicyear,
       "term": term,
       "subjects": subjects ?? [],
