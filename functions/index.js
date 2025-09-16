@@ -68,7 +68,7 @@ async function sendSms(phone, senderId, message) {
 // Helper to generate password: email + random 6 digits
 function generateEmailPassword(email) {
   const randomDigits = Math.floor(100000 + Math.random() * 900000).toString();
-  return `${email}${randomDigits}`;
+  return randomDigits;
 }
 
 // Convert phone number to E.164 format
