@@ -77,7 +77,7 @@ class Staff {
       sex: map["sex"] ?? "",
       region: map["region"] ?? "",
       status: map["status"] ?? "0",
-      schoolId: map["schoolid"] ?? "",
+      schoolId: map["schoolId"] ?? "",
       schoolname: map["schoolname"] ?? "",
       createdAt: (map["createdAt"] is Timestamp)
           ? (map["createdAt"] as Timestamp).toDate()

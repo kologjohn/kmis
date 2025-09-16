@@ -35,6 +35,7 @@ class LoginProvider extends ChangeNotifier {
         email: email,
         password: password,
       );
+
       if (loginhere.user != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('useremail', email);
@@ -55,8 +56,7 @@ class LoginProvider extends ChangeNotifier {
         prefs.setString("role", roleTxt);
         prefs.setString("phone", phoneTxt);
         prefs.setString("schoolid", scchoolIdTxt);
-        print(userData);
-        print(usermodel!.schoolname);
+
         if (numberofdocs > 1) {
           staffschools = detail.docs.map((doc) {
             return Staff.fromMap(doc.data(), doc.id);
@@ -70,10 +70,7 @@ class LoginProvider extends ChangeNotifier {
         else {
           await getdata();
           auth.currentUser!.updateDisplayName(nameTxt);
-          print(currentschool);
-         context.go(Routes.dashboard);
-          //print(usermodel?.schoolId);
-          print("Single user.");
+          context.go(Routes.dashboard);
           notifyListeners();
         }
 
@@ -94,6 +91,7 @@ class LoginProvider extends ChangeNotifier {
     name = prefs.getString('name') ?? '';
     staffSchoolIds = prefs.getStringList("staffschools") ?? [];
     schoolnames = prefs.getStringList("schoolnames") ?? [];
+    print(schoolid);
     notifyListeners();
   }
   setSchool(String school, String schoolid) async {
@@ -109,8 +107,7 @@ class LoginProvider extends ChangeNotifier {
   staffcount() async {
     await getdata();
     try {
-     // print(phone);
-
+      print(schoolid);
       final detail = await db.collection("staff").where('schoolId', isEqualTo: schoolid).get();
       int numberofdocs = detail.docs.length;
       staffcount_in_school = numberofdocs;
