@@ -73,7 +73,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
         builder: (context, value, child) {
           return Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color(0xFF2D2F45),
+              backgroundColor: const Color(0xFF00273a),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => context.go(Routes.dashboard),
@@ -92,11 +92,11 @@ class _RegisterSchoolState extends State<RegisterSchool> {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  color: const Color(0xFF2D2F45),
+                  color: const Color(0xFFffffff),
                   margin: const EdgeInsets.all(30.0),
-                  constraints: const BoxConstraints(maxWidth: 800),
+                  constraints: const BoxConstraints(maxWidth: 600),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(30.0),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -176,12 +176,12 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                                 onChanged: (val) {
                                   setState(() => agreedToTerms = val ?? false);
                                 },
-                                activeColor: Colors.blueAccent,
+                                activeColor: Color(0xFF00496d),
                               ),
                               const Expanded(
                                 child: Text(
                                   "I agree to the terms & conditions",
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: Colors.black54),
                                 ),
                               ),
                             ],
@@ -263,7 +263,7 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                             icon: Icon(isEdit ? Icons.update : Icons.save),
                             label: Text(isEdit ? 'Update School' : 'Register School'),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
+                              backgroundColor: Color(0xFF00496d),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                               textStyle: const TextStyle(fontSize: 18),
@@ -303,18 +303,18 @@ class _RegisterSchoolState extends State<RegisterSchool> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        labelStyle: const TextStyle(color: Colors.white),
-        hintStyle: const TextStyle(color: Colors.grey),
+        labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+        hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
         border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
         contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        filled: true,
+        filled: false,
         fillColor: fillColor,
       ),
       style: TextStyle(
-        fontSize: 16,
-        color: readOnly ? Colors.grey[400] : Colors.white,
+        fontSize: 14,
+        color: readOnly ? Colors.black54 : Colors.black,
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) return validatorMsg;

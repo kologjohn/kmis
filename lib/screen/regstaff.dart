@@ -51,7 +51,7 @@ class _RegstaffState extends State<Regstaff> {
 
   @override
   Widget build(BuildContext context) {
-    final inputFill = const Color(0xFF2C2C3C);
+    final inputFill = const Color(0xFFffffff);
     final isEdit = widget.staffData != null;
 
     return ProgressHUD(
@@ -61,7 +61,7 @@ class _RegstaffState extends State<Regstaff> {
             builder: (context, value, child) {
               return Scaffold(
                 appBar: AppBar(
-                  backgroundColor: const Color(0xFF2D2F45),
+                  backgroundColor: const Color(0xFF00273a),
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: () {
@@ -81,12 +81,12 @@ class _RegstaffState extends State<Regstaff> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      color: const Color(0xFF2D2F45),
+                      color: const Color(0xFFffffff),
                       margin: const EdgeInsets.all(20),
                       child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 800),
+                        constraints: const BoxConstraints(maxWidth: 600),
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(40.0),
                           child: Form(
                             key: _formKey,
                             child: Column(
@@ -141,7 +141,7 @@ class _RegstaffState extends State<Regstaff> {
                                   items: _sex.map((cat) {
                                     return DropdownMenuItem(
                                       value: cat,
-                                      child: Text(cat, style: const TextStyle(color: Colors.white)),
+                                      child: Text(cat, style: const TextStyle(color: Colors.black54)),
                                     );
                                   }).toList(),
                                   dropdownColor: inputFill,
@@ -157,7 +157,7 @@ class _RegstaffState extends State<Regstaff> {
                                   items: value.regionList.map((cat) {
                                     return DropdownMenuItem(
                                       value: cat.regionname,
-                                      child: Text(cat.regionname, style: const TextStyle(color: Colors.white)),
+                                      child: Text(cat.regionname, style: const TextStyle(color: Colors.black54)),
                                     );
                                   }).toList(),
                                   dropdownColor: inputFill,
@@ -173,7 +173,7 @@ class _RegstaffState extends State<Regstaff> {
                                   items: value.staffaccesslevel.map((accesslevel) {
                                     return DropdownMenuItem(
                                       value: accesslevel,
-                                      child: Text(accesslevel, style: const TextStyle(color: Colors.white)),
+                                      child: Text(accesslevel, style: const TextStyle(color: Colors.black54)),
                                     );
                                   }).toList(),
                                   onChanged: (val) => setState(() => _selectedAccessLevel = val),
@@ -182,68 +182,72 @@ class _RegstaffState extends State<Regstaff> {
                                 ),
                                 const SizedBox(height: 30),
                                 // Buttons
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                Column(
                                   children: [
-                                    ElevatedButton.icon(
-                                      onPressed: () async {
-                                        if (_formKey.currentState!.validate()) {
-                                          final progress = ProgressHUD.of(context);
-                                          progress!.show();
-                                          String nameTxt= nameController.text.trim();
-                                          String phoneTxt= phoneController.text.trim();
-                                          String sexTxt= _selectedSex ?? "";
-                                          String regionTxt= myRegion ?? "";
-                                          String emailTxt= emailController.text.trim().toString().toLowerCase();
-                                          String schoolId= value.schoolid ?? "";
-                                          String schoolName= value.currentschool ?? "";
-                                          DateTime createdAt= DateTime.now();
-                                          String accessLevelTxt= _selectedAccessLevel ?? "";
-                                          //get the next staffid
-                                          await value.staffcount();
-                                          String _staffcount=value.staffcount_in_school.toString();
-                                          String _staffid= value.schoolid! + _staffcount;
-                                          bool existstaffbyeamil=await value.staffexistbyemail(emailTxt);
-                                          bool existstaffbyphone=await value.staffexistbyphone(phoneTxt);
-                                          print("Number of docs: $schoolId");
-                                          if(existstaffbyeamil || existstaffbyphone)
-                                            {
-                                              SnackBar snackBar = const SnackBar(
-                                                content: Text('Staff with this Phone Number or Email already exists'),
-                                                backgroundColor: Colors.red,
-                                              );
-                                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                                             //await value.smsalert("Hello $nameTxt, you already exist in ${value.currentschool}", phoneTxt);
+                                    Wrap(
+                                      spacing: 10,
+                                      runSpacing: 10,
+                                      children: [
+                                        ElevatedButton.icon(
+                                          onPressed: () async {
+                                            if (_formKey.currentState!.validate()) {
+                                              final progress = ProgressHUD.of(context);
+                                              progress!.show();
+                                              String nameTxt= nameController.text.trim();
+                                              String phoneTxt= phoneController.text.trim();
+                                              String sexTxt= _selectedSex ?? "";
+                                              String regionTxt= myRegion ?? "";
+                                              String emailTxt= emailController.text.trim().toString().toLowerCase();
+                                              String schoolId= value.schoolid ?? "";
+                                              String schoolName= value.currentschool ?? "";
+                                              DateTime createdAt= DateTime.now();
+                                              String accessLevelTxt= _selectedAccessLevel ?? "";
+                                              //get the next staffid
+                                              await value.staffcount();
+                                              String _staffcount=value.staffcount_in_school.toString();
+                                              String _staffid= value.schoolid! + _staffcount;
+                                              bool existstaffbyeamil=await value.staffexistbyemail(emailTxt);
+                                              bool existstaffbyphone=await value.staffexistbyphone(phoneTxt);
+                                              print("Number of docs: $schoolId");
+                                              if(existstaffbyeamil || existstaffbyphone)
+                                              {
+                                                SnackBar snackBar = const SnackBar(
+                                                  content: Text('Staff with this Phone Number or Email already exists'),
+                                                  backgroundColor: Colors.red,
+                                                );
+                                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                                //await value.smsalert("Hello $nameTxt, you already exist in ${value.currentschool}", phoneTxt);
+                                                progress.dismiss();
+                                                return;
+                                              }
+                                              final staffdata=Staff(name: nameTxt, accessLevel: accessLevelTxt, phone: phoneTxt, email: emailTxt, sex: sexTxt, region: regionTxt, schoolId: schoolId, schoolname: schoolName, createdAt: createdAt).toMap();
+
+                                              await value.db.collection('staff').doc(_staffid).set(staffdata, SetOptions(merge: true));
+
+                                              await Future.delayed(const Duration(seconds: 1));
                                               progress.dismiss();
-                                              return;
+
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                content: Text(isEdit ? 'Data Updated Successfully' : 'Data Saved Successfully'),
+                                                backgroundColor: Colors.green,
+                                              ));
+                                              //await value.smsalert("Hello $nameTxt, you have been added successfully to  ${value.currentschool}, please visit  www.kologsoft.com/mis to login", phoneTxt);
+
+
                                             }
-                                          final staffdata=Staff(name: nameTxt, accessLevel: accessLevelTxt, phone: phoneTxt, email: emailTxt, sex: sexTxt, region: regionTxt, schoolId: schoolId, schoolname: schoolName, createdAt: createdAt).toMap();
-
-                                          await value.db.collection('staff').doc(_staffid).set(staffdata, SetOptions(merge: true));
-
-                                          await Future.delayed(const Duration(seconds: 1));
-                                          progress.dismiss();
-
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                            content: Text(isEdit ? 'Data Updated Successfully' : 'Data Saved Successfully'),
-                                            backgroundColor: Colors.green,
-                                          ));
-                                          //await value.smsalert("Hello $nameTxt, you have been added successfully to  ${value.currentschool}, please visit  www.kologsoft.com/mis to login", phoneTxt);
-
-
-                                        }
-                                      },
-                                      icon: Icon(isEdit ? Icons.update : Icons.save),
-                                      label: Text(isEdit ? 'Update Staff' : 'Register Staff'),
-                                      style: _btnStyle(),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    ElevatedButton.icon(
-                                      onPressed: () => context.go(Routes.viewstaff),
-                                      icon: const Icon(Icons.view_list),
-                                      label: const Text('View Staff'),
-                                      style: _btnStyle(),
-                                    ),
+                                          },
+                                          icon: Icon(isEdit ? Icons.update : Icons.save),
+                                          label: Text(isEdit ? 'Update Staff' : 'Register Staff'),
+                                          style: _btnStyle(),
+                                        ),
+                                        ElevatedButton.icon(
+                                          onPressed: () => context.go(Routes.viewstaff),
+                                          icon: const Icon(Icons.view_list),
+                                          label: const Text('View Staff'),
+                                          style: _btnStyle(),
+                                        ),
+                                      ],
+                                    )
                                   ],
                                 ),
                               ],
@@ -266,20 +270,20 @@ class _RegstaffState extends State<Regstaff> {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      labelStyle: const TextStyle(color: Colors.white),
-      hintStyle: const TextStyle(color: Colors.grey),
+      labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+      hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
       border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[700]!)),
       enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[700]!)),
-      focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+      focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      filled: true,
+      filled: false,
       fillColor: fill,
     );
   }
 
   ButtonStyle _btnStyle() {
     return ElevatedButton.styleFrom(
-      backgroundColor: Colors.blueAccent,
+      backgroundColor: Color(0xFF00496d),
       foregroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
       textStyle: const TextStyle(fontSize: 18),

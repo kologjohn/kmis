@@ -39,7 +39,7 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
             builder: (context, provider, _) {
               return Scaffold(
                 appBar: AppBar(
-                  backgroundColor: const Color(0xFF2D2F45),
+                  backgroundColor: const Color(0xFF00273a),
                   title: Text(
                     isEdit ? "Edit Score Config" : "New Score Config",
                     style: const TextStyle(color: Colors.white),
@@ -50,11 +50,11 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      color: const Color(0xFF2D2F45),
+                      color: const Color(0xFFffffff),
                       margin: const EdgeInsets.all(30.0),
-                      constraints: const BoxConstraints(maxWidth: 800),
+                      constraints: const BoxConstraints(maxWidth: 600),
                       child: Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(30.0),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -64,7 +64,13 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                 decoration: const InputDecoration(
                                   labelText: "Continuous (%)",
                                   hintText: "Enter continuous score",
-                                  labelStyle: TextStyle(color: Colors.white),
+                                  //labelStyle: TextStyle(color: Colors.white),
+                                  labelStyle: TextStyle(color: Colors.black54, fontSize: 12),
+                                  hintStyle: TextStyle(color: Colors.black54, fontSize: 12),
+                                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
+                                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -85,7 +91,13 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                 decoration: const InputDecoration(
                                   labelText: "Exam (%)",
                                   hintText: "Enter exam score",
-                                  labelStyle: TextStyle(color: Colors.white),
+                                  //labelStyle: TextStyle(color: Colors.white),
+                                  labelStyle: TextStyle(color: Colors.black54, fontSize: 12),
+                                  hintStyle: TextStyle(color: Colors.black54, fontSize: 12),
+                                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
+                                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -175,11 +187,11 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                 label:
                                 Text(isEdit ? "Update Config" : "Save Config"),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent,
+                                  backgroundColor: Color(0xFF00496d),
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 40, vertical: 15),
-                                  textStyle: const TextStyle(fontSize: 18),
+                                  textStyle: const TextStyle(fontSize: 16),
                                 ),
                               ),
                             ],

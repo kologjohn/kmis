@@ -40,7 +40,7 @@ class _AcademicYrState extends State<AcademicYr> {
             builder: (BuildContext context, Myprovider value, Widget? child) {
               return Scaffold(
                 appBar: AppBar(
-                  backgroundColor: const Color(0xFF2D2F45),
+                  backgroundColor: const Color(0xFF00273a),
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: () => context.go(Routes.dashboard),
@@ -62,11 +62,11 @@ class _AcademicYrState extends State<AcademicYr> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      color: const Color(0xFF2D2F45),
+                      color: const Color(0xFFffffff),
                       margin: const EdgeInsets.all(30.0),
-                      constraints: const BoxConstraints(maxWidth: 800),
+                      constraints: const BoxConstraints(maxWidth: 600),
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(30.0),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -78,8 +78,8 @@ class _AcademicYrState extends State<AcademicYr> {
                                 decoration: InputDecoration(
                                   labelText: "Academic Year",
                                   hintText: "Enter Academic Year (e.g. 2024/2025)",
-                                  labelStyle: const TextStyle(color: Colors.white),
-                                  hintStyle: const TextStyle(color: Colors.grey),
+                                  labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+                                  hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Colors.grey[700]!,
@@ -92,17 +92,17 @@ class _AcademicYrState extends State<AcademicYr> {
                                   ),
                                   focusedBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Colors.blueAccent,
+                                      color: Color(0xFF00496d),
                                     ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 10,
                                     horizontal: 12,
                                   ),
-                                  filled: true,
+                                  filled: false,
                                   fillColor: inputFill,
                                 ),
-                                style: const TextStyle(fontSize: 16),
+                                style: const TextStyle(fontSize: 14),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Academic Year cannot be empty';
@@ -111,93 +111,97 @@ class _AcademicYrState extends State<AcademicYr> {
                                 },
                               ),
                               const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              Column(
                                 children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        final progress = ProgressHUD.of(context);
-                                        progress!.show();
+                                  Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        onPressed: () async {
+                                          if (_formKey.currentState!.validate()) {
+                                            final progress = ProgressHUD.of(context);
+                                            progress!.show();
 
-                                        String year = yearName.text.trim();
-                                        String yea = yearName.text.trim().replaceAll('/', '');
-                                        String id = "${value.schoolid}_${yea.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
-                                        final data = AcademicModel(
-                                          id: id,
-                                          name: year,
-                                          schoolid: value.schoolid,
-                                          timestamp: DateTime.now(),
-                                        ).toMap();
-                                        await value.db.collection('academicyears').doc(id).set(data, SetOptions(merge: true));
-                                        await value.db.collection('schools').doc(value.schoolid).update({
-                                          "academicyr": year,
-                                          "updatedAt": DateTime.now(),
-                                        });
-                                        progress.dismiss();
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              isEdit
-                                                  ? 'Academic Year updated successfully'
-                                                  : 'Academic Year registered successfully',
-                                            ),
-                                            backgroundColor: Colors.green,
+                                            String year = yearName.text.trim();
+                                            String yea = yearName.text.trim().replaceAll('/', '');
+                                            String id = "${value.schoolid}_${yea.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
+                                            final data = AcademicModel(
+                                              id: id,
+                                              name: year,
+                                              schoolid: value.schoolid,
+                                              timestamp: DateTime.now(),
+                                            ).toMap();
+                                            await value.db.collection('academicyears').doc(id).set(data, SetOptions(merge: true));
+                                            await value.db.collection('schools').doc(value.schoolid).update({
+                                              "academicyr": year,
+                                              "updatedAt": DateTime.now(),
+                                            });
+                                            progress.dismiss();
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  isEdit
+                                                      ? 'Academic Year updated successfully'
+                                                      : 'Academic Year registered successfully',
+                                                ),
+                                                backgroundColor: Colors.green,
+                                              ),
+                                            );
+
+                                            if (!isEdit) {
+                                              yearName.clear();
+                                            }
+                                          }
+                                        },
+                                        icon: Icon(
+                                          isEdit ? Icons.update : Icons.save,
+                                        ),
+                                        label: Text(
+                                          isEdit ? 'Update Year' : 'Register Year',
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xFF00496d),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 40,
+                                            vertical: 15,
                                           ),
-                                        );
-
-                                        if (!isEdit) {
-                                          yearName.clear();
-                                        }
-                                      }
-                                    },
-                                    icon: Icon(
-                                      isEdit ? Icons.update : Icons.save,
-                                    ),
-                                    label: Text(
-                                      isEdit ? 'Update Year' : 'Register Year',
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blueAccent,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 40,
-                                        vertical: 15,
+                                          textStyle: const TextStyle(fontSize: 18),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          elevation: 5,
+                                        ),
                                       ),
-                                      textStyle: const TextStyle(fontSize: 18),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          context.go(Routes.viewacademicyr);
+                                        },
+                                        icon: const Icon(
+                                          Icons.list,
+                                          color: Colors.white,
+                                        ),
+                                        label: const Text(
+                                          'View Academic yr',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xFF00496d),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 40,
+                                            vertical: 15,
+                                          ),
+                                          textStyle: const TextStyle(fontSize: 18),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          elevation: 5,
+                                        ),
                                       ),
-                                      elevation: 5,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      context.go(Routes.viewacademicyr);
-                                    },
-                                    icon: const Icon(
-                                      Icons.list,
-                                      color: Colors.white,
-                                    ),
-                                    label: const Text(
-                                      'View Academic yr',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blueAccent,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 40,
-                                        vertical: 15,
-                                      ),
-                                      textStyle: const TextStyle(fontSize: 18),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      elevation: 5,
-                                    ),
-                                  ),
+                                    ],
+                                  )
                                 ],
                               ),
                               const SizedBox(height: 20),
