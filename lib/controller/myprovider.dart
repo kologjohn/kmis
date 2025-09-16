@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../components/academicyrmodel.dart';
 import 'dbmodels/componentmodel.dart';
 import 'dbmodels/contestantsmodel.dart';
 import 'dbmodels/departmodel.dart';
@@ -24,13 +25,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'loginprovider.dart';
 class Myprovider extends LoginProvider {
   List<TermModel> terms = [];
+  List<AcademicModel> academicyears = [];
   List<DepartmentModel> departments = [];
   List<DepartmentModel> classdata = [];
   List<SubjectModel> subjectList = [];
   List<StudentModel> studentlist = [];
-  List<SchoolModel> schoollist = [];
-  List<Staff> staffList = [];
- List<RegionModel> regionList = [];
+  List<Staff> stafflist = [];
+  List<RegionModel> regionList = [];
   List<ScoremodelConfig> scoreconfig = [];
   List<ComponentModel> accessComponents = [];
   bool loadterms = false;
@@ -46,6 +47,7 @@ class Myprovider extends LoginProvider {
   bool savingSetup = false;
   bool loginform = true;
   bool regform = false;
+  bool loadacademicyear =false;
   Future<void> fetchterms() async {
     try {
       loadterms = true;
@@ -143,15 +145,39 @@ class Myprovider extends LoginProvider {
     try {
       loadstaff = true;
       notifyListeners();
-      final snap = await db.collection('staff').get();
-      staffList = snap.docs.map((doc) {
+      final snap = await db.collection('staff').where('schoolId', isEqualTo: schoolid).get();
+      stafflist = snap.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
-        return Staff.fromMap(data, doc.id); // Use fromMap constructor
+        return Staff.fromMap(data, doc.id);
       }).toList();
       loadstaff = false;
+      print(stafflist);
       notifyListeners();
     } catch (e) {
       print("Error fetching staff: $e");
+    }
+  }
+  Future<void> fetchacademicyear() async {
+    try {
+      loadacademicyear = true;
+      notifyListeners();
+
+      final snapshot = await db
+          .collection("academicyears")
+          .where("schoolid", isEqualTo: schoolid)
+          .get();
+
+      academicyears = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return AcademicModel.fromMap(data, doc.id);
+      }).toList();
+
+      loadacademicyear = false;
+      notifyListeners();
+    } catch (e) {
+      loadacademicyear = false;
+      notifyListeners();
+      print("Failed to fetch academic years: $e");
     }
   }
   Future<void> fetchScoreConfig() async {
@@ -269,9 +295,7 @@ class Myprovider extends LoginProvider {
   }) async {
     savingSetup = true;
     notifyListeners();
-
     const int _batchLimit = 450;
-
     try {
       if (teacherIds.isEmpty) throw Exception("No teachers selected.");
       if (levels.isEmpty) throw Exception("No levels selected.");
@@ -317,7 +341,7 @@ class Myprovider extends LoginProvider {
         if (writes > 0) await batch.commit();
       }
 
-      // 🔹 STEP 2: Create SubjectScoring docs for each student/subject
+      // STEP Create SubjectScoring docs for each student/subject
           {
         int writes = 0;
         WriteBatch batch = db.batch();

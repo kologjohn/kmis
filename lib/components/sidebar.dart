@@ -15,14 +15,14 @@ class CustomDrawer extends StatelessWidget {
     return Consumer<Myprovider>(
       builder: (BuildContext context, value, Widget? child) {
         return Drawer(
-          backgroundColor: Color(0xFF1C1D2A),
+          backgroundColor: Color(0xFFdc3545),
           child: SafeArea(
             child: Column(
               children: [
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: Color(0xFF2C2F3E)),
+                  decoration: BoxDecoration(color: Color(0xFFdc3545)),
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -56,7 +56,7 @@ class CustomDrawer extends StatelessWidget {
                           child: Text(
                             "STUDENTS REGISTRATION",
                             style: TextStyle(
-                              color: Colors.white60,
+                              color: Colors.white,
                               fontSize: 12,
                               letterSpacing: 1.2,
                             ),
@@ -68,18 +68,33 @@ class CustomDrawer extends StatelessWidget {
                           child: ExpansionTile(
                             collapsedIconColor: Colors.white,
                             iconColor: Colors.white,
-                            leading: Icon(Icons.settings, color: Colors.white),
+                            leading: Icon(Icons.settings, color: Colors.white60, size: 17,),
                             title: Text(
                               'Configurations',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white54, fontSize: 14),
                             ),
                             children: [
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'SCHOOL LIST',
+                                  onTap: () =>
+                                      context.go(Routes.nextpage),
+                                ),
+                              ),
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.military_tech,
                                   title: 'Term',
                                   onTap: () =>
                                       context.go(Routes.term),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
+                                  title: 'Academic year',
+                                  onTap: ()=>context.go(Routes.academicyr),
                                 ),
                               ),
                               SizedBox(
@@ -186,26 +201,24 @@ class CustomDrawer extends StatelessWidget {
                           child: Text(
                             "Teacher Setup",
                             style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 12,
+                              color: Colors.white,
+                              fontSize: 14,
                               letterSpacing: 1.2,
                             ),
                           ),
                         ),
-
                         Card(
                           color: Colors.transparent,
                           elevation: 0,
                           child: ExpansionTile(
                             collapsedIconColor: Colors.white,
                             iconColor: Colors.white,
-                            leading: Icon(Icons.people, color: Colors.white),
+                            leading: Icon(Icons.people, color: Colors.white60, size: 17,),
                             title: Text(
                               'Assessment Data',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white54, fontSize: 14),
                             ),
                             children: [
-
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.person_add,
@@ -220,7 +233,6 @@ class CustomDrawer extends StatelessWidget {
                                   },
                                 ),
                               ),
-
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.person_add,
@@ -249,8 +261,6 @@ class CustomDrawer extends StatelessWidget {
                                   },
                                 ),
                               ),
-
-
                             ],
                           ),
                         ),
@@ -259,8 +269,8 @@ class CustomDrawer extends StatelessWidget {
                           child: Text(
                             "USER MANAGEMENT",
                             style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 12,
+                              color: Colors.white,
+                              fontSize: 14,
                               letterSpacing: 1.2,
                             ),
                           ),
@@ -271,10 +281,10 @@ class CustomDrawer extends StatelessWidget {
                           child: ExpansionTile(
                             collapsedIconColor: Colors.white,
                             iconColor: Colors.white,
-                            leading: Icon(Icons.people, color: Colors.white),
+                            leading: Icon(Icons.people, color: Colors.white60, size: 17,),
                             title: Text(
                               'User Management',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white54, fontSize: 14),
                             ),
                             children: [
                               _drawerTile(
@@ -307,8 +317,8 @@ class CustomDrawer extends StatelessWidget {
                           child: Text(
                             "MANAGE CONTESTANTS RESULTS",
                             style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 12,
+                              color: Colors.white,
+                              fontSize: 14,
                               letterSpacing: 1.2,
                             ),
                           ),
@@ -319,10 +329,10 @@ class CustomDrawer extends StatelessWidget {
                           child: ExpansionTile(
                             collapsedIconColor: Colors.white,
                             iconColor: Colors.white,
-                            leading: Icon(Icons.description_outlined, color: Colors.white),
+                            leading: Icon(Icons.description_outlined, color: Colors.white60, size: 17,),
                             title: Text(
                               'Contestants Results',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white54, fontSize: 14),
                             ),
                             children: [
 
@@ -387,8 +397,8 @@ class CustomDrawer extends StatelessWidget {
                           child: Text(
                             "REPORTS",
                             style: TextStyle(
-                              color: Colors.white60,
-                              fontSize: 12,
+                              color: Colors.white,
+                              fontSize: 14,
                               letterSpacing: 1.2,
                             ),
                           ),
@@ -401,11 +411,12 @@ class CustomDrawer extends StatelessWidget {
                             iconColor: Colors.white,
                             leading: Icon(
                               Icons.insert_chart,
-                              color: Colors.white,
+                              color: Colors.white60,
+                              size: 17,
                             ),
                             title: Text(
                               'Reports',
-                              style: TextStyle(color: Colors.white),
+                              style: TextStyle(color: Colors.white54),
                             ),
                             children: [
                               SizedBox(
@@ -487,8 +498,8 @@ Widget _drawerTile({
 }) {
   return ListTile(
     contentPadding: EdgeInsets.only(left: 24.0),
-    leading: Icon(icon, color: Colors.white70, size: 20),
-    title: Text(title, style: TextStyle(color: Colors.white)),
+    leading: Icon(icon, color: Colors.white60, size: 17),
+    title: Text(title, style: TextStyle(color: Colors.white54, fontSize: 14)),
     onTap: onTap,
     hoverColor: Colors.white10,
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),

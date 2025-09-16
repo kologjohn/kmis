@@ -40,14 +40,14 @@ class _ColumnChartState extends State<ColumnChart> {
           width: widget.cwidth,
           height: 400,
           decoration: const BoxDecoration(
-            color: Color(0xFF1C1D2A),
-            boxShadow: [
-              BoxShadow(
-                offset: Offset(0.5, 0.5),
-                spreadRadius: 1,
-                blurRadius: 1,
-              ),
-            ],
+            color: Color(0xFFffffff),
+            // boxShadow: [
+            //   BoxShadow(
+            //     offset: Offset(0.5, 0.5),
+            //     spreadRadius: 1,
+            //     blurRadius: 1,
+            //   ),
+            // ],
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -57,7 +57,7 @@ class _ColumnChartState extends State<ColumnChart> {
                 const Text(
                   'Votes By Region',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: Color(0xFF00273a),
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
@@ -79,7 +79,7 @@ class _ColumnChartState extends State<ColumnChart> {
                             child: Text(
                               'Votes',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Color(0xFF00496d),
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -94,7 +94,7 @@ class _ColumnChartState extends State<ColumnChart> {
                                 child: Text(
                                   value.toInt().toString(),
                                   style: const TextStyle(
-                                    color: Colors.white,
+                                    color: Color(0xFF00273a),
                                     fontSize: 9,
                                     fontWeight: FontWeight.bold,
                                   ),

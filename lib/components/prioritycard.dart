@@ -18,16 +18,16 @@ class PriorityDonutChart extends StatelessWidget {
             width: cwidth,
             height: 250,
             decoration: BoxDecoration(
-              color: const Color(0xFF1C1D2A),
-              boxShadow: const [
-                BoxShadow(
-                    offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
-              ],
+              color: const Color(0xFFffffff),
+              // boxShadow: const [
+              //   BoxShadow(
+              //       offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
+              // ],
             ),
             child: const Center(
               child: Text(
                 "Loading Contestant Data...",
-                style: TextStyle(color: Colors.white54, fontSize: 14),
+                style: TextStyle(color: Color(0xFF00273a), fontSize: 14),
               ),
             ),
           );

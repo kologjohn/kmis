@@ -69,6 +69,7 @@ class _SchoolListState extends State<SchoolList> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
+                            // Top: user info
                             Wrap(
                               alignment: WrapAlignment.center,
                               crossAxisAlignment: WrapCrossAlignment.center,
@@ -90,7 +91,6 @@ class _SchoolListState extends State<SchoolList> {
                                     ),
                                   ],
                                 )
-
                               ],
                             ),
 
@@ -105,13 +105,12 @@ class _SchoolListState extends State<SchoolList> {
                             color: Colors.teal.shade50,
                           borderRadius: BorderRadius.circular(10),
 
-
                         ),
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text("Your Schools",style: TextStyle(fontSize: 16,)),
+                              padding: const EdgeInsets.only(left: 8.0, top: 8,  right: 8),
+                              child: Text("Select Your School",style: TextStyle(fontSize: 16, color: Colors.black54, fontWeight: FontWeight.w900)),
                             ),
                             Divider(color: Colors.white),
                             SizedBox(
@@ -125,14 +124,13 @@ class _SchoolListState extends State<SchoolList> {
                                   return InkWell(
                                     onTap: () async {
                                       await value.setSchool(schoolnameTxt,schoolidTxt);
-                                      await value.setSchool(schoolnameTxt, schoolidTxt);
-                                     context.go(Routes.dashboard);
-
+                                      print("${value.schoolid} selected");
+                                      print("${value.currentschool} selected");
+                                      context.go(Routes.dashboard);
                                     },
                                       child: _schoolCard(schoolnameTxt)
                                   );
                                 },
-
                               ),
                             ),
                           ],
@@ -149,7 +147,6 @@ class _SchoolListState extends State<SchoolList> {
       },
     );
   }
-
 }
 
 
@@ -161,7 +158,6 @@ Widget _schoolCard(String name) {
       color: Colors.white,
       borderRadius: BorderRadius.circular(15),
       boxShadow: [
-
       ],
     ),
     child: Row(
@@ -180,6 +176,7 @@ Widget _schoolCard(String name) {
         ),
       ],
     ),
-  );}
+  );
+}
 
 

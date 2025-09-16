@@ -7,6 +7,8 @@ class SchoolModel {
   final String address;
   final String email;
   final String phone;
+  final String? academicyr;
+  final String? term;
   final String logoUrl;
   final DateTime createdAt;
 
@@ -24,6 +26,8 @@ class SchoolModel {
     required this.address,
     required this.email,
     required this.phone,
+     this.academicyr,
+     this.term,
     required this.logoUrl,
     required this.createdAt,
     this.agreedToTerms = true,
@@ -40,6 +44,8 @@ class SchoolModel {
     "address": address,
     "email": email,
     "phone": phone,
+    "academicyr": academicyr,
+    "term": term,
     "logoUrl": logoUrl,
     "createdAt": createdAt,
 

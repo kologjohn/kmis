@@ -2,8 +2,10 @@ import 'package:go_router/go_router.dart';
 import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
+import '../components/academicyrmodel.dart';
 import '../components/dashboard.dart';
 
+import '../screen/academicyr.dart';
 import '../screen/acceslist.dart';
 import '../screen/accesscomponent.dart';
 import '../screen/class.dart';
@@ -21,6 +23,7 @@ import '../screen/subject.dart';
 import '../screen/teachersetup.dart';
 import '../screen/term.dart';
 import '../screen/termlist.dart';
+import '../screen/viewacademicyr.dart';
 import '../screen/viewclass.dart';
 import '../screen/viewdepartment.dart';
 import '../screen/viewschool.dart';
@@ -105,6 +108,8 @@ class Routes {
   static const terminalreport = "/terminalreport";
   static const gradingsystem = "/gradingsystem";
   static const setupteacher = "/setupteacher";
+  static const academicyr = "/academicyr";
+  static const viewacademicyr = "/viewacademicyr";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
@@ -185,6 +190,13 @@ final GoRouter router = GoRouter(
         return ScoreConfigPage(config: config);
       },
     ),
+    GoRoute(
+      path: Routes.academicyr,
+      builder: (context, state) {
+        final year = state.extra as AcademicModel?;
+        return AcademicYr(year: year);
+      },
+    ),
     GoRoute(path: Routes.gradingsystem, builder: (c, s) => GradingSystemFormPage()),
     GoRoute(path: Routes.viewterm, builder: (c, s) => Viewterms()),
     GoRoute(path: Routes.viewdepart, builder: (c, s) => Viewdepartment()),
@@ -194,5 +206,6 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.accesscomponent, builder: (c, s) => AccessComponent()),
     GoRoute(path: Routes.accesslist, builder: (c, s) => AccessList()),
     GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),
+    GoRoute(path: Routes.viewacademicyr, builder: (c, s) => ViewAcademicyr()),
   ],
 );

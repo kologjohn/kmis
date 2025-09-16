@@ -19,10 +19,10 @@ class GaugeContainer extends StatelessWidget {
       width: cwidth,
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFF1C1D2A),
-        boxShadow: [
-          BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
-        ],
+        color: Color(0xFFffffff),
+        // boxShadow: [
+        //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
+        // ],
       ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -46,15 +46,18 @@ class GaugeContainer extends StatelessWidget {
                     SizedBox(width: 5),
                     Text(
                       'Results Progress',
-                      style: TextStyle(fontSize: 10),
+                      style: TextStyle(fontSize: 10, color: Color(0xFF00273a)),
                     ),
                   ],
                 ),
                 Container(
-                  color: Colors.white12,
-                  child: Text(
-                    '7 days',
-                    style: TextStyle(fontSize: 10, color: Colors.white30),
+                  color: Color(0xFF00496d),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      '7 days',
+                      style: TextStyle(fontSize: 10, color: Colors.white54),
+                    ),
                   ),
                 ),
               ],
@@ -62,7 +65,7 @@ class GaugeContainer extends StatelessWidget {
             SizedBox(height: 5),
             Text(
               'Score',
-              style: TextStyle(fontSize: 15, color: Colors.white30),
+              style: TextStyle(fontSize: 15, color: Color(0xFF00496d)),
             ),
             SizedBox(height: 50),
             ResponseTimeGauge(value: totalval, reader: reader,),
