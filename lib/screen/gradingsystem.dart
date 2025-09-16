@@ -203,7 +203,7 @@ class _GradingSystemFormPageState extends State<GradingSystemFormPage> {
                                 // final id ="${provider.companyid}${systemName.toLowerCase()}";
                                       final rawsystemname = _selectedLevel!;
                                       final systemname = rawsystemname.replaceAll(RegExp(r'\s+'), ''); //remove
-                                      final id = "${provider.companyid}${systemname.toLowerCase()}"; //safe id
+                                      final id = "${provider.schoolid}${systemname.toLowerCase()}"; //safe id
 
                                       final systemData = {
                                         "id": id,
@@ -212,7 +212,7 @@ class _GradingSystemFormPageState extends State<GradingSystemFormPage> {
                                       };
 
                                       final gradingSystem = {
-                                        "schoolid": provider.companyid,
+                                        "schoolid": provider.schoolid,
                                         "name": systemName,
                                         "datecreated":
                                         DateTime.now().toIso8601String(),

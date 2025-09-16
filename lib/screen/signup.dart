@@ -803,19 +803,14 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                 
                                           children: const [
                                             Text(
-                                              'Welcome Back!',
+                                              'Login',
                                               style: TextStyle(
                                                 fontSize: 22,
                                                 fontWeight: FontWeight.bold,
                                                 color: Color(0xFF00244A),
                                               ),
                                             ),
-                                            SizedBox(height: 8),
-                                            Text(
-                                              'Sign in to continue to the Election System. '
-                                                  'Your secure access to voting, results, and management tools.',
-                                              style: TextStyle(fontSize: 15, color: Colors.black87),
-                                            ),
+
                                           ],
                                         ),
                                       ),
@@ -939,38 +934,36 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
       );
     }
 
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.white,
-          iconTheme: const IconThemeData(color: Colors.black),
-          actions: [
-            TextButton(
-              onPressed: () {},
-              child: Row(
-                children: [
-                  Icon(Icons.how_to_vote_rounded),
-                  Text('Vote', style: TextStyle(color: Colors.black)),
-                ],
-              ),
+    return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
+        actions: [
+          TextButton(
+            onPressed: () {},
+            child: Row(
+              children: [
+                Icon(Icons.how_to_vote_rounded),
+                Text('Vote', style: TextStyle(color: Colors.black)),
+              ],
             ),
-          ],
-        ),
-        body: isMobile
-            ? Column(
-                children: [
-                  mobileLeftPanel(context),
-                  Expanded(child: rightPanel(context)),
-                ],
-              )
-            : Row(
-                children: [
-                  Flexible(flex: 1, child: leftPanel(context)),
-                  Flexible(flex: 1, child: rightPanel(context)),
-                ],
-              ),
+          ),
+        ],
       ),
+      body: isMobile
+          ? Column(
+              children: [
+                mobileLeftPanel(context),
+                Expanded(child: rightPanel(context)),
+              ],
+            )
+          : Row(
+              children: [
+                Flexible(flex: 1, child: leftPanel(context)),
+                Flexible(flex: 1, child: rightPanel(context)),
+              ],
+            ),
     );
   }
 }

@@ -126,12 +126,12 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                         return;
                                       }
 
-                             final id = widget.config?.id ?? ("${provider.companyid}${continuous}${exam}").replaceAll(RegExp(r'\s+'), '')
+                             final id = widget.config?.id ?? ("${provider.schoolid}${continuous}${exam}").replaceAll(RegExp(r'\s+'), '')
                                               .toLowerCase();
 
                                       final scoreConfig = ScoremodelConfig(
                                         id: id.toString(),
-                                        companyid: provider.companyid,
+                                        companyid: provider.schoolid,
                                         continuous: continuous.toString(),
                                         exam: exam.toString(),
                                       ).toMap();

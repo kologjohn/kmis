@@ -93,6 +93,13 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.military_tech,
+                                  title: 'Academic year',
+                                  onTap: ()=>context.go(Routes.academicyr),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
                                   title: 'Component',
                                   onTap: () =>
                                       context.go(Routes.accesscomponent),
@@ -200,7 +207,6 @@ class CustomDrawer extends StatelessWidget {
                             ),
                           ),
                         ),
-
                         Card(
                           color: Colors.transparent,
                           elevation: 0,
@@ -213,7 +219,6 @@ class CustomDrawer extends StatelessWidget {
                               style: TextStyle(color: Colors.white54, fontSize: 14),
                             ),
                             children: [
-
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.person_add,
@@ -228,14 +233,13 @@ class CustomDrawer extends StatelessWidget {
                                   },
                                 ),
                               ),
-
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.person_add,
                                   title: 'View Teachers',
                                   onTap: () async {
                                     try {
-                                      context.go(Routes.judgelist,
+                                      context.go(Routes.viewstaff,
                                       );
                                     } catch (e) {
                                       print(e);
@@ -257,8 +261,6 @@ class CustomDrawer extends StatelessWidget {
                                   },
                                 ),
                               ),
-
-
                             ],
                           ),
                         ),

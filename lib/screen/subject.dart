@@ -128,14 +128,14 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
                               final progress = ProgressHUD.of(context);
                               progress!.show();
 
-                              final id = "${subjectController.text.trim()}${value.companyid.trim()}".replaceAll(" ", "") .toLowerCase();
+                              final id = "${subjectController.text.trim()}${value.schoolid.trim()}".replaceAll(" ", "") .toLowerCase();
 
                               final subjectData = SubjectModel(
                                 id:id,
                                 name: subjectController.text.trim(),
                                 code: codeController.text.trim(),
                                 level: selectedLevel ?? '',
-                                companyid: value.companyid,
+                                companyid: value.schoolid,
                                 timestamp: DateTime.now(),
                               ).toMap();
 

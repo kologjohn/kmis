@@ -10,14 +10,13 @@ import '../controller/dbmodels/staffmodel.dart';
 
 import 'dropdown.dart';
 
-/// Multi-select widget model
+/// Multi-select  model
 class MultiSelectItem<T> {
   final T value;
   final String label;
   MultiSelectItem({required this.value, required this.label});
 }
 
-/// Multi-select reusable widget
 class MultiSelectField<T> extends StatelessWidget {
   final String label;
   final List<MultiSelectItem<T>> items;
@@ -138,7 +137,6 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
   List<String> selectedLevels = [];
   List<Map<String, dynamic>> selectedComponents = [];
   List<String> selectedTeachers = [];
-
   String? academicYear;
   String? term;
 
@@ -153,7 +151,6 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
       provider.fetchstaff();
     });
   }
-
   int get totalSelectedMarks {
     return selectedComponents.fold(
       0,
@@ -161,7 +158,6 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
       sum + (int.tryParse(comp['totalmark']?.toString() ?? "0") ?? 0),
     );
   }
-
   ButtonStyle _btnStyle() {
     return ElevatedButton.styleFrom(
       backgroundColor: Colors.blueAccent,
@@ -171,7 +167,6 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
-
   void _showMsg(BuildContext ctx, String msg, bool isError) {
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(
@@ -194,12 +189,12 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
             .map<MultiSelectItem<String>>(
                 (lvl) => MultiSelectItem(value: lvl.id!, label: lvl.name))
             .toList();
-       /*
-        final teacherItems = value.staffList
+
+        final teacherItems = value.stafflist
             .map<MultiSelectItem<String>>(
                 (t) => MultiSelectItem(value: t.id!, label: t.name))
             .toList();
-       */
+
         return Scaffold(
           appBar: AppBar(
             backgroundColor: const Color(0xFF2D2F45),
@@ -213,7 +208,7 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
               child: Column(
                 children: [
 
-                 /*
+
                   // Teachers
                   MultiSelectField<String>(
                     label: "Teachers",
@@ -225,8 +220,8 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  */
-                  // Subjects
+
+                  //Subjects
                   MultiSelectField<String>(
                     label: "Subjects",
                     items: subjectItems,
@@ -310,7 +305,7 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                         value.savingSetup = true;
                         await value.saveTeacherSetupMulti(
                           teacherIds: selectedTeachers,
-                          schoolId: value.companyid!,
+                          schoolId: value.schoolid!,
                           academicYear: academicYear!,
                           term: term!,
                           levels: value.departments
