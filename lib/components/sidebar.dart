@@ -227,7 +227,7 @@ class CustomDrawer extends StatelessWidget {
                                   title: 'View Teachers',
                                   onTap: () async {
                                     try {
-                                      context.go(Routes.judgelist,
+                                      context.go(Routes.viewstaff,
                                       );
                                     } catch (e) {
                                       print(e);

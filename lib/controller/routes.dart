@@ -50,6 +50,7 @@ class Routes {
   static const viewsubjects = "/viewsubjects";
   static const viewstudentlist = "/viewstudentlist";
   static const viewschool = "/viewschool";
+  static const viewstaff = "/viewstaff";
   static const nextpage = "/nextpage";
 
 
@@ -67,7 +68,6 @@ class Routes {
 
   static const weekreg = "/weekreg";
   static const scoresheet = "/scoresheet";
-  static const viewstaff = "/viewstaff";
   static const judgesetup = "/judgesetup";
   static const scores = "/scores";
   static const judgeselect = "/judgeselect";
@@ -191,7 +191,6 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.viewclass, builder: (c, s) => Viewclass()),
     GoRoute(path: Routes.viewsubjects, builder: (c, s) => ViewSubjectPage()),
     //GoRoute(path: Routes.viewschool, builder: (c, s) => ViewSchoolPage()),
-   // GoRoute(path: Routes.viewconfig, builder: (c, s) => ViewSchoolPage()),
     GoRoute(path: Routes.accesscomponent, builder: (c, s) => AccessComponent()),
     GoRoute(path: Routes.accesslist, builder: (c, s) => AccessList()),
     GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),
