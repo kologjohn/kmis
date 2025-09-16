@@ -35,6 +35,7 @@ class LoginProvider extends ChangeNotifier {
         email: email,
         password: password,
       );
+
       if (loginhere.user != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('useremail', email);
