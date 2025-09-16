@@ -34,18 +34,20 @@ class _RegstaffState extends State<Regstaff> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<Myprovider>().getdata();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<Myprovider>().getdata();
       context.read<Myprovider>().getfetchRegions();
       context.read<Myprovider>().staffcount();
-      print( context.read<Myprovider>().staffcount_in_school);
     });
-    // final data = widget.staffData;
-    // if (data != null) {
-    //   name.text = data.name ?? '';
-    //   phone.text = data.phone ?? '';
-    //   _selectedSex = data.sex;
-    //   myRegion = data.region;
-    //   _selectedAccessLevel = data.accessLevel;
-    // }
+    // // final data = widget.staffData;
+    // // if (data != null) {
+    // //   name.text = data.name ?? '';
+    // //   phone.text = data.phone ?? '';
+    // //   _selectedSex = data.sex;
+    // //   myRegion = data.region;
+    // //   _selectedAccessLevel = data.accessLevel;
+    // // }
   }
 
   @override
@@ -67,7 +69,7 @@ class _RegstaffState extends State<Regstaff> {
                       context.go(Routes.dashboard);
                     },
                   ),
-                  title: Text(value.schoolid,
+                  title: Text(value.currentschool,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -204,6 +206,7 @@ class _RegstaffState extends State<Regstaff> {
                                           String _staffid= value.schoolid! + _staffcount;
                                           bool existstaffbyeamil=await value.staffexistbyemail(emailTxt);
                                           bool existstaffbyphone=await value.staffexistbyphone(phoneTxt);
+                                          print("Number of docs: $schoolId");
                                           if(existstaffbyeamil || existstaffbyphone)
                                             {
                                               SnackBar snackBar = const SnackBar(

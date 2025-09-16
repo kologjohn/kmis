@@ -225,7 +225,7 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                     },
                   ),
                   const SizedBox(height: 15),
-
+                  */
                   // Subjects
                   MultiSelectField<String>(
                     label: "Subjects",
@@ -344,7 +344,7 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                         : "Save Teacher Setup"),
                     style: _btnStyle(),
                   ),
-                  */
+
                 ],
               ),
             ),
