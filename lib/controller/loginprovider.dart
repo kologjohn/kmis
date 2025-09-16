@@ -15,7 +15,6 @@ class LoginProvider extends ChangeNotifier {
   List<SchoolModel> schoolList = [];
   List<Staff> staffschools = [];
   List<String> staffaccesslevel = ["admin", "teacher", "super admin"];
-  String companyid = "ksoo1";
   String currentschool = "";
   Staff? usermodel;
   String schoolid = "";
