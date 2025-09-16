@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:core';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
 import 'package:ksoftsms/controller/dbmodels/termmodel.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../components/academicyrmodel.dart';
+import 'dbmodels/classmodel.dart';
 import 'dbmodels/componentmodel.dart';
 import 'dbmodels/contestantsmodel.dart';
 import 'dbmodels/departmodel.dart';
@@ -27,7 +30,7 @@ class Myprovider extends LoginProvider {
   List<TermModel> terms = [];
   List<AcademicModel> academicyears = [];
   List<DepartmentModel> departments = [];
-  List<DepartmentModel> classdata = [];
+  List<ClassModel> classdata = [];
   List<SubjectModel> subjectList = [];
   List<StudentModel> studentlist = [];
   List<Staff> stafflist = [];
@@ -48,6 +51,8 @@ class Myprovider extends LoginProvider {
   bool loginform = true;
   bool regform = false;
   bool loadacademicyear =false;
+  XFile? imagefile;
+  String imageUrl = "";
   Future<void> fetchterms() async {
     try {
       loadterms = true;
@@ -91,7 +96,7 @@ class Myprovider extends LoginProvider {
       notifyListeners();
       final snapshot = await db.collection("classes").get();
       classdata = snapshot.docs.map((doc) {
-        return DepartmentModel.fromMap(doc.data(), doc.id);
+        return ClassModel.fromMap(doc.data(), doc.id);
       }).toList();
 
       loadclassdata = false;
@@ -145,7 +150,8 @@ class Myprovider extends LoginProvider {
     try {
       loadstaff = true;
       notifyListeners();
-      final snap = await db.collection('staff').where('schoolId', isEqualTo: schoolid).get();
+      //final snap = await db.collection('staff').where('schoolId', isEqualTo: schoolid).get();
+      final snap = await db.collection('staff').get();
       stafflist = snap.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
         return Staff.fromMap(data, doc.id);
@@ -298,10 +304,7 @@ class Myprovider extends LoginProvider {
     required List<DepartmentModel> levels,
     required List<SubjectModel> subjects,
     required List<ComponentModel> components,
-  }) async {
-    savingSetup = true;
-    notifyListeners();
-    const int _batchLimit = 450;
+  }) async {savingSetup = true;   notifyListeners();    const int _batchLimit = 450;
     try {
       if (teacherIds.isEmpty) throw Exception("No teachers selected.");
       if (levels.isEmpty) throw Exception("No levels selected.");
@@ -309,8 +312,7 @@ class Myprovider extends LoginProvider {
       if (academicYear.trim().isEmpty || term.trim().isEmpty) {
         throw Exception("Academic year and term are required.");
       }
-
-      // 🔹 STEP 1: Save TeacherSetup docs
+      //STEP 1: Save TeacherSetup docs
           {
         int writes = 0;
         WriteBatch batch = db.batch();
@@ -404,7 +406,74 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
+  pickImageFromGallery(BuildContext context) async {
+    try {
+      final XFile? selectedImage = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+      );
 
+      if (selectedImage == null) {
+        print("No image selected");
+        return;
+      }
+
+      final int fileSizeInBytes = await selectedImage.length();
+
+      if (fileSizeInBytes > 5 * 1024 * 1024) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Image size exceeds 5MB. Please choose a smaller file.',
+            ),
+          ),
+        );
+        return;
+      }
+      imagefile = selectedImage;
+      notifyListeners();
+    } catch (e) {
+      print("Error picking image: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Failed to pick image.')));
+    }
+  }
+  uploadImage(String studentcode) async {
+    if (imagefile == null) return;
+
+    try {
+      final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      final ref = FirebaseStorage.instance.ref().child(
+        'uploads/$fileName$studentcode.jpg',
+      );
+      UploadTask uploadTask;
+
+      if (kIsWeb) {
+        print("Uploading for Web");
+        final Uint8List data = await imagefile!.readAsBytes();
+        uploadTask = ref.putData(
+          data,
+          SettableMetadata(contentType: 'image/jpeg'),
+        );
+      } else {
+        print("Uploading for iOS/Android/Mac");
+
+        final file = File(imagefile!.path);
+        uploadTask = ref.putFile(
+          file,
+          SettableMetadata(contentType: 'image/jpeg'),
+        );
+      }
+
+      final snapshot = await uploadTask;
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+      imageUrl = downloadUrl;
+      // print("Image URL: $imageUrl");
+      notifyListeners();
+    } catch (e) {
+      print('Upload failed: $e');
+    }
+  }
 
 
 /*

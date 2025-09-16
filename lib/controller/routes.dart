@@ -17,6 +17,7 @@ import '../screen/judgeui.dart';
 import '../screen/levelreg.dart';
 import '../screen/multipleschools.dart';
 import '../screen/registerschool.dart';
+import '../screen/registerstudents.dart';
 import '../screen/regstaff.dart';
 import '../screen/scoreconfig.dart';
 import '../screen/subject.dart';
@@ -207,5 +208,6 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.accesslist, builder: (c, s) => AccessList()),
     GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),
     GoRoute(path: Routes.viewacademicyr, builder: (c, s) => ViewAcademicyr()),
+    GoRoute(path: Routes.registerstudent, builder: (c, s) => RegisterStudent()),
   ],
 );
