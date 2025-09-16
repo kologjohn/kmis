@@ -74,7 +74,7 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: CircleAvatar(
                     backgroundColor: Color(0xFF00496d),
-                      child: Icon(Icons.person, color: Colors.white54,)
+                      child: Icon(Icons.person, color: Colors.white54)
                   ),
                 ),
               ],
@@ -87,8 +87,8 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
+                      spacing: 15,
+                      runSpacing: 15,
                       crossAxisAlignment: WrapCrossAlignment.start,
                       children: [
                         DuplicateContainer(
@@ -138,10 +138,10 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 15),
                     Wrap(
-                      runSpacing: 10,
-                      spacing: 10,
+                      runSpacing: 16,
+                      spacing: 16,
                       crossAxisAlignment: WrapCrossAlignment.start,
                       children: [
                         TicketsByDayChart(
@@ -173,10 +173,10 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                         ),
                       ],
                     ),
-                    SizedBox(height: 10),
+                    SizedBox(height: 15),
                     Wrap(
-                      runSpacing: 10,
-                      spacing: 10,
+                      runSpacing: 15,
+                      spacing: 15,
                       crossAxisAlignment: WrapCrossAlignment.start,
                       children: [
                         ColumnChart(

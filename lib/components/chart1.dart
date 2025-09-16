@@ -26,7 +26,7 @@ class ResponseTimeGauge extends StatelessWidget {
                 axisLineStyle: AxisLineStyle(
                   thickness: 0.2,
                   cornerStyle: CornerStyle.bothCurve,
-                  color: Color(0xFFfb7d5b),
+                  color: Color(0xFF00496d),
                   thicknessUnit: GaugeSizeUnit.factor,
                 ),
                 pointers: <GaugePointer>[
@@ -45,7 +45,7 @@ class ResponseTimeGauge extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.green,
+                        color: Color(0xFFfb7d5b),
                       ),
                     ),
                     angle: 90,

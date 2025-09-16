@@ -30,14 +30,14 @@ class DuplicateContainer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(heading, style: TextStyle(fontSize: 18, color: Color(0xFF00273a))),
+            Text(heading, style: TextStyle(fontSize: 18, color: Color(0xFF00496d))),
             Center(
               child: Text(
                 number,
-                style: TextStyle(fontSize: 70, fontWeight: FontWeight.w700, color: Color(0xFFdc3545)),
+                style: TextStyle(fontSize: 70, fontWeight: FontWeight.w700, color: Color(0xFFfb7d5b)),
               ),
             ),
-            Center(child: Text(value, style: TextStyle(fontSize: 20, color: Color(0xFF00273a)))),
+            Center(child: Text(value, style: TextStyle(fontSize: 20, color: Color(0xFF00496d)))),
           ],
         ),
       ),

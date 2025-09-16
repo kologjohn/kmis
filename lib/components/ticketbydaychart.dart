@@ -96,7 +96,7 @@ class TicketsByDayChart extends StatelessWidget {
                     ),
                     LineChartBarData(
                       isCurved: true,
-                      color: Color(0xFFdc3545),
+                      color: Color(0xFFb0bcc2),
                       dotData: FlDotData(show: true),
                       spots: [
                         FlSpot(0, 1),
@@ -110,7 +110,7 @@ class TicketsByDayChart extends StatelessWidget {
                       ],
                       belowBarData: BarAreaData(
                         show: true,
-                        color: const Color(0xFFdc3545).withOpacity(0.1),
+                        color: const Color(0xFFb0bcc2).withOpacity(0.3),
                       ),
                     ),
                   ],
@@ -123,7 +123,7 @@ class TicketsByDayChart extends StatelessWidget {
               children: const [
                 LegendDot(color: Color(0xFFfb7d5b), label: 'Created',),
                 SizedBox(width: 20),
-                LegendDot(color: Color(0xFFdc3545), label: 'Solved'),
+                LegendDot(color: Color(0xFFb0bcc2), label: 'Solved'),
               ],
             ),
           ],

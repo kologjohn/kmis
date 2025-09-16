@@ -15,14 +15,14 @@ class CustomDrawer extends StatelessWidget {
     return Consumer<Myprovider>(
       builder: (BuildContext context, value, Widget? child) {
         return Drawer(
-          backgroundColor: Color(0xFFdc3545),
+          backgroundColor: Color(0xFF00273a),
           child: SafeArea(
             child: Column(
               children: [
                 Container(
                   width: double.infinity,
                   padding: EdgeInsets.all(20),
-                  decoration: BoxDecoration(color: Color(0xFFdc3545)),
+                  decoration: BoxDecoration(color: Color(0xFF00273a)),
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -265,7 +265,7 @@ class CustomDrawer extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
                           child: Text(
-                            "USER MANAGEMENT",
+                            "User Management",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -313,7 +313,7 @@ class CustomDrawer extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
                           child: Text(
-                            "MANAGE CONTESTANTS RESULTS",
+                            "Manage Contestants Results",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -393,7 +393,7 @@ class CustomDrawer extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
                           child: Text(
-                            "REPORTS",
+                            "Reports",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,

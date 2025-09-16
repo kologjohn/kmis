@@ -34,7 +34,7 @@ class SummaryDonutChart extends StatelessWidget {
                   percent: 0.7,
                   circularStrokeCap: CircularStrokeCap.round,
                   backgroundColor: Color(0xFFfb7d5b).withOpacity(0.3),
-                  progressColor: Color(0xFFdc3545),
+                  progressColor: Color(0xFF00496d),
                   center: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -56,7 +56,7 @@ class SummaryDonutChart extends StatelessWidget {
               ),
               SizedBox(height: 10),
               Container(
-                decoration: BoxDecoration(color: Color(0xFF00496d)),
+                decoration: BoxDecoration(color: Color(0xFFb0bcc2)),
                 child: Padding(
                   padding: const EdgeInsets.all(4.0),
                   child: Row(
@@ -90,7 +90,7 @@ class SummaryItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(color: Colors.grey, fontSize: 10)),
+        Text(label, style: TextStyle(color: Colors.black, fontSize: 10)),
         SizedBox(height: 4),
         Text(
           value,
