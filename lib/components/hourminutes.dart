@@ -35,7 +35,7 @@ class HourMinutes extends StatelessWidget {
                 SizedBox(height: 50),
                 Center(
                   child: Text('${0}/${0}', style: TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFFdc3545))),
+                      fontSize: 24, fontWeight: FontWeight.w700, color: Color(0xFFfb7d5b))),
                 ),
               ],
             ),

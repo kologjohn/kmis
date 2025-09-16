@@ -39,7 +39,7 @@ class GaugeContainer extends StatelessWidget {
                       width: 10,
                       height: 10,
                       decoration: BoxDecoration(
-                        color: Colors.green,
+                        color: Color(0xFFfb7d5b),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -51,12 +51,12 @@ class GaugeContainer extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  color: Color(0xFF00496d),
+                  color: Color(0xFFb0bcc2),
                   child: Padding(
                     padding: const EdgeInsets.all(4.0),
                     child: Text(
                       '7 days',
-                      style: TextStyle(fontSize: 10, color: Colors.white54),
+                      style: TextStyle(fontSize: 10, color: Colors.white),
                     ),
                   ),
                 ),
