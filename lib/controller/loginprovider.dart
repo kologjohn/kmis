@@ -21,6 +21,8 @@ class LoginProvider extends ChangeNotifier {
   String accesslevel = "";
   String phone = "";
   String name = "";
+  String year = "";
+  String term = "";
   String errorMessage = "";
   int staffcount_in_school = 0;
   String schooldomain = "kologsoftsmiscom.com";
@@ -44,6 +46,8 @@ class LoginProvider extends ChangeNotifier {
         usermodel = Staff.fromMap(userData, detail.docs.first.id);
         String emailTxt = usermodel?.email ?? '';
         String nameTxt = usermodel?.name ?? '';
+        String yearTxt = usermodel?.name ?? '';
+        String termTxt = usermodel?.name ?? '';
         String roleTxt = usermodel?.accessLevel ?? '';
         String phoneTxt = usermodel?.phone ?? '';
         String schoolTxt = usermodel?.schoolname ?? '';
@@ -52,6 +56,8 @@ class LoginProvider extends ChangeNotifier {
         prefs.setString("school", schoolTxt);
         prefs.setString("email", emailTxt);
         prefs.setString("name", nameTxt);
+        prefs.setString("year", yearTxt);
+        prefs.setString("term", termTxt);
         prefs.setString("role", roleTxt);
         prefs.setString("phone", phoneTxt);
         prefs.setString("schoolid", scchoolIdTxt);
@@ -88,6 +94,8 @@ class LoginProvider extends ChangeNotifier {
     phone = prefs.getString('phone') ?? '';
     accesslevel = prefs.getString('role') ?? '';
     name = prefs.getString('name') ?? '';
+    year = prefs.getString('year') ?? '';
+    term = prefs.getString('term') ?? '';
     staffSchoolIds = prefs.getStringList("staffschools") ?? [];
     schoolnames = prefs.getStringList("schoolnames") ?? [];
     print(schoolid);
