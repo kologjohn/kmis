@@ -18,7 +18,7 @@ class DepartmentModel {
     return {
       'id': id,
       'name': name,
-      'companyid': schoolId,
+      'schoolId': schoolId,
       'timestamp': Timestamp.fromDate(timestamp),
     };
   }

@@ -185,7 +185,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                               String categoryName =componentname.text.trim();
                                               String totalMark = totalmark.text.trim();
                                               String totalMar = totalmark.text.trim();
-                                              String id = "${value.schoolid}_${totalMar.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
+                                              String id = "${value.schoolid}_${categoryName.replaceAll(RegExp(r'\s+'), '').toLowerCase()}${totalMar.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
 
                                               final data = ComponentModel(
                                                 name: categoryName,

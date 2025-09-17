@@ -121,10 +121,12 @@ class _ClassScreenState extends State<ClassScreen> {
                                         progress!.show();
 
                                         String className = classController.text.trim();
-                                        String id = className.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                        String idd = className.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                        final id = "${value.schoolid}_$idd".replaceAll(" ", "");
                                         final data = ClassModel(
                                           id: className.toLowerCase(),
                                           name: className,
+                                          schoolId: value.schoolid,
                                           timestamp: DateTime.now(),
                                         ).toMap();
 

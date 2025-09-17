@@ -127,8 +127,9 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
                             if (_formKey.currentState!.validate()) {
                               final progress = ProgressHUD.of(context);
                               progress!.show();
-
-                              final id = "${subjectController.text.trim()}${value.schoolid.trim()}".replaceAll(" ", "") .toLowerCase();
+                             String subject = subjectController.text.trim().replaceAll(" ", "") .toLowerCase();
+                             String code = codeController.text.trim().replaceAll(" ", "") .toLowerCase();
+                              final id = "${value.schoolid}_$subject$code";
 
                               final subjectData = SubjectModel(
                                 id:id,

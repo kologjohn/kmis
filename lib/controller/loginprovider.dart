@@ -46,8 +46,6 @@ class LoginProvider extends ChangeNotifier {
         usermodel = Staff.fromMap(userData, detail.docs.first.id);
         String emailTxt = usermodel?.email ?? '';
         String nameTxt = usermodel?.name ?? '';
-        String yearTxt = usermodel?.name ?? '';
-        String termTxt = usermodel?.name ?? '';
         String roleTxt = usermodel?.accessLevel ?? '';
         String phoneTxt = usermodel?.phone ?? '';
         String schoolTxt = usermodel?.schoolname ?? '';
@@ -56,12 +54,10 @@ class LoginProvider extends ChangeNotifier {
         prefs.setString("school", schoolTxt);
         prefs.setString("email", emailTxt);
         prefs.setString("name", nameTxt);
-        prefs.setString("year", yearTxt);
-        prefs.setString("term", termTxt);
         prefs.setString("role", roleTxt);
         prefs.setString("phone", phoneTxt);
         prefs.setString("schoolid", scchoolIdTxt);
-
+        await fetchtermyear(scchoolIdTxt, prefs);
         if (numberofdocs > 1) {
           staffschools = detail.docs.map((doc) {
             return Staff.fromMap(doc.data(), doc.id);
@@ -72,6 +68,7 @@ class LoginProvider extends ChangeNotifier {
           context.go(Routes.nextpage);
           notifyListeners();
         }
+
         else {
           await getdata();
           auth.currentUser!.updateDisplayName(nameTxt);
@@ -158,6 +155,21 @@ class LoginProvider extends ChangeNotifier {
     } catch (e) {
       print(e);
       return false;
+    }
+  }
+  Future<void> fetchtermyear(String schoolId, SharedPreferences prefs) async {
+    try {
+      final snapshot = await db.collection("schools").doc(schoolId).get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>;
+        final String termTxt = data['term']?.toString() ?? "";
+        final String yearTxt = data['academicyr']?.toString() ?? "";
+        await prefs.setString("term", termTxt);
+        await prefs.setString("year", yearTxt);
+      }
+    } catch (e) {
+      debugPrint("Error fetching term/year: $e");
     }
   }
   // smsalert(String message,String phoneTxt) async {

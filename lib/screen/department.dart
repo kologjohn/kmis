@@ -121,10 +121,12 @@ class _DepartmentState extends State<Department> {
                                         progress!.show();
 
                                         String departmentName = departController.text.trim();
-                                        String id = departmentName.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                        String idd = departmentName.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                        final id = "${value.schoolid}_$idd".replaceAll(" ", "");
                                         final data = DepartmentModel(
                                           id: departmentName.toLowerCase(),
                                           name: departmentName,
+                                          schoolId: value.schoolid,
                                           timestamp: DateTime.now(),
                                         ).toMap();
 

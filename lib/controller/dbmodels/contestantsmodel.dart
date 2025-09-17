@@ -10,7 +10,7 @@ class StudentModel {
   final String level;
   final String department;
   final String term;
-  final String companyid;
+  final String schoolId;
   final String dob;            // date of birth as string
   final String address;
   final String? email;
@@ -31,7 +31,7 @@ class StudentModel {
     required this.level,
     required this.department,
     required this.term,
-    required this.companyid,
+    required this.schoolId,
     required this.dob,
     required this.address,
     this.email,
@@ -55,7 +55,7 @@ class StudentModel {
       'level': level,
       'department': department,
       'term': term,
-      'companyid': companyid,
+      'schoolId': schoolId,
       'dob': dob,
       'address': address,
       'email': email,
@@ -80,7 +80,7 @@ class StudentModel {
       level: map['level'] ?? '',
       department: map['department'] ?? '',
       term: map['term'] ?? '',
-      companyid: map['companyid'] ?? '',
+      schoolId: map['companyid'] ?? '',
       dob: map['dob'] ?? '',
       address: map['address'] ?? '',
       email: map['email'],

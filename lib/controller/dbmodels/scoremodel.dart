@@ -1,8 +1,8 @@
 class ScoremodelConfig {
   final String? id;
   final String schoolId;
-  final String continuous;
-  final String exam;
+  final String continuous; // stored as string
+  final String exam;       // stored as string
 
   ScoremodelConfig({
     this.id,
@@ -10,7 +10,10 @@ class ScoremodelConfig {
     required this.continuous,
     required this.exam,
   }) {
-    if ((continuous + exam) != 100) {
+    // validation using doubles
+    final cont = double.tryParse(continuous) ?? 0;
+    final ex = double.tryParse(exam) ?? 0;
+    if ((cont + ex).toStringAsFixed(2) != "100.00") {
       throw Exception("Continuous + Exam must sum to 100");
     }
   }
@@ -20,8 +23,8 @@ class ScoremodelConfig {
     return ScoremodelConfig(
       id: id,
       schoolId: map['schoolId'] ?? "",
-      continuous: (map['continuous'] ?? 50).toDouble(),
-      exam: (map['exam'] ?? 50).toDouble(),
+      continuous: map['continuous']?.toString() ?? "0",
+      exam: map['exam']?.toString() ?? "0",
     );
   }
 

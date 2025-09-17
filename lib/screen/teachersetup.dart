@@ -204,7 +204,7 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
               child: Column(
                 children: [
                   ChoiceChip(
-                    label: Text("2024/2025${value.year } - ${value.term} First"),
+                    label: Text("${value.year } - ${value.term}"),
                     selected: true,
                     selectedColor: Colors.blueAccent,
                     labelStyle: const TextStyle(color: Colors.white),
@@ -309,8 +309,8 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                         await value.saveTeacherSetupMulti(
                           teacherIds: selectedTeachers,
                           schoolId: value.schoolid,
-                          academicYear: "20242025",
-                          term: "first",
+                          academicYear: value.year,
+                          term: value.term,
                           levels: value.departments
                               .where(
                                   (lvl) => selectedLevels.contains(lvl.id))
@@ -320,6 +320,7 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                               selectedSubjects.contains(s.id))
                               .toList(),
                           components: selectedComponents,
+                          classes: _selectclass!,
                         );
                         _showMsg(context, "Setup saved", false);
                       } catch (e) {

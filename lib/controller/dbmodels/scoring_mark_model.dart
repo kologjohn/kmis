@@ -52,7 +52,8 @@ class SubjectScoring {
     required String subjectId,
     required List<ComponentModel> components,
   }) {
-    final id = "${studentId}_${academicYear}_${term}_$subjectId";
+   // final id = "${studentId}_${academicYear}_${term}_$subjectId";
+    final id = "${studentId}_${academicYear}_${term}";
 
     // initialize components with "0" marks
     final Map<String, String> initialScores = {

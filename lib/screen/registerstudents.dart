@@ -412,7 +412,8 @@ class _RegisterStudentState extends State<RegisterStudent> {
                               progress?.show();
 
                               final sid = studentId.text.trim().toLowerCase();
-                              final id = "${sid}${value.schoolid}".replaceAll(" ", "").toLowerCase();
+                              String idd =sid.toString();
+                              final id = "${value.schoolid}$idd".replaceAll(" ", "");
                               await value.uploadImage(sid);
 
                               final student = StudentModel(
@@ -427,7 +428,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                 parentname: parentNames.map((c) => c.text.trim()).toList(),
                                 level: selectedLevel ?? "",
                                 term: selectedTerm ?? "",
-                                companyid: value.schoolid,
+                                schoolId: value.schoolid,
                                 dob: dob.text.trim(),
                                 address: address.text.trim(),
                                 email: email.text.trim().isEmpty ? null : email.text.trim(),
@@ -437,7 +438,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                     ? value.imageUrl
                                     : _uploadedImageUrl ?? "",
                                 status: selectedStatus ?? "active",
-                                department: '',
+                                department: selecteddepart ?? "",
                               );
 
                               await value.db
