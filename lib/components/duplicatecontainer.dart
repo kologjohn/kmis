@@ -20,7 +20,15 @@ class DuplicateContainer extends StatelessWidget {
       width: containerwidth,
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFFffffff),
+          gradient: LinearGradient(
+            colors: [
+               // very light cyan
+              Colors.white,
+              Color(0xFFe8fbf0),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
         // boxShadow: [
         //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 0.5),
         // ],

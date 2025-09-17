@@ -129,7 +129,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
 
   @override
   Widget build(BuildContext context) {
-    final inputFill = const Color(0xFF2C2C3C);
+    final inputFill = const Color(0xFFffffff);
     final isEdit = widget.studentData != null;
 
     return ProgressHUD(
@@ -137,7 +137,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
         builder: (context, value, child) {
           return Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color(0xFF2D2F45),
+              backgroundColor: const Color(0xFF00273a),
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => context.go(Routes.dashboard),
@@ -156,11 +156,11 @@ class _RegisterStudentState extends State<RegisterStudent> {
               child: Align(
                 alignment: Alignment.topCenter,
                 child: Container(
-                  color: const Color(0xFF2D2F45),
+                  color: const Color(0xFFffffff),
                   margin: const EdgeInsets.all(30.0),
-                  constraints: const BoxConstraints(maxWidth: 800),
+                  constraints: const BoxConstraints(maxWidth: 600),
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(30.0),
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -194,7 +194,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                       .map((d) => DropdownMenuItem(
                                     value: d,
                                     child: Text(d.toString(),
-                                        style: const TextStyle(color: Colors.white)),
+                                        style: const TextStyle(color: Colors.black54)),
                                   ))
                                       .toList(),
                                   onChanged: (v) {
@@ -205,9 +205,9 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   },
                                   decoration: InputDecoration(
                                     labelText: "Day",
-                                    labelStyle: const TextStyle(color: Colors.white),
+                                    labelStyle: const TextStyle(color: Colors.black54),
                                     border: const OutlineInputBorder(),
-                                    filled: true,
+                                    filled: false,
                                     fillColor: inputFill,
                                   ),
                                   validator: (v) => v == null ? "Select day" : null,
@@ -224,7 +224,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                       .map((m) => DropdownMenuItem(
                                     value: m,
                                     child: Text(m,
-                                        style: const TextStyle(color: Colors.white)),
+                                        style: const TextStyle(color: Colors.black54)),
                                   ))
                                       .toList(),
                                   onChanged: (v) {
@@ -235,9 +235,9 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   },
                                   decoration: InputDecoration(
                                     labelText: "Month",
-                                    labelStyle: const TextStyle(color: Colors.white),
+                                    labelStyle: const TextStyle(color: Colors.black54),
                                     border: const OutlineInputBorder(),
-                                    filled: true,
+                                    filled: false,
                                     fillColor: inputFill,
                                   ),
                                   validator: (v) => v == null ? "Select month" : null,
@@ -254,7 +254,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                       .map((y) => DropdownMenuItem(
                                     value: y,
                                     child: Text(y.toString(),
-                                        style: const TextStyle(color: Colors.white)),
+                                        style: const TextStyle(color: Colors.black54)),
                                   ))
                                       .toList(),
                                   onChanged: (v) {
@@ -265,10 +265,11 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                   },
                                   decoration: InputDecoration(
                                     labelText: "Year",
-                                    labelStyle: const TextStyle(color: Colors.white),
+                                    labelStyle: const TextStyle(color: Colors.black54),
                                     border: const OutlineInputBorder(),
-                                    filled: true,
+                                    filled: false,
                                     fillColor: inputFill,
+                                    focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
                                   ),
                                   validator: (v) => v == null ? "Select year" : null,
                                   dropdownColor: inputFill,
@@ -350,9 +351,9 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                 onPressed: () {
                                   setState(() => parentNames.add(TextEditingController()));
                                 },
-                                icon: const Icon(Icons.add, color: Colors.white),
+                                icon: const Icon(Icons.add, color: Color(0xFF00496d)),
                                 label: const Text("Add another guardian",
-                                    style: TextStyle(color: Colors.white)),
+                                    style: TextStyle(color: Color(0xFF00496d))),
                               )
                             ],
                           ),
@@ -376,9 +377,9 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                 onPressed: () {
                                   setState(() => guardianContacts.add(TextEditingController()));
                                 },
-                                icon: const Icon(Icons.add, color: Colors.white),
+                                icon: const Icon(Icons.add, color: Color(0xFF00496d)),
                                 label: const Text("Add another phone",
-                                    style: TextStyle(color: Colors.white)),
+                                    style: TextStyle(color: Color(0xFF00496d))),
                               )
                             ],
                           ),
@@ -405,87 +406,117 @@ class _RegisterStudentState extends State<RegisterStudent> {
                           _buildImagePicker(value),
                           const SizedBox(height: 20),
 
-                          ElevatedButton.icon(
-                            onPressed: () async {
-                              if (!_formKey.currentState!.validate()) return;
-                              final progress = ProgressHUD.of(context);
-                              progress?.show();
+                          Column(
+                            children: [
+                              Wrap(
+                                spacing: 10,
+                                runSpacing: 10,
+                                children: [
+                                  ElevatedButton.icon(
+                                    onPressed: () async {
+                                      if (!_formKey.currentState!.validate()) return;
+                                      final progress = ProgressHUD.of(context);
+                                      progress?.show();
 
-                              final sid = studentId.text.trim().toLowerCase();
-                              final id = "${sid}${value.schoolid}".replaceAll(" ", "").toLowerCase();
-                              await value.uploadImage(sid);
+                                      final sid = studentId.text.trim().toLowerCase();
+                                      final id = "${sid}${value.schoolid}".replaceAll(" ", "").toLowerCase();
+                                      await value.uploadImage(sid);
 
-                              final student = StudentModel(
-                                id: widget.studentData?.id ?? id,
-                                studentid: id,
-                                name: studentName.text.trim(),
-                                sex: selectedSex ?? "",
-                                school: value.currentschool,
-                                region: selectedRegion ?? "",
-                                guardiancontact:
-                                guardianContacts.map((c) => c.text.trim()).toList(),
-                                parentname: parentNames.map((c) => c.text.trim()).toList(),
-                                level: selectedLevel ?? "",
-                                term: selectedTerm ?? "",
-                                companyid: value.schoolid,
-                                dob: dob.text.trim(),
-                                address: address.text.trim(),
-                                email: email.text.trim().isEmpty ? null : email.text.trim(),
-                                phone: phone.text.trim(),
-                                timestamp: DateTime.now().toIso8601String(),
-                                photourl: value.imageUrl.isNotEmpty
-                                    ? value.imageUrl
-                                    : _uploadedImageUrl ?? "",
-                                status: selectedStatus ?? "active",
-                                department: '',
-                              );
+                                      final student = StudentModel(
+                                        id: widget.studentData?.id ?? id,
+                                        studentid: id,
+                                        name: studentName.text.trim(),
+                                        sex: selectedSex ?? "",
+                                        school: value.currentschool,
+                                        region: selectedRegion ?? "",
+                                        guardiancontact:
+                                        guardianContacts.map((c) => c.text.trim()).toList(),
+                                        parentname: parentNames.map((c) => c.text.trim()).toList(),
+                                        level: selectedLevel ?? "",
+                                        term: selectedTerm ?? "",
+                                        companyid: value.schoolid,
+                                        dob: dob.text.trim(),
+                                        address: address.text.trim(),
+                                        email: email.text.trim().isEmpty ? null : email.text.trim(),
+                                        phone: phone.text.trim(),
+                                        timestamp: DateTime.now().toIso8601String(),
+                                        photourl: value.imageUrl.isNotEmpty
+                                            ? value.imageUrl
+                                            : _uploadedImageUrl ?? "",
+                                        status: selectedStatus ?? "active",
+                                        department: '',
+                                      );
 
-                              await value.db
-                                  .collection("students")
-                                  .doc(student.id)
-                                  .set(student.toMap(), SetOptions(merge: true));
+                                      await value.db
+                                          .collection("students")
+                                          .doc(student.id)
+                                          .set(student.toMap(), SetOptions(merge: true));
 
-                              progress?.dismiss();
+                                      progress?.dismiss();
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(isEdit
-                                      ? 'Student Updated Successfully'
-                                      : 'Student Registered Successfully'),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(isEdit
+                                              ? 'Student Updated Successfully'
+                                              : 'Student Registered Successfully'),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
 
-                              value.imagefile = null;
+                                      value.imagefile = null;
 
-                              if (!isEdit) {
-                                setState(() {
-                                  value.imageUrl = "";
-                                  _uploadedImageUrl = "";
-                                });
-                                studentName.clear();
-                                studentId.clear();
-                                dob.clear();
-                                address.clear();
-                                email.clear();
-                                phone.clear();
-                                parentNames.clear();
-                                guardianContacts.clear();
-                                parentNames.add(TextEditingController());
-                                guardianContacts.add(TextEditingController());
-                                selectedDay = null;
-                                selectedMonth = null;
-                                selectedYear = null;
-                              }
-                            },
-                            icon: Icon(isEdit ? Icons.update : Icons.save),
-                            label: Text(isEdit ? 'Update Student' : 'Register Student'),
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () => context.go(Routes.viewstudentlist),
-                            icon: const Icon(Icons.list),
-                            label: const Text("View students"),
-                          ),
+                                      if (!isEdit) {
+                                        setState(() {
+                                          value.imageUrl = "";
+                                          _uploadedImageUrl = "";
+                                        });
+                                        studentName.clear();
+                                        studentId.clear();
+                                        dob.clear();
+                                        address.clear();
+                                        email.clear();
+                                        phone.clear();
+                                        parentNames.clear();
+                                        guardianContacts.clear();
+                                        parentNames.add(TextEditingController());
+                                        guardianContacts.add(TextEditingController());
+                                        selectedDay = null;
+                                        selectedMonth = null;
+                                        selectedYear = null;
+                                      }
+                                    },
+                                    icon: Icon(isEdit ? Icons.update : Icons.save),
+                                    label: Text(isEdit ? 'Update Student' : 'Register Student'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF00496d),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                      textStyle: const TextStyle(fontSize: 18),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 5,
+                                    ),
+                                  ),
+                                  ElevatedButton.icon(
+                                    onPressed: () => context.go(Routes.viewstudentlist),
+                                    icon: const Icon(Icons.list),
+                                    label: const Text("View students"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Color(0xFF00496d),
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                      textStyle: const TextStyle(fontSize: 18),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      elevation: 5,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -513,16 +544,16 @@ class _RegisterStudentState extends State<RegisterStudent> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        labelStyle: const TextStyle(color: Colors.white),
-        hintStyle: const TextStyle(color: Colors.grey),
+        labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+        hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
         border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
         contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        filled: true,
+        filled: false,
         fillColor: fillColor,
       ),
-      style: const TextStyle(fontSize: 16, color: Colors.white),
+      style: const TextStyle(fontSize: 16, color: Colors.black),
       validator: (value) {
         if (value == null || value.trim().isEmpty) return validatorMsg;
         return null;
@@ -543,17 +574,20 @@ class _RegisterStudentState extends State<RegisterStudent> {
       items: items
           .map((e) => DropdownMenuItem(
         value: e,
-        child: Text(e, style: const TextStyle(color: Colors.white)),
+        child: Text(e, style: const TextStyle(color: Colors.black54)),
       ))
           .toList(),
       dropdownColor: fillColor,
       onChanged: onChanged,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white),
-        border: const OutlineInputBorder(),
+        labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+        hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+        border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
+        focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
         contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        filled: true,
+        filled: false,
         fillColor: fillColor,
       ),
       validator: (v) => v == null || v.isEmpty ? validatorMsg : null,
@@ -573,12 +607,12 @@ class _RegisterStudentState extends State<RegisterStudent> {
                 ? Image.network(value.imagefile!.path, fit: BoxFit.cover)
                 : (_uploadedImageUrl != null && _uploadedImageUrl!.isNotEmpty
                 ? CachedNetworkImage(imageUrl: _uploadedImageUrl!, fit: BoxFit.cover)
-                : const Icon(Icons.person, size: 40, color: Colors.white54)))
+                : const Icon(Icons.person, size: 40, color: Color(0xFF00496d))))
                 : (value.imagefile != null
                 ? Image.file(File(value.imagefile!.path), fit: BoxFit.cover)
                 : (_uploadedImageUrl != null && _uploadedImageUrl!.isNotEmpty
                 ? CachedNetworkImage(imageUrl: _uploadedImageUrl!, fit: BoxFit.cover)
-                : const Icon(Icons.person, size: 40, color: Colors.white54)))),
+                : const Icon(Icons.person, size: 40, color: Color(0xFF00496d))))),
       ),
 
     );
