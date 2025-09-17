@@ -15,7 +15,6 @@ class MultiSelectItem<T> {
   final String label;
   MultiSelectItem({required this.value, required this.label});
 }
-
 class MultiSelectField<T> extends StatelessWidget {
   final String label;
   final List<MultiSelectItem<T>> items;
@@ -135,8 +134,6 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
   List<String> selectedLevels = [];
   List<ComponentModel> selectedComponents = [];
   List<String> selectedTeachers = [];
-  String? academicYear;
-  String? term;
   String? _selectclass;
   @override
   void initState() {
@@ -298,10 +295,8 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                   // Save Button
                   ElevatedButton.icon(
                     onPressed: value.savingSetup
-                        ? null
-                        : () async {
-                      if ([academicYear, term].contains(null) ||
-                          selectedTeachers.isEmpty ||
+                        ? null: () async {
+                      if ( selectedTeachers.isEmpty ||
                           selectedSubjects.isEmpty ||
                           selectedLevels.isEmpty ||
                           selectedComponents.isEmpty) {
@@ -313,9 +308,9 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
                         value.savingSetup = true;
                         await value.saveTeacherSetupMulti(
                           teacherIds: selectedTeachers,
-                          schoolId: value.schoolid!,
-                          academicYear: academicYear!,
-                          term: term!,
+                          schoolId: value.schoolid,
+                          academicYear: "20242025",
+                          term: "first",
                           levels: value.departments
                               .where(
                                   (lvl) => selectedLevels.contains(lvl.id))
