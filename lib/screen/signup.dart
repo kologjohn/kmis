@@ -630,7 +630,6 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                   return;
                                                 }
                 
-                
                                                 String school = _schoolController.text.trim();
                                                 String name = _nameController.text.trim();
                                                 String email = _emailController.text.trim().toString().toLowerCase();
@@ -676,7 +675,8 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                     ScaffoldMessenger.of(context).showSnackBar(snackBar);
                                                   }
                                                   progress!.dismiss();
-                                                }catch(e){
+                                                }
+                                                catch(e){
                                                   print(e);
                                                   progress?.dismiss();
 

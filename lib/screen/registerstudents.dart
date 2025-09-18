@@ -20,7 +20,6 @@ class RegisterStudent extends StatefulWidget {
 
 class _RegisterStudentState extends State<RegisterStudent> {
   final _formKey = GlobalKey<FormState>();
-
   final studentName = TextEditingController();
   final studentId = TextEditingController();
   final dob = TextEditingController();
@@ -33,7 +32,9 @@ class _RegisterStudentState extends State<RegisterStudent> {
   final List<TextEditingController> guardianContacts = [TextEditingController()];
 
   final List<String> _sex = ['male', "female"];
-  final List<String> _status = ['active', 'completed', 'dropped'];
+  final List<String> _status = ['active', 'completed',];
+  final List<String> _yeargroup =
+  List.generate(5, (i) => (2022 + i).toString());
 
   String? selectedSex;
   String? selectedLevel;
@@ -41,7 +42,8 @@ class _RegisterStudentState extends State<RegisterStudent> {
   String? selectedRegion;
   String? selectedStatus;
   String? selectedTerm;
-
+  String? selectedYearGroup;
+  bool showStudentId = false;
   String? _uploadedImageUrl = '';
 
   // 🔹 DOB dropdowns
@@ -166,23 +168,55 @@ class _RegisterStudentState extends State<RegisterStudent> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildTextField(
-                            controller: studentName,
-                            label: "Student Name",
-                            hint: "Enter student name",
-                            validatorMsg: 'Student name required',
+                          /*
+                          SizedBox(
+                            child: _buildTextField(
+                              controller: studentId,
+                              label: "Student ID",
+                              hint: "Auto-generated or enter manually",
+                              validatorMsg: 'Student ID required',
+                              fillColor: inputFill,
+                            ),
+                          ),
+                          */
+                          Switch(
+                            value: showStudentId,
+                            onChanged: (val) {
+                              setState(() {
+                                showStudentId = val;
+                              });
+                            },
+                          ),
+                          if (showStudentId)
+                            SizedBox(
+                              child: _buildTextField(
+                                controller: studentId,
+                                label: "Student ID",
+                                hint: "Auto-generated or enter manually",
+                                validatorMsg: 'Student ID required',
+                                fillColor: inputFill,
+                              ),
+                            ),
+                          const SizedBox(height: 10),
+                          _buildDropdown(
+                            value: selectedYearGroup,
+                            items: _yeargroup,
+                            label: "Year Group",
                             fillColor: inputFill,
+                            onChanged: (v) => setState(() => selectedYearGroup = v),
+                            validatorMsg: "Select year group",
                           ),
                           const SizedBox(height: 10),
-                          _buildTextField(
-                            controller: studentId,
-                            label: "Student ID",
-                            hint: "Auto-generated or enter manually",
-                            validatorMsg: 'Student ID required',
-                            fillColor: inputFill,
+                          SizedBox(
+                            child: _buildTextField(
+                              controller: studentName,
+                              label: "Student Name",
+                              hint: "Enter student name",
+                              validatorMsg: 'Student name required',
+                              fillColor: inputFill,
+                            ),
                           ),
                           const SizedBox(height: 10),
-
                           // 🔹 DOB Dropdowns
                           Row(
                             children: [
@@ -404,30 +438,47 @@ class _RegisterStudentState extends State<RegisterStudent> {
                           const SizedBox(height: 20),
                           _buildImagePicker(value),
                           const SizedBox(height: 20),
-
                           ElevatedButton.icon(
                             onPressed: () async {
                               if (!_formKey.currentState!.validate()) return;
                               final progress = ProgressHUD.of(context);
-                              progress?.show();
+                               progress?.show();
+                              final query = await value.db
+                                  .collection('idformats').where('schoolId', isEqualTo: value.schoolid)
+                                  .limit(1)
+                                  .get();
 
-                              final sid = studentId.text.trim().toLowerCase();
-                              String idd =sid.toString();
-                              final id = "${value.schoolid}$idd".replaceAll(" ", "");
+                              if (query.docs.isEmpty) {
+                                throw Exception("No ID format found for school ${value.schoolid}");
+                              }
+                              final formatRef = query.docs.first.reference;
+                              final generatedId = await value.db.runTransaction((transaction) async {
+                                final snapshot = await transaction.get(formatRef);
+                                final data = snapshot.data() as Map<String, dynamic>;
+                                final prefix = data['name'] as String;
+                                final lastNumber = (data['lastnumber'] ?? 0) as int;
+                                final newNumber = lastNumber + 1;
+                                final newId = '$prefix${newNumber.toString().padLeft(4, '0')}';
+                                transaction.update(formatRef, {"lastnumber": newNumber});
+                                return newId;
+                              });
+                              final sid = showStudentId
+                                  ? studentId.text.trim() // use typed ID
+                                  : generatedId;
+                              //final id = "${value.schoolid}_$generatedId";
+                              final id = "${value.schoolid}_$sid";
                               await value.uploadImage(sid);
-
                               final student = StudentModel(
                                 id: widget.studentData?.id ?? id,
-                                studentid: id,
+                                studentid: generatedId,
                                 name: studentName.text.trim(),
                                 sex: selectedSex ?? "",
                                 school: value.currentschool,
                                 region: selectedRegion ?? "",
-                                guardiancontact:
-                                guardianContacts.map((c) => c.text.trim()).toList(),
+                                guardiancontact: guardianContacts.map((c) => c.text.trim()).toList(),
                                 parentname: parentNames.map((c) => c.text.trim()).toList(),
                                 level: selectedLevel ?? "",
-                                term: selectedTerm ?? "",
+                                term: value.term,
                                 schoolId: value.schoolid,
                                 dob: dob.text.trim(),
                                 address: address.text.trim(),
@@ -439,15 +490,12 @@ class _RegisterStudentState extends State<RegisterStudent> {
                                     : _uploadedImageUrl ?? "",
                                 status: selectedStatus ?? "active",
                                 department: selecteddepart ?? "",
+                                yeargroup: '2025',
                               );
-
-                              await value.db
-                                  .collection("students")
+                              await value.db.collection("students")
                                   .doc(student.id)
                                   .set(student.toMap(), SetOptions(merge: true));
-
                               progress?.dismiss();
-
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(isEdit

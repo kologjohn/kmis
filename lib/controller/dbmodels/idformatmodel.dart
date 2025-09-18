@@ -1,15 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ClassModel {
+class IdformatModel {
   final String id;
   final String name;
+  final int  lastnumber;
   final String staff;
   final String? schoolId;
   final DateTime timestamp;
 
-  ClassModel({
+  IdformatModel({
     required this.id,
     required this.name,
+     this.lastnumber =000,
     required this.staff,
     this.schoolId,
     DateTime? timestamp,
@@ -20,6 +22,7 @@ class ClassModel {
     return {
       'id': id,
       'name': name,
+      'lastnumber': lastnumber,
       'staff': staff,
       'schoolId': schoolId,
       'timestamp': Timestamp.fromDate(timestamp),
@@ -27,7 +30,7 @@ class ClassModel {
   }
 
   // Create from Map (when reading data)
-  factory ClassModel.fromMap(Map<String, dynamic> map, String docId) {
+  factory IdformatModel.fromMap(Map<String, dynamic> map, String docId) {
     DateTime parsedTime;
 
     final ts = map['timestamp'];
@@ -41,9 +44,10 @@ class ClassModel {
       parsedTime = DateTime.now();
     }
 
-    return ClassModel(
+    return IdformatModel(
       id: docId,
       name: map['name'] ?? '',
+      lastnumber: map['lastnumber'] ?? '',
       staff: map['staff'] ?? '',
       schoolId: map['schoolId'],
       timestamp: parsedTime,

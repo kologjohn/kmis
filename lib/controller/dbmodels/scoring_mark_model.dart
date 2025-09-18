@@ -11,6 +11,9 @@ class SubjectScoring {
   final String region;
   final String schoolId;
   final String photoUrl;
+  final String staff;
+  final String classes;
+  final String teacher;
 
   /// subjectId -> score details
   final Map<String, dynamic> subjectData;
@@ -36,6 +39,9 @@ class SubjectScoring {
     required this.subjectData,
     required this.scoredFlags,
     required this.totalScores,
+    required this.staff,
+    required this.classes,
+    required this.teacher,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
@@ -45,6 +51,9 @@ class SubjectScoring {
     required String studentName,
     required String academicYear,
     required String term,
+    required String staff,
+    required String classes,
+    required String teacher,
     required String level,
     required String region,
     required String schoolId,
@@ -71,6 +80,9 @@ class SubjectScoring {
       studentName: studentName,
       academicYear: academicYear,
       term: term,
+      staff: staff,
+      classes: classes,
+      teacher: teacher,
       level: level,
       region: region,
       schoolId: schoolId,
@@ -83,6 +95,8 @@ class SubjectScoring {
           "timestamp": DateTime.now(),
           "totalScore": "0",
           "grade": "",
+          "rawca": "",
+          "convertedexams": "",
           "remark": "",
         }
       },
@@ -99,6 +113,9 @@ class SubjectScoring {
     return {
       "academicYear": academicYear,
       "term": term,
+      "staff": staff,
+      "classes": classes,
+      "teacher": teacher,
       "studentId": studentId,
       "studentName": studentName,
       "level": level,

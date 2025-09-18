@@ -93,6 +93,14 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.military_tech,
+                                  title: 'Id format',
+                                  onTap: () =>
+                                      context.go(Routes.idformat),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
                                   title: 'Academic year',
                                   onTap: ()=>context.go(Routes.academicyr),
                                 ),

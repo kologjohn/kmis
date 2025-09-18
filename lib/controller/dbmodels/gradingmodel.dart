@@ -1,12 +1,14 @@
 class GradingSystem {
   final String schoolId;
   final String name;
+  final String staff;
   final DateTime dateCreated;
   final List<System> systems;
 
   GradingSystem({
     required this.schoolId,
     required this.name,
+    required this.staff,
     required this.dateCreated,
     required this.systems,
   });
@@ -15,6 +17,7 @@ class GradingSystem {
     return GradingSystem(
       schoolId: map['schoolId'] ?? '',
       name: map['name'] ?? '',
+      staff: map['staff'] ?? '',
       dateCreated: DateTime.tryParse(map['dateCreated'] ?? '') ?? DateTime.now(),
       systems: (map['systems'] as List<dynamic>?)
           ?.map((e) => System.fromMap(e))
@@ -27,6 +30,7 @@ class GradingSystem {
     return {
       'schoolId': schoolId,
       'name': name,
+      'staff': staff,
       'dateCreated': dateCreated.toIso8601String(),
       'systems': systems.map((e) => e.toMap()).toList(),
     };
@@ -36,11 +40,13 @@ class GradingSystem {
 class System {
   final String id;
   final String name;
+  final String staff;
   final List<Grade> grades;
 
   System({
     required this.id,
     required this.name,
+    required this.staff,
     required this.grades,
   });
 
@@ -48,6 +54,7 @@ class System {
     return System(
       id: map['id'] ?? '',
       name: map['name'] ?? '',
+      staff: map['staff'] ?? '',
       grades: (map['grades'] as List<dynamic>?)
           ?.map((e) => Grade.fromMap(e))
           .toList() ??
@@ -59,6 +66,7 @@ class System {
     return {
       'id': id,
       'name': name,
+      'staff': staff,
       'grades': grades.map((e) => e.toMap()).toList(),
     };
   }

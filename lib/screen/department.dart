@@ -128,6 +128,7 @@ class _DepartmentState extends State<Department> {
                                           name: departmentName,
                                           schoolId: value.schoolid,
                                           timestamp: DateTime.now(),
+                                          staff: value.name,
                                         ).toMap();
 
                                         await value.db

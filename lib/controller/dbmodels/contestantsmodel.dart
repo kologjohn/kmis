@@ -18,6 +18,7 @@ class StudentModel {
   final String timestamp;      // registration time as string
   final String photourl;
   final String status;         // single string: active, dropped, completed, etc.
+  final String yeargroup;         // single string: active, dropped, completed, etc.
 
   StudentModel({
     required this.id,
@@ -38,6 +39,7 @@ class StudentModel {
     required this.phone,
     required this.timestamp,
     required this.photourl,
+    required this.yeargroup,
     this.status = "active", // default
   });
 
@@ -63,6 +65,7 @@ class StudentModel {
       'timestamp': timestamp,
       'photourl': photourl,
       'status': status, // string, not list
+      'yeargroup': yeargroup, // string, not list
     };
   }
 
@@ -87,6 +90,7 @@ class StudentModel {
       phone: map['phone'] ?? '',
       timestamp: map['timestamp'] ?? '',
       photourl: map['photourl'] ?? '',
+      yeargroup: map['yeargroup'] ?? '',
       status: map['status'] ?? 'active',
     );
   }

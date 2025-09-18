@@ -109,6 +109,7 @@ class _RegionregistrationState extends State<Regionregistration> {
                                 regionname: regioncontroller.text.trim(),
                                 time: DateTime.now(),
                                 schoolId: value.schoolid,
+                                staff: value.name,
                               ).toMap();
 
 

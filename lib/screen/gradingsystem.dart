@@ -49,7 +49,7 @@ class _GradingSystemFormPageState extends State<GradingSystemFormPage> {
             builder: (context, provider, _) {
               return Scaffold(
                 appBar: AppBar(
-                  backgroundColor: const Color(0xFF2D2F45),
+                  backgroundColor: const Color(0xFF00273a),
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: () => context.go(Routes.dashboard),
@@ -64,11 +64,11 @@ class _GradingSystemFormPageState extends State<GradingSystemFormPage> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      color: const Color(0xFF2D2F45),
+                      color: const Color(0xFFffffff),
                       margin: const EdgeInsets.all(30.0),
-                      constraints: const BoxConstraints(maxWidth: 800),
+                      constraints: const BoxConstraints(maxWidth: 600),
                       child: Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(30.0),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -84,10 +84,30 @@ class _GradingSystemFormPageState extends State<GradingSystemFormPage> {
                                 }).toList(),
                                 onChanged: (val) =>
                                     setState(() => _selectedLevel = val),
-                                decoration: const InputDecoration(
+                                decoration: InputDecoration(
                                   labelText: "Department",
                                   hintText: "Select department",
-                                  labelStyle: TextStyle(color: Colors.white),
+                                  labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+                                  hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+                                  border: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[700]!,
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Colors.grey[700]!,
+                                    ),
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color(0xFF00496d),
+                                    ),
+                                  ),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 12,
+                                  ),
                                 ),
                                 validator: (value) => value == null
                                     ? 'Please select department'
@@ -98,9 +118,9 @@ class _GradingSystemFormPageState extends State<GradingSystemFormPage> {
                                 alignment: Alignment.centerRight,
                                 child: FloatingActionButton(
                                   mini: true, // smaller button
-                                  backgroundColor: Colors.green,
+                                  backgroundColor: Color(0xFF00496d).withOpacity(0.7),
                                   onPressed: _addGrade,
-                                  child: const Icon(Icons.add),
+                                  child: const Icon(Icons.add, color: Colors.white,),
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -254,11 +274,11 @@ class _GradingSystemFormPageState extends State<GradingSystemFormPage> {
                                 icon: const Icon(Icons.save),
                                 label: const Text("Save System"),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blueAccent,
+                                  backgroundColor: Color(0xFF00496d),
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 40, vertical: 15),
-                                  textStyle: const TextStyle(fontSize: 18),
+                                  textStyle: const TextStyle(fontSize: 14),
                                 ),
                               ),
                             ],
