@@ -1,11 +1,13 @@
 class ScoremodelConfig {
   final String? id;
+  final String? staff;
   final String schoolId;
   final String continuous; // stored as string
   final String exam;       // stored as string
 
   ScoremodelConfig({
     this.id,
+    this.staff,
     required this.schoolId,
     required this.continuous,
     required this.exam,
@@ -32,6 +34,7 @@ class ScoremodelConfig {
   Map<String, dynamic> toMap() {
     return {
       "id": id,
+      "staff": staff,
       "schoolId": schoolId,
       "continuous": continuous,
       "exam": exam,

@@ -41,7 +41,7 @@ class _TermState extends State<Term> {
             builder: (BuildContext context, Myprovider value, Widget? child) {
               return Scaffold(
                 appBar: AppBar(
-                  backgroundColor: const Color(0xFF2D2F45),
+                  backgroundColor: const Color(0xFF00273a),
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: () => context.go(Routes.dashboard),
@@ -63,11 +63,11 @@ class _TermState extends State<Term> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      color: const Color(0xFF2D2F45),
+                      color: const Color(0xFFffffff),
                       margin: const EdgeInsets.all(30.0),
-                      constraints: const BoxConstraints(maxWidth: 800),
+                      constraints: const BoxConstraints(maxWidth: 600),
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.all(30.0),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -79,8 +79,8 @@ class _TermState extends State<Term> {
                                 decoration: InputDecoration(
                                   labelText: "Term Name",
                                   hintText: "Enter Term Name",
-                                  labelStyle: const TextStyle(color: Colors.white),
-                                  hintStyle: const TextStyle(color: Colors.grey),
+                                  labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+                                  hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Colors.grey[700]!,
@@ -93,17 +93,17 @@ class _TermState extends State<Term> {
                                   ),
                                   focusedBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Colors.blueAccent,
+                                      color: Color(0xFF00496d),
                                     ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
                                     vertical: 10,
                                     horizontal: 12,
                                   ),
-                                  filled: true,
+                                  filled: false,
                                   fillColor: inputFill,
                                 ),
-                                style: const TextStyle(fontSize: 16),
+                                style: const TextStyle(fontSize: 14),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Term name cannot be empty';
@@ -112,97 +112,103 @@ class _TermState extends State<Term> {
                                 },
                               ),
                               const SizedBox(height: 20),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                              Column(
+                                //mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        final progress = ProgressHUD.of(context);
-                                        progress!.show();
+                                  Wrap(
+                                    spacing: 10,
+                                    runSpacing: 10,
+                                    children: [
+                                      ElevatedButton.icon(
+                                        onPressed: () async {
+                                          if (_formKey.currentState!.validate()) {
+                                            final progress = ProgressHUD.of(context);
+                                            progress!.show();
 
-                                        String term = termname.text.trim();
-                                        String id = "${value.schoolid}_${term.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
-                                        final data = TermModel(
-                                          id: id,
-                                          name: term,
-                                          schoolId: value.schoolid,
-                                          timestamp: DateTime.now(),
-                                        ).toMap();
+                                            String term = termname.text.trim();
+                                            String id = "${value.schoolid}_${term.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
+                                            final data = TermModel(
+                                              id: id,
+                                              name: term,
+                                              schoolId: value.schoolid,
+                                              timestamp: DateTime.now(),
+                                            ).toMap();
 
-                                        await value.db
-                                            .collection('terms')
-                                            .doc(id)
-                                            .set(data, SetOptions(merge: true));
-                                        await value.db.collection('schools').doc(value.schoolid)
-                                            .update({
-                                          "term": term,
-                                          "updatedAt": DateTime.now(),
-                                        });
-                                        progress.dismiss();
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              isEdit
-                                                  ? 'Term updated successfully'
-                                                  : 'Term registered successfully',
-                                            ),
-                                            backgroundColor: Colors.green,
+                                            await value.db
+                                                .collection('terms')
+                                                .doc(id)
+                                                .set(data, SetOptions(merge: true));
+                                            await value.db.collection('schools').doc(value.schoolid)
+                                                .update({
+                                              "term": term,
+                                              "updatedAt": DateTime.now(),
+                                            });
+                                            progress.dismiss();
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  isEdit
+                                                      ? 'Term updated successfully'
+                                                      : 'Term registered successfully',
+                                                ),
+                                                backgroundColor: Colors.green,
+                                              ),
+                                            );
+
+                                            if (!isEdit) {
+                                              termname.clear();
+                                            }
+                                          }
+                                        },
+                                        icon: Icon(
+                                          isEdit ? Icons.update : Icons.save,
+                                        ),
+                                        label: Text(
+                                          isEdit ? 'Update Term' : 'Register Term',
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xFF00496d),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 40,
+                                            vertical: 15,
                                           ),
-                                        );
-
-                                        if (!isEdit) {
-                                          termname.clear();
-                                        }
-                                      }
-                                    },
-                                    icon: Icon(
-                                      isEdit ? Icons.update : Icons.save,
-                                    ),
-                                    label: Text(
-                                      isEdit ? 'Update Term' : 'Register Term',
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blueAccent,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 40,
-                                        vertical: 15,
+                                          textStyle: const TextStyle(fontSize: 18),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          elevation: 5,
+                                        ),
                                       ),
-                                      textStyle: const TextStyle(fontSize: 18),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                      //const SizedBox(width: 20),
+                                      ElevatedButton.icon(
+                                        onPressed: () {
+                                          context.go(Routes.viewterm);
+                                        },
+                                        icon: const Icon(
+                                          Icons.list,
+                                          color: Colors.white,
+                                        ),
+                                        label: const Text(
+                                          'View Terms',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Color(0xFF00496d),
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 40,
+                                            vertical: 15,
+                                          ),
+                                          textStyle: const TextStyle(fontSize: 18),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                          elevation: 5,
+                                        ),
                                       ),
-                                      elevation: 5,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 20),
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      context.go(Routes.viewterm);
-                                    },
-                                    icon: const Icon(
-                                      Icons.list,
-                                      color: Colors.white,
-                                    ),
-                                    label: const Text(
-                                      'View Terms',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.blueAccent,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 40,
-                                        vertical: 15,
-                                      ),
-                                      textStyle: const TextStyle(fontSize: 18),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      elevation: 5,
-                                    ),
-                                  ),
+                                    ],
+                                  )
                                 ],
                               ),
                               const SizedBox(height: 20),

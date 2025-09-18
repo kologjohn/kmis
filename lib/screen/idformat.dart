@@ -3,41 +3,41 @@ import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../controller/dbmodels/classmodel.dart';
+
+import '../controller/dbmodels/idformatmodel.dart';
 import '../controller/myprovider.dart';
 import '../controller/routes.dart';
 
-class ClassScreen extends StatefulWidget {
-  final ClassModel? classes;
-  const ClassScreen({super.key, this.classes});
+class IdformatScreen extends StatefulWidget {
+  final IdformatModel? idformatModel;
+  const IdformatScreen({super.key, this.idformatModel});
 
   @override
-  State<ClassScreen> createState() => _ClassScreenState();
+  State<IdformatScreen> createState() => _IdformatScreenState();
 }
 
-class _ClassScreenState extends State<ClassScreen> {
-  final classController = TextEditingController();
+class _IdformatScreenState extends State<IdformatScreen> {
+  final idformatController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
   @override
   void initState() {
     super.initState();
-    final data = widget.classes;
+    final data = widget.idformatModel;
     if (data != null) {
-      classController.text = data.name;
+      idformatController.text = data.name;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final inputFill = const Color(0xFF2C2C3C);
-    final isEdit = widget.classes != null;
+    final isEdit = widget.idformatModel != null;
 
     return ProgressHUD(
       child: Builder(
         builder: (context) {
           return Consumer<Myprovider>(
-            builder: (BuildContext context, Myprovider value, Widget? child) {
+            builder: (BuildContext context, Myprovider provider, Widget? child) {
               return Scaffold(
                 appBar: AppBar(
                   backgroundColor: const Color(0xFF2D2F45),
@@ -46,7 +46,7 @@ class _ClassScreenState extends State<ClassScreen> {
                     onPressed: () => context.go(Routes.dashboard),
                   ),
                   title: Text(
-                    isEdit ? 'Edit Class' : 'Register Class',
+                    isEdit ? 'Edit ID Format' : 'Register ID Format',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -74,10 +74,10 @@ class _ClassScreenState extends State<ClassScreen> {
                             children: [
                               const SizedBox(height: 20),
                               TextFormField(
-                                controller: classController,
+                                controller: idformatController,
                                 decoration: InputDecoration(
-                                  labelText: "Class Name",
-                                  hintText: "Enter Class Name",
+                                  labelText: "ID Format Name",
+                                  hintText: "Enter ID Format",
                                   labelStyle: const TextStyle(color: Colors.white),
                                   hintStyle: const TextStyle(color: Colors.grey),
                                   border: OutlineInputBorder(
@@ -102,10 +102,11 @@ class _ClassScreenState extends State<ClassScreen> {
                                   filled: true,
                                   fillColor: inputFill,
                                 ),
-                                style: const TextStyle(fontSize: 16, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Class name cannot be empty';
+                                    return 'ID format cannot be empty';
                                   }
                                   return null;
                                 },
@@ -120,36 +121,44 @@ class _ClassScreenState extends State<ClassScreen> {
                                         final progress = ProgressHUD.of(context);
                                         progress!.show();
 
-                                        String className = classController.text.trim();
-                                        String idd = className.replaceAll(RegExp(r'\s+'), '').toLowerCase();
-                                        final id = "${value.schoolid}_$idd".replaceAll(" ", "");
-                                        final data = ClassModel(
-                                          id: className.toLowerCase(),
-                                          name: className,
-                                          schoolId: value.schoolid,
+                                        final idformatName =
+                                        idformatController.text.trim();
+
+                                        // ✅ Create consistent Firestore doc ID
+                                        final formattedId = idformatName
+                                            .replaceAll(RegExp(r'\s+'), '')
+                                            .toUpperCase();
+                                      final docId ="${provider.schoolid}_$formattedId";
+
+                                        final idformatData = IdformatModel(
+                                          id: docId,
+                                          name: idformatName.toUpperCase(),
+                                          schoolId: provider.schoolid,
                                           timestamp: DateTime.now(),
-                                          staff: value.name,
+                                          staff: provider.name,
                                         ).toMap();
 
-                                        await value.db
-                                            .collection('classes')
-                                            .doc(id)
-                                            .set(data, SetOptions(merge: true));
+                                        await provider.db
+                                            .collection('idformats')
+                                            .doc(docId)
+                                            .set(idformatData,
+                                            SetOptions(merge: true));
 
                                         progress.dismiss();
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               isEdit
-                                                  ? 'Class updated successfully'
-                                                  : 'Class registered successfully',
+                                                  ? 'ID Format updated successfully'
+                                                  : 'ID Format registered successfully',
                                             ),
                                             backgroundColor: Colors.green,
                                           ),
                                         );
 
                                         if (!isEdit) {
-                                          classController.clear();
+                                          idformatController.clear();
                                         }
                                       }
                                     },
@@ -157,7 +166,9 @@ class _ClassScreenState extends State<ClassScreen> {
                                       isEdit ? Icons.update : Icons.save,
                                     ),
                                     label: Text(
-                                      isEdit ? 'Update Class' : 'Register Class',
+                                      isEdit
+                                          ? 'Update ID Format'
+                                          : 'Register ID Format',
                                     ),
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.blueAccent,
@@ -166,9 +177,11 @@ class _ClassScreenState extends State<ClassScreen> {
                                         horizontal: 40,
                                         vertical: 15,
                                       ),
-                                      textStyle: const TextStyle(fontSize: 18),
+                                      textStyle:
+                                      const TextStyle(fontSize: 18),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius:
+                                        BorderRadius.circular(10),
                                       ),
                                       elevation: 5,
                                     ),
@@ -176,14 +189,14 @@ class _ClassScreenState extends State<ClassScreen> {
                                   const SizedBox(width: 20),
                                   ElevatedButton.icon(
                                     onPressed: () {
-                                      context.go(Routes.viewclass);
+                                      context.go(Routes.viewidformats); // new route
                                     },
                                     icon: const Icon(
                                       Icons.list,
                                       color: Colors.white,
                                     ),
                                     label: const Text(
-                                      'View Classes',
+                                      'View ID Formats',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     style: ElevatedButton.styleFrom(
@@ -193,9 +206,11 @@ class _ClassScreenState extends State<ClassScreen> {
                                         horizontal: 40,
                                         vertical: 15,
                                       ),
-                                      textStyle: const TextStyle(fontSize: 18),
+                                      textStyle:
+                                      const TextStyle(fontSize: 18),
                                       shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                        borderRadius:
+                                        BorderRadius.circular(10),
                                       ),
                                       elevation: 5,
                                     ),
@@ -218,3 +233,4 @@ class _ClassScreenState extends State<ClassScreen> {
     );
   }
 }
+

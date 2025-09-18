@@ -192,6 +192,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                                 totalMark: totalMark,
                                                 dateCreated: DateTime.now(),
                                                 schoolId: value.schoolid,
+                                                staff: value.name,
                                               );
 
                                               // Save as Map

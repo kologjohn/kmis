@@ -12,6 +12,7 @@ import '../screen/class.dart';
 import '../screen/department.dart';
 
 import '../screen/gradingsystem.dart';
+import '../screen/idformat.dart';
 import '../screen/judgeui.dart';
 
 import '../screen/levelreg.dart';
@@ -42,6 +43,7 @@ import 'myprovider.dart';
 class Routes {
 
   static const registerstudent = "/registerstudent";
+  static const idformat = "/idformat";
   static const term = "/term";
   static const depart = "/depart";
   static const classes = "/classes";
@@ -112,6 +114,7 @@ class Routes {
   static const setupteacher = "/setupteacher";
   static const academicyr = "/academicyr";
   static const viewacademicyr = "/viewacademicyr";
+  static const viewidformats = "/viewidformats";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
@@ -211,5 +214,6 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.viewacademicyr, builder: (c, s) => ViewAcademicyr()),
     GoRoute(path: Routes.registerstudent, builder: (c, s) => RegisterStudent()),
     GoRoute(path: Routes.regionreg, builder: (c, s) => Regionregistration()),
+    GoRoute(path: Routes.idformat, builder: (c, s) => IdformatScreen()),
   ],
 );
