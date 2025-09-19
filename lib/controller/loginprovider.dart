@@ -28,10 +28,10 @@ class LoginProvider extends ChangeNotifier {
   String schooldomain = "kologsoftsmiscom.com";
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
-
+  List<String> accounts = [];
+  List<String> accountclass = [];
   login(String email, String password, BuildContext context) async {
     try {
-
       final loginhere = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -95,7 +95,7 @@ class LoginProvider extends ChangeNotifier {
     term = prefs.getString('term') ?? '';
     staffSchoolIds = prefs.getStringList("staffschools") ?? [];
     schoolnames = prefs.getStringList("schoolnames") ?? [];
-    print(schoolid);
+    print(currentschool);
     notifyListeners();
   }
   setSchool(String school, String schoolid) async {
@@ -172,14 +172,20 @@ class LoginProvider extends ChangeNotifier {
       debugPrint("Error fetching term/year: $e");
     }
   }
-  // smsalert(String message,String phoneTxt) async {
-  //   await db.collection("smsQueue").add({
-  //     'phone': phoneTxt,
-  //     'message': message,
-  //     'senderId': "KologSoft",
-  //     'createdat': DateTime.now().toIso8601String(),
-  //     'status': 'pending',
-  //   });
-  // }
+  void setAccounts(List<String> accounts) {
+    accounts = accounts;
+    notifyListeners();
+  }
+  Future<void> fetchAccounts() async {
+    try {
+      final snapshot = await db.collection("mainaccounts").get();
+      accounts = snapshot.docs.map((doc) => (doc.data()["name"] ?? "") as String).where((name) => name.isNotEmpty).toList();
+      accountclass = snapshot.docs.map((doc) => (doc.data()["accountType"] ?? "") as String).where((name) => name.isNotEmpty).toList();
+    } catch (e) {
+      print("Error fetching accounts: $e");
+    }
+    notifyListeners();
+  }
+
 
 }

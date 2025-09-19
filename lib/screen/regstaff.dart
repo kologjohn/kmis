@@ -134,7 +134,6 @@ class _RegstaffState extends State<Regstaff> {
 
                                 ),
                                 const SizedBox(height: 20),
-
                                 // Sex
                                 DropdownButtonFormField<String>(
                                   value: _selectedSex,
