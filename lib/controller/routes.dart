@@ -1,7 +1,10 @@
 import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/components/billing.dart';
 import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
+import 'package:ksoftsms/screen/accountChart.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
+import 'package:ksoftsms/screen/systemActivity.dart';
 import '../components/academicyrmodel.dart';
 import '../components/dashboard.dart';
 
@@ -29,7 +32,6 @@ import '../screen/termlist.dart';
 import '../screen/viewacademicyr.dart';
 import '../screen/viewclass.dart';
 import '../screen/viewdepartment.dart';
-import '../screen/viewschool.dart';
 import '../screen/viewsubject.dart';
 import 'dbmodels/departmodel.dart';
 import 'dbmodels/levelmodel.dart';
@@ -38,7 +40,6 @@ import 'dbmodels/scoremodel.dart';
 import 'dbmodels/staffmodel.dart';
 import 'dbmodels/subjectmodel.dart';
 import 'dbmodels/termmodel.dart';
-import 'myprovider.dart';
 
 class Routes {
 
@@ -59,7 +60,9 @@ class Routes {
   static const viewschool = "/viewschool";
   static const viewstaff = "/viewstaff";
   static const nextpage = "/nextpage";
-
+  static const coa = "/coa";
+  static const accountActivity = "/accountActivity";
+  static const billing = "/billing";
 
   static const registerzone = "/registerzone";
   static const regstaff = "/regstaff";
@@ -70,14 +73,9 @@ class Routes {
   static const dashboard = "/dashboard";
   static const sexreg = "/sexreg";
   static const seasonreg = "/seasonreg";
-  static const episodereg = "/episodereg";
   static const marks = "/marks";
 
-  static const weekreg = "/weekreg";
-  static const scoresheet = "/scoresheet";
-  static const judgesetup = "/judgesetup";
   static const scores = "/scores";
-  static const judgeselect = "/judgeselect";
   static const setupjudge = "/setupjudge";
   static const episodeh = "/episodeh";
   static const jscore = "/jscore";
@@ -92,7 +90,6 @@ class Routes {
   static const regionreg = "/regionreg";
   static const clearscores = "/clearscores";
   static const accesslist = "/accesslist";
-  static const autoform2 = "/autoform2";
   static const viewvotes = "/viewvotes";
   static const bestcriteria = "/bestcriteria";
   static const judgelist = "/judgelist";
@@ -120,7 +117,7 @@ class Routes {
     "Judge": [
       Routes.judgelandingpage,
       Routes.scores,
-      Routes.autoform2,
+      // Routes.autoform2,
       Routes.viewmarks,
     ],
   };
@@ -133,6 +130,9 @@ final GoRouter router = GoRouter(
 
 
   routes: [
+    GoRoute(path: Routes.billing, builder: (c, s) => Billing()),
+    GoRoute(path: Routes.coa, builder: (c, s) => AccountsChart()),
+    GoRoute(path: Routes.accountActivity, builder: (c, s) => SystemActivity()),
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
     GoRoute(
       path: Routes.regstaff,
@@ -141,17 +141,14 @@ final GoRouter router = GoRouter(
         return Regstaff();
       },
     ),
-
     GoRoute(
     path: Routes.levelreg,
     builder: (context, state) {
     final level = state.extra as LevelModel?;
     return LevelListScreen(levelData: level);
     },),
-
     GoRoute(path: Routes.dashboard, builder: (c, s) => DashboardLayout()),
     GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
-
     GoRoute(path: Routes.jscore, builder: (c, s) => JudgeGroundScreen()),
     GoRoute(
       path: Routes.term,

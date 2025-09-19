@@ -85,25 +85,25 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
               children: features
                   .map(
                     (f) => Padding(
-                      padding: const EdgeInsets.only(bottom: 7.0),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.check_circle,
-                            size: 18,
-                            color: Colors.green,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              f,
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                          ),
-                        ],
+                  padding: const EdgeInsets.only(bottom: 7.0),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        size: 18,
+                        color: Colors.green,
                       ),
-                    ),
-                  )
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          f,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
                   .toList(),
             ),
           ),
@@ -328,7 +328,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
     Widget mobileLeftPanel(BuildContext context) {
       return Consumer<Myprovider>(
         builder: (BuildContext context,  value, Widget? child) {
-         // final value = ref.watch(formsProvider);
+          // final value = ref.watch(formsProvider);
           return  Padding(
             padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
             child: Container(
@@ -439,13 +439,13 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                     child: Padding(
                       padding: isMobile
                           ? const EdgeInsets.symmetric(
-                              horizontal: 22,
-                              vertical: 0,
-                            )
+                        horizontal: 22,
+                        vertical: 0,
+                      )
                           : const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 60,
-                            ),
+                        horizontal: 32,
+                        vertical: 60,
+                      ),
                       child: Form(
                         key: _formKey,
                         child: Consumer<Myprovider>(
@@ -475,7 +475,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                           //floatingLabelStyle: TextStyle(color: Colors.orange),
                                           border: UnderlineInputBorder(),
                                         ),
-                
+
                                         validator: (value) =>
                                         value == null || value.isEmpty
                                             ? 'Please enter your name'
@@ -489,7 +489,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                           //floatingLabelStyle: TextStyle(color: Colors.orange),
                                           border: UnderlineInputBorder(),
                                         ),
-                
+
                                         validator: (value) =>
                                         value == null || value.isEmpty
                                             ? 'Please enter school Name'
@@ -550,12 +550,12 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                             setState(() {
                                               selectedCountryName = selected['name'];
                                               selectedDialCode = selected['dial_code'];
-                
+
                                               final cleanedNumber = _phoneController.text
                                                   .replaceFirst(RegExp(r'^\+\d+\s*'), '');
                                               _phoneController.text =
                                               '${selectedDialCode!}$cleanedNumber';
-                
+
                                               _phoneController
                                                   .selection = TextSelection.fromPosition(
                                                 TextPosition(
@@ -629,7 +629,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('You must agree to the terms to continue.'),));
                                                   return;
                                                 }
-                
+
                                                 String school = _schoolController.text.trim();
                                                 String name = _nameController.text.trim();
                                                 String email = _emailController.text.trim().toString().toLowerCase();
@@ -642,7 +642,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                 final result_count = await value.db.collection('schools').get();
                                                 final progress=ProgressHUD.of(context);
                                                 progress?.showWithText('Setting up your school...');
-                
+
                                                 int count_exist=result_count.docs.length;
                                                 int new_count=count_exist+1;
                                                 String schoolid='KS${new_count.toString().padLeft(4, '0')}';
@@ -681,9 +681,9 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                   progress?.dismiss();
 
                                                 }
-                
-                
-                
+
+
+
                                               }
                                             },
                                             child: Container(
@@ -772,7 +772,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                                 ),
                                               ),
                                             ),
-                
+
                                             // Facebook Icon Button
                                           ],
                                         ),
@@ -800,7 +800,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                         ),
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
-                
+
                                           children: const [
                                             Text(
                                               'Login',
@@ -841,13 +841,13 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                           onTap: () async{
 
 
-                                           // Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordPage()));
+                                            // Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordPage()));
                                           },
                                           child: const Text('Forgot password?', style: TextStyle(fontSize: 14)),
                                         ),
                                       ),
                                       const SizedBox(height: 5),
-                
+
                                       InkWell(
                                         onTap: () async {
                                           if (_formKey.currentState!.validate()) {
@@ -877,12 +877,12 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                       TextButton(
                                         onPressed: () {
                                           value.showform(true, "signup");
-                
+
                                         },
                                         child: const Text("Don't have an account? Sign Up"),
                                       ),
                                       const SizedBox(height: 5),
-                
+
                                       Center(
                                         child: Wrap(
                                           spacing: 20,
@@ -953,17 +953,17 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
       ),
       body: isMobile
           ? Column(
-              children: [
-                mobileLeftPanel(context),
-                Expanded(child: rightPanel(context)),
-              ],
-            )
+        children: [
+          mobileLeftPanel(context),
+          Expanded(child: rightPanel(context)),
+        ],
+      )
           : Row(
-              children: [
-                Flexible(flex: 1, child: leftPanel(context)),
-                Flexible(flex: 1, child: rightPanel(context)),
-              ],
-            ),
+        children: [
+          Flexible(flex: 1, child: leftPanel(context)),
+          Flexible(flex: 1, child: rightPanel(context)),
+        ],
+      ),
     );
   }
 }
