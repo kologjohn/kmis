@@ -124,7 +124,7 @@ class _ClassScreenState extends State<ClassScreen> {
                                         String idd = className.replaceAll(RegExp(r'\s+'), '').toLowerCase();
                                         final id = "${value.schoolid}_$idd".replaceAll(" ", "");
                                         final data = ClassModel(
-                                          id: className.toLowerCase(),
+                                          id: id,
                                           name: className,
                                           schoolId: value.schoolid,
                                           timestamp: DateTime.now(),

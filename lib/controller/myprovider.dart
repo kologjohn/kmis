@@ -53,7 +53,10 @@ class Myprovider extends LoginProvider {
   bool loadacademicyear =false;
   XFile? imagefile;
   String imageUrl = "";
-  int studentcount_in_school = 0;
+  List<TeacherSetup> teacherSetupList = [];
+  bool isLoadingTeacherList = false;
+  DocumentSnapshot? firstTeacherDocument;
+  DocumentSnapshot? lastTeacherDocument;
   Future<void> fetchterms() async {
     try {
       loadterms = true;
@@ -247,6 +250,7 @@ class Myprovider extends LoginProvider {
   Future<void> deleteData(String collection, String documentId) async {
     try {
     //  fetchstaff();
+      fetchomponents();
       fetchterms();
       fetchdepart();
       fetchclass();
@@ -274,6 +278,7 @@ class Myprovider extends LoginProvider {
     notifyListeners();
   }
   Future<void> fetchomponents() async {
+
     isloadcomponents = true;
     notifyListeners();
     try {
@@ -309,143 +314,268 @@ class Myprovider extends LoginProvider {
       "lastnumber": lastNumber,
     };
   }
+  Future<void> fetchTeacherSetupList({int limit = 10, bool reset = false, bool nextPage = true,}) async {
+    try {
+      isLoadingTeacherList = true;
+      notifyListeners();
+      Query query = db
+          .collection("teacherSetup")
+          .orderBy("timestamp", descending: false)
+          .limit(limit);
+      if (!reset && lastTeacherDocument != null && nextPage) {
+        query = query.startAfterDocument(lastTeacherDocument!);
+      } else if (!reset && firstTeacherDocument != null && !nextPage) {
+        query = query.endBeforeDocument(firstTeacherDocument!).limitToLast(limit);
+      }
+
+      final snapshot = await query.get();
+
+      if (snapshot.docs.isNotEmpty) {
+        // Save pagination cursors
+        firstTeacherDocument = snapshot.docs.first;
+        lastTeacherDocument = snapshot.docs.last;
+        teacherSetupList = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+
+          return TeacherSetup(
+            staffid: data['staffid'] ?? '',
+            staffname: data['staffname'] ?? '',
+            schoolId: data['schoolId'] ?? '',
+            academicyear: data['academicyear'] ?? '',
+            term: data['term'] ?? '',
+            component: (data['component'] as List<dynamic>?)
+                ?.map((c) => ComponentModel.fromMap(c as Map<String, dynamic>))
+                .toList()
+                ?? [],
+            classname: (data['classname'] as List<dynamic>? ?? [])
+                .map((c) => ClassModel(
+              id: c['id'] ?? '',
+              name: c['name'] ?? '',
+              staff: name,
+            ))
+                .toList(),
+            status: data['status'] ?? 'active',
+            complete: data['complete'] ?? 'no',
+            email: data['email'],
+            phone: data['phone'],
+            createby: data['createby'],
+            levels: (data['levels'] as List<dynamic>? ?? [])
+                .map((lvl) => DepartmentModel(
+              id: lvl['id'] ?? '',
+              name: lvl['name'] ?? '',
+              staff: name,
+            ))
+                .toList(),
+            subjects: (data['subjects'] as List<dynamic>? ?? [])
+                .map((s) => SubjectModel(
+              id: s['id'] ?? '',
+              name: s['name'] ?? '',
+            
+            ))
+                .toList(),
+            timestamp: data['timestamp'] != null
+                ? DateTime.tryParse(data['timestamp']) ?? DateTime.now()
+                : DateTime.now(),
+
+          );
+        }).toList();
+      } else {
+        teacherSetupList = [];
+      }
+    } catch (e) {
+      debugPrint("Error fetching teacherSetup: $e");
+    } finally {
+      isLoadingTeacherList = false;
+      notifyListeners();
+    }
+  }
+  updateAccessComponent(String id, Map<String, dynamic> newData) async {
+    try {
+      final docRef = FirebaseFirestore.instance
+          .collection('assesscomponent')
+          .doc(id);
+
+      await docRef.update(newData);
+      // Refresh the list after update
+      await fetchomponents();
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error updating component: $e");
+      rethrow;
+    }
+  }
+
   Future<void> saveTeacherSetupMulti({
     required List<String> teacherIds,
+    required List<String> teacherNames, // dynamic teacher names
     required String schoolId,
     required String academicYear,
     required String term,
-    required String classes,
+    required List<ClassModel> classes, // multiple classes
     required List<DepartmentModel> levels,
     required List<SubjectModel> subjects,
     required List<ComponentModel> components,
   }) async {
+    if (teacherIds.isEmpty) throw Exception("No teachers selected.");
+    if (teacherNames.isEmpty) throw Exception("Teacher names missing.");
+    if (levels.isEmpty) throw Exception("No levels selected.");
+    if (subjects.isEmpty) throw Exception("No subjects selected.");
+    if (academicYear.trim().isEmpty || term.trim().isEmpty) {
+      throw Exception("Academic year and term are required.");
+    }
+
     savingSetup = true;
     notifyListeners();
     const int _batchLimit = 450;
 
     try {
-      if (teacherIds.isEmpty) throw Exception("No teachers selected.");
-      if (levels.isEmpty) throw Exception("No levels selected.");
-      if (subjects.isEmpty) throw Exception("No subjects selected.");
-      if (academicYear.trim().isEmpty || term.trim().isEmpty) {
-        throw Exception("Academic year and term are required.");
+      // ----------------------------
+      // STEP 1: Create SubjectScoring docs for all students
+      // ----------------------------
+      WriteBatch batch = db.batch();
+      int writes = 0;
+
+      final classNames = classes.map((c) => c.name).toList();
+      final levelNames = levels.map((c) => c.name).toList();
+
+      // Fetch all students in selected classes and levels
+      final studentSnap = await db
+          .collection("students")
+          .where("schoolId", isEqualTo: schoolId)
+          .where("level", whereIn: classNames)
+          .where("department", whereIn: levelNames)
+          .get();
+
+      final List<Map<String, String>> teacherInfo = [];
+      for (int i = 0; i < teacherIds.length; i++) {
+        teacherInfo.add({
+          "id": teacherIds[i],
+          "name": teacherNames[i],
+        });
       }
 
-      // STEP 1: Create SubjectScoring docs (one per student per term)
-          {
-        int writes = 0;
-        WriteBatch batch = db.batch();
+      for (final studentDoc in studentSnap.docs) {
+        final studentData = studentDoc.data() as Map<String, dynamic>;
+        final studentId = studentDoc.id;
+        final studentClass = studentData['level'] ?? '';
 
-        for (final level in levels) {
-          final studentSnap = await db
-              .collection("students")
-              .where("schoolId", isEqualTo: schoolId)
-              .where("department", isEqualTo: level.name)
-              .where("level", isEqualTo: classes)
-              .get();
+        // Skip students not in selected classes
+        if (!classNames.contains(studentClass)) continue;
 
-          if (studentSnap.docs.isEmpty) continue;
+        // Build subjects using SubjectScoring model
+        final Map<String, dynamic> subjectMap = {};
+        final Map<String, String> scoredFlags = {};
+        final Map<String, String> totalScores = {};
 
-          for (final studentDoc in studentSnap.docs) {
-            final studentData = studentDoc.data() as Map<String, dynamic>;
-            final studentId = studentDoc.id;
-            final studentName = studentData['name'] ?? '';
-            final region = studentData['region'] ?? '';
-            final photoUrl = studentData['photoUrl'] ?? '';
-
-            // ✅ one doc per student per academic year + term
-            final scoringId = "${studentId}_${academicYear}_${term}";
-            final scoringRef = db.collection("subjectScoring").doc(scoringId);
-
-            // build subjects array
-            final List<Map<String, dynamic>> subjectEntries = subjects.map((s) {
-              final Map<String, String> initialScores = {
-                for (var c in components) c.name: "0"
-              };
-
-              final criteriaTotal = components.fold<int>(
-                0,
-                    (sum, c) => sum + int.tryParse(c.totalMark)!,
-              ).toString();
-
-              return {
-                "subjectId": s.id,
-                "subjectName": s.name,
-                "criteriatotal": criteriaTotal,
-                "scores": initialScores,
-                "status": "pending",
-                "totalScore": "0",
-                "grade": "",
-                "remark": "",
-                "timestamp": DateTime.now(),
-              };
-            }).toList();
-
-            final scoringData = {
-              "studentId": studentId,
-              "studentName": studentName,
-              "academicYear": academicYear,
-              "term": term,
-              "level": level.name,
-              "region": region,
-              "schoolId": schoolId,
-              "photoUrl": photoUrl,
-              "subjects": subjectEntries, // ✅ all subjects stored here
-              "createdAt": FieldValue.serverTimestamp(),
-            };
-
-            batch.set(scoringRef, scoringData, SetOptions(merge: true));
-
-            writes++;
-            if (writes >= _batchLimit) {
-              await batch.commit();
-              batch = db.batch();
-              writes = 0;
-            }
-          }
-        }
-
-        if (writes > 0) await batch.commit();
-      }
-
-      // STEP 2: Save TeacherSetup docs
-          {
-        int writes = 0;
-        WriteBatch batch = db.batch();
-
-        for (final teacherId in teacherIds) {
-          final teacherSetupId = "${teacherId}_${academicYear}_$term";
-
-          final teacherSetup = TeacherSetup(
-            staffid: teacherId,
-            staffname: name,
-            classname: classes,
-            schoolId: schoolId,
-            academicyear: academicYear,
+        for (final subject in subjects) {
+          final scoring = SubjectScoring.create(
+            studentId: studentId,
+            studentName: studentData['name'] ?? '',
+            academicYear: academicYear,
             term: term,
-            levels: levels,     // all levels selected
-            subjects: subjects, // all subjects selected
+            staff: name,
+            classes: studentClass,
+            teacher: '', // assign teacher if needed
+            level: studentData['level'] ?? '',
+            department: studentData['department'] ?? '',
+            region: studentData['region'] ?? '',
+            schoolId: schoolId,
+            school: studentData['school'] ?? '',
+            photoUrl: studentData['photourl'] ?? '',
+            dob: studentData['dob'] ?? '',
+            email: studentData['email'] ?? '',
+            phone: studentData['phone'] ?? '',
+            sex: studentData['sex'] ?? '',
+            status: studentData['status'] ?? 'active',
+            yeargroup: studentData['yeargroup'] ?? '',
+            subjectId: subject.id,
+            subjectName: subject.name,
+            components: components,
           );
 
-          final teacherSetupRef =
-          db.collection("teacherSetup").doc(teacherSetupId);
-
-          batch.set(
-            teacherSetupRef,
-            teacherSetup.toJson(),
-            SetOptions(merge: true),
-          );
-
-          writes++;
-          if (writes >= _batchLimit) {
-            await batch.commit();
-            batch = db.batch();
-            writes = 0;
-          }
+          subjectMap.addAll(scoring.subjectData);
+          scoredFlags.addAll(scoring.scoredFlags);
+          totalScores.addAll(scoring.totalScores);
         }
 
-        if (writes > 0) await batch.commit();
+        final scoringId = "${studentId}_$academicYear$term";
+        final scoringRef = db.collection("subjectScoring").doc(scoringId);
+        final scoringData = {
+          "studentId": studentId,
+          "studentName": studentData['name'] ?? '',
+          "academicYear": academicYear,
+          "term": term,
+          "level": studentData['level'] ?? '',
+          "class": studentClass,
+          "department": studentData['department'] ?? '',
+          "region": studentData['region'] ?? '',
+          "schoolId": schoolId,
+          "school": studentData['school'] ?? '',
+          "photourl": studentData['photourl'] ?? '',
+          "dob": studentData['dob'] ?? '',
+          "email": studentData['email'] ?? '',
+          "phone": studentData['phone'] ?? '',
+          "sex": studentData['sex'] ?? '',
+          "status": studentData['status'] ?? 'active',
+          "yeargroup": studentData['yeargroup'] ?? '',
+          "teachers": teacherInfo,
+          "subjects":subjectMap,
+          //...subjectMap,
+          ...scoredFlags,
+          ...totalScores,
+          "timestamp": DateTime.now(),
+        };
+
+        batch.set(scoringRef, scoringData, SetOptions(merge: true));
+        writes++;
+
+        if (writes >= _batchLimit) {
+          await batch.commit();
+          batch = db.batch();
+          writes = 0;
+        }
       }
+
+      if (writes > 0) await batch.commit();
+
+      // ----------------------------
+      // STEP 2: Save TeacherSetup docs after student scoring
+      // ----------------------------
+      batch = db.batch();
+      writes = 0;
+
+      for (int i = 0; i < teacherIds.length; i++) {
+        final teacherId = teacherIds[i];
+       // final teachername = teacherNames[i];
+
+        final teacherSetupId = "${teacherId}_${academicYear}_$term";
+
+        final teacherSetup = TeacherSetup(
+          staffid: teacherId,
+          staffname: teacherNames[i],
+          classname: classes,
+          schoolId: schoolId,
+          academicyear: academicYear,
+          term: term,
+          component: components,
+          levels: levels,
+          subjects: subjects,
+          createby: name,
+        );
+
+        final teacherSetupRef = db.collection("teacherSetup").doc(teacherSetupId);
+        batch.set(teacherSetupRef, teacherSetup.toJson(), SetOptions(merge: true));
+        writes++;
+
+        if (writes >= _batchLimit) {
+          await batch.commit();
+          batch = db.batch();
+          writes = 0;
+        }
+      }
+
+      if (writes > 0) await batch.commit();
     } catch (e, stack) {
       debugPrint("Error in saveTeacherSetupMulti: $e");
       debugPrintStack(stackTrace: stack);
@@ -455,7 +585,6 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
-
   pickImageFromGallery(BuildContext context) async {
     try {
       final XFile? selectedImage = await ImagePicker().pickImage(
@@ -525,136 +654,217 @@ class Myprovider extends LoginProvider {
     }
   }
 
-
-/*
-
-  Future<void> saveTeacherSetupForSelectedStudents({
-    required List<String> teacherIds,
+  Future<void> deleteTeacherAndCleanup({
     required String schoolId,
+    required String staffId,
     required String academicYear,
     required String term,
-    required List<DepartmentModel> levels,
-    required List<SubjectModel> subjects,
-    required List<ComponentModel> components,
-    required List<Map<String, dynamic>> selectedStudents, // from UI
   }) async {
-    contestantSaving = true;
-    notifyListeners();
+    const teachersetupColl = 'teachersetup';
+    const subjectScoringColl = 'subjectScoring';
 
-    const int _batchLimit = 450;
+    final teachersetupDocId = '${schoolId}_${academicYear}_$term';
+    final setupRef = db.collection(teachersetupColl).doc(teachersetupDocId);
 
     try {
-      if (teacherIds.isEmpty) throw Exception("No teachers selected.");
-      if (levels.isEmpty) throw Exception("No levels selected.");
-      if (subjects.isEmpty) throw Exception("No subjects selected.");
-      if (selectedStudents.isEmpty) throw Exception("No students selected.");
-      if (academicYear.isEmpty || term.isEmpty) {
-        throw Exception("Academic year and term are required.");
+      // 1) Read teacher setup
+      final setupSnap = await setupRef.get();
+      if (!setupSnap.exists) {
+        debugPrint('No teachersetup found: $teachersetupDocId');
+        return;
+      }
+      final Map<String, dynamic> setupData =
+      setupSnap.data()! as Map<String, dynamic>;
+
+      // 2) Extract subjects and classes from setup
+      final List<String> subjectIds = (setupData['subjects'] as List<dynamic>?)
+          ?.map((s) {
+        final m = s as Map<String, dynamic>;
+        return (m['id'] ?? m['subjectId'] ?? m['name'] ?? '').toString();
+      })
+          .where((id) => id.isNotEmpty)
+          .toList() ??
+          [];
+
+      final List<String> classes = (setupData['classname'] as List<dynamic>?)
+          ?.map((c) {
+        if (c is String) return c;
+        if (c is Map && c['name'] != null) return c['name'].toString();
+        return c.toString();
+      })
+          .toList() ??
+          [];
+
+      if (subjectIds.isEmpty) {
+        debugPrint('No subjects found in teachersetup $teachersetupDocId — nothing to clean.');
       }
 
-      // 🔹 Normalize components
-      final comps = components.map<ComponentModel>((m) {
-        if (m is ComponentModel) return m;
-        if (m is Map<String, dynamic>) return ComponentModel.fromMap(m);
-        throw Exception("Unsupported component type: ${m.runtimeType}");
-      }).toList();
+      // 3) Query subjectScoring docs for these classes (chunked by 10)
+      final int chunkSize = 10;
+      final List<List<String>> classChunks = [];
+      for (var i = 0; i < classes.length; i += chunkSize) {
+        classChunks.add(classes.sublist(
+          i,
+          i + chunkSize > classes.length ? classes.length : i + chunkSize,
+        ));
+      }
 
-      // 🔹 Initial zero-scores per component
-      final Map<String, String> initialScores = {
-        for (final c in comps) c.name: "0"
-      };
+      // We'll collect all subjectScoring docs that match the filters
+      final List<QueryDocumentSnapshot<Map<String, dynamic>>> scoringDocs = [];
 
-      final String criteriaTotalStr = comps.fold<int>(
-        0,
-            (sum, c) => sum + int.tryParse(c.totalMark)!,
-      ).toString();
+      for (final chunk in classChunks.isNotEmpty ? classChunks : [<String>[]]) {
+        Query<Map<String, dynamic>> q = db
+            .collection(subjectScoringColl)
+            .withConverter<Map<String, dynamic>>(
+            fromFirestore: (s, _) => s.data() ?? <String, dynamic>{},
+            toFirestore: (m, _) => m);
 
-      int writes = 0;
+        q = q.where('schoolId', isEqualTo: schoolId)
+            .where('academicYear', isEqualTo: academicYear)
+            .where('term', isEqualTo: term);
+
+        // if chunk is empty means no classes — then we still should avoid whereIn
+        if (chunk.isNotEmpty) {
+          q = q.where('class', whereIn: chunk);
+        }
+
+        final snap = await q.get();
+        scoringDocs.addAll(snap.docs);
+      }
+
+      // 4) Scan for any marks. If any student has marks for any of these subjects -> abort
+      final List<Map<String, String>> conflicts = [];
+
+      bool _hasMarksInSubjectMap(Map<String, dynamic> subj) {
+        // returns true if there's indication of any entered marks
+        bool notZero(dynamic v) {
+          if (v == null) return false;
+          final s = v.toString().trim();
+          if (s.isEmpty) return false;
+          // treat any non-zero string as evidence of score
+          if (s == '0' || s == '0.0' || s == '0.00') return false;
+          return true;
+        }
+
+        if (notZero(subj['CA']) ||
+            notZero(subj['Exams']) ||
+            notZero(subj['CAtotal']) ||
+            notZero(subj['examstotal']) ||
+            notZero(subj['totalScore']) ||
+            notZero(subj['rawCA']) ||
+            notZero(subj['rawExams'])) {
+          return true;
+        }
+
+        // check nested scores map if present
+        if (subj['scores'] is Map) {
+          final scoresMap = subj['scores'] as Map;
+          for (final v in scoresMap.values) {
+            if (notZero(v)) return true;
+          }
+        }
+
+        final status = subj['status']?.toString().toLowerCase();
+        if (status != null && status.isNotEmpty && status != 'pending' && status != 'no') {
+          // If status indicates anything other than 'pending' or 'no', treat it as scored
+          return true;
+        }
+
+        return false;
+      }
+
+      for (final doc in scoringDocs) {
+        final data = doc.data();
+        final subjectsMap = (data['subjects'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+
+        for (final subId in subjectIds) {
+          if (!subjectsMap.containsKey(subId)) continue;
+          final subjRaw = subjectsMap[subId];
+          if (subjRaw == null) continue;
+          if (subjRaw is! Map) continue;
+          final Map<String, dynamic> subj = Map<String, dynamic>.from(subjRaw);
+          if (_hasMarksInSubjectMap(subj)) {
+            conflicts.add({
+              'docId': doc.id,
+              'studentId': data['studentId']?.toString() ?? '',
+              'studentName': data['studentName']?.toString() ?? '',
+              'subjectId': subId,
+              'subjectName': subj['subjectName']?.toString() ?? '',
+            });
+            // we do NOT break because we want to find at least some sample conflicts
+          }
+        }
+      }
+
+      if (conflicts.isNotEmpty) {
+        // Abort: found scores — do not delete anything
+        final example = conflicts.take(5).map((c) => '${c['studentName']}:${c['subjectId']}').join(', ');
+        throw StateError(
+            'Cannot delete teacher/setup — found existing scores for subjects. Example: $example. '
+                'Found ${conflicts.length} scoring entries.');
+      }
+
+      // 5) No conflicts found -> proceed to remove subject entries + teacher references AND delete teachersetup
       WriteBatch batch = db.batch();
+      int pendingWrites = 0;
 
-      for (final student in selectedStudents) {
-        final String studentId = student["id"];
-        final String studentName = (student["name"] ?? "").toString();
-        final String studentLevel = (student["level"] ?? "").toString();
-        final String photoUrl = (student["photoUrl"] ?? "").toString();
-        final String region = (student["region"] ?? "").toString();
-
-        // 🔹 Create scoring docs for each subject
-        for (final subject in subjects) {
-          final scoring = SubjectScoring.create(
-            studentId: studentId,
-            studentName: studentName,
-            academicYear: academicYear,
-            term: term,
-            level: studentLevel,
-            region: region,
-            schoolId: schoolId,
-            photoUrl: photoUrl,
-            subjectId: subject.id,
-            components: comps,
-          );
-
-          final scoringRef = db.collection("subjectScoring").doc(scoring.id);
-
-          // prevent overwriting scored students
-          final existingSnap = await scoringRef.get();
-          if (existingSnap.exists) {
-            final existing = existingSnap.data() as Map<String, dynamic>;
-            if (existing["scored${subject.id}"]?.toString() == "yes") {
-              throw Exception("Scores already entered for $studentName in ${subject.name}.");
-            }
-          }
-
-          batch.set(scoringRef, scoring.toJson(), SetOptions(merge: true));
-          writes++;
-
-          if (writes >= _batchLimit) {
-            await batch.commit();
-            batch = db.batch();
-            writes = 0;
-          }
-        }
-      }
-
-      // 🔹 Ensure TeacherSetup docs exist
-      for (final teacherId in teacherIds) {
-        final teacherSetupId = "${teacherId}_$academicYear_$term";
-        final teacherSetupRef = db.collection("teacherSetup").doc(teacherSetupId);
-
-        final teacherSetup = TeacherSetup(
-          staffid: teacherId,
-          staffname: "", // TODO: lookup teacher
-          schoolid: schoolId,
-          academicyear: academicYear,
-          term: term,
-          levels: levels,
-          subjects: subjects,
-        );
-
-        batch.set(
-          teacherSetupRef,
-          teacherSetup.toJson(),
-          SetOptions(merge: true),
-        );
-        writes++;
-
-        if (writes >= _batchLimit) {
+      Future<void> _commitBatchIfNeeded() async {
+        if (pendingWrites > 0) {
           await batch.commit();
+          pendingWrites = 0;
           batch = db.batch();
-          writes = 0;
         }
       }
 
-      if (writes > 0) await batch.commit();
-    } catch (e, stack) {
-      debugPrint("Error in saveTeacherSetupForSelectedStudents: $e");
-      debugPrintStack(stackTrace: stack);
+      for (final doc in scoringDocs) {
+        final data = doc.data();
+        final subjectsMap = (data['subjects'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+
+        final Map<String, dynamic> updates = <String, dynamic>{};
+
+        // delete each subject key under subjects.<subId>
+        for (final subId in subjectIds) {
+          if (subjectsMap.containsKey(subId)) {
+            updates['subjects.$subId'] = FieldValue.delete();
+          }
+        }
+
+        // remove teacher entry from teachers array (if present)
+        if (data['teachers'] is List) {
+          final List<dynamic> teachersList = List<dynamic>.from(data['teachers'] as List<dynamic>);
+          final newTeachers = teachersList.where((t) {
+            if (t is Map) {
+              final id = t['id']?.toString();
+              final tTerm = t['term']?.toString();
+              return !(id == staffId && (tTerm == null || tTerm == term || tTerm == term));
+            }
+            return true;
+          }).toList();
+
+          if (newTeachers.length != teachersList.length) {
+            updates['teachers'] = newTeachers;
+          }
+        }
+
+        if (updates.isNotEmpty) {
+          batch.update(doc.reference, updates);
+          pendingWrites++;
+          if (pendingWrites >= 450) {
+            await _commitBatchIfNeeded();
+          }
+        }
+      }
+
+      // commit any remaining student updates
+      await _commitBatchIfNeeded();
+
+      // 6) Safe to delete teacher setup doc
+      await setupRef.delete();
+      debugPrint('deleteTeacherAndCleanup: completed for $teachersetupDocId (teacher $staffId)');
+    } catch (e, st) {
+      debugPrint('deleteTeacherAndCleanup error: $e\n$st');
       rethrow;
-    } finally {
-      contestantSaving = false;
-      notifyListeners();
     }
   }
-*/
 
 }

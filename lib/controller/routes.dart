@@ -31,12 +31,15 @@ import '../screen/viewclass.dart';
 import '../screen/viewdepartment.dart';
 import '../screen/viewschool.dart';
 import '../screen/viewsubject.dart';
+import '../screen/viewteachersetup.dart';
+import 'dbmodels/componentmodel.dart';
 import 'dbmodels/departmodel.dart';
 import 'dbmodels/levelmodel.dart';
 import 'dbmodels/schoolmodel.dart';
 import 'dbmodels/scoremodel.dart';
 import 'dbmodels/staffmodel.dart';
 import 'dbmodels/subjectmodel.dart';
+import 'dbmodels/teachermodel.dart';
 import 'dbmodels/termmodel.dart';
 import 'myprovider.dart';
 
@@ -60,10 +63,7 @@ class Routes {
   static const viewstaff = "/viewstaff";
   static const nextpage = "/nextpage";
 
-
-  static const registerzone = "/registerzone";
   static const regstaff = "/regstaff";
-  static const revenuetype = "/revenuetype";
   static const accesscomponent = "/accesscomponent";
   static const login = "/login";
   static const home = "/home";
@@ -115,6 +115,7 @@ class Routes {
   static const academicyr = "/academicyr";
   static const viewacademicyr = "/viewacademicyr";
   static const viewidformats = "/viewidformats";
+  static const viewteachersetup = "/viewteachersetup";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
@@ -202,18 +203,33 @@ final GoRouter router = GoRouter(
         return AcademicYr(year: year);
       },
     ),
+    GoRoute(
+      path: Routes.setupteacher,
+      builder: (context, state) {
+        final setupData = state.extra as TeacherSetup?; // Optional
+        return TeacherSetupPage(setupData: setupData);
+      },
+    ),
+    /*GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),*/
     GoRoute(path: Routes.gradingsystem, builder: (c, s) => GradingSystemFormPage()),
     GoRoute(path: Routes.viewterm, builder: (c, s) => Viewterms()),
     GoRoute(path: Routes.viewdepart, builder: (c, s) => Viewdepartment()),
     GoRoute(path: Routes.viewclass, builder: (c, s) => Viewclass()),
     GoRoute(path: Routes.viewsubjects, builder: (c, s) => ViewSubjectPage()),
     //GoRoute(path: Routes.viewschool, builder: (c, s) => ViewSchoolPage()),
-    GoRoute(path: Routes.accesscomponent, builder: (c, s) => AccessComponent()),
+    GoRoute(
+      path: Routes.accesscomponent,
+      builder: (context, state) {
+        final component = state.extra as ComponentModel?;
+        return AccessComponent(component: component);
+      },
+    ),
     GoRoute(path: Routes.accesslist, builder: (c, s) => AccessList()),
-    GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),
+
     GoRoute(path: Routes.viewacademicyr, builder: (c, s) => ViewAcademicyr()),
     GoRoute(path: Routes.registerstudent, builder: (c, s) => RegisterStudent()),
     GoRoute(path: Routes.regionreg, builder: (c, s) => Regionregistration()),
     GoRoute(path: Routes.idformat, builder: (c, s) => IdformatScreen()),
+    GoRoute(path: Routes.viewteachersetup, builder: (c, s) => TeacherListPage()),
   ],
 );
