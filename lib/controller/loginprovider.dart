@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/controller/dbmodels/feeSetUpModel.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -30,6 +31,9 @@ class LoginProvider extends ChangeNotifier {
   final db = FirebaseFirestore.instance;
   List<String> accounts = [];
   List<String> accountclass = [];
+  List<FeeSetUpModel> fees = [];
+
+  List<String> accountsubclass = [];
   login(String email, String password, BuildContext context) async {
     try {
       final loginhere = await auth.signInWithEmailAndPassword(
@@ -181,11 +185,32 @@ class LoginProvider extends ChangeNotifier {
       final snapshot = await db.collection("mainaccounts").get();
       accounts = snapshot.docs.map((doc) => (doc.data()["name"] ?? "") as String).where((name) => name.isNotEmpty).toList();
       accountclass = snapshot.docs.map((doc) => (doc.data()["accountType"] ?? "") as String).where((name) => name.isNotEmpty).toList();
+      accountsubclass = snapshot.docs.map((doc) => (doc.data()["subType"] ?? "") as String).where((name) => name.isNotEmpty).toList();
     } catch (e) {
       print("Error fetching accounts: $e");
     }
     notifyListeners();
   }
+
+
+  Future<void> fetchFess() async {
+    try {
+      //loadclassdata = true;
+      notifyListeners();
+      final snapshot = await db.collection("feeSetup").get();
+      fees = snapshot.docs.map((doc) {
+        return FeeSetUpModel.fromMap(doc.data());
+      }).toList();
+
+    //  loadclassdata = false;
+      notifyListeners();
+    } catch (e) {
+     // loadclassdata = false;
+      notifyListeners();
+      print("Failed to fetch class: $e");
+    }
+  }
+
 
 
 }

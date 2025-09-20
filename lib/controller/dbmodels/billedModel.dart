@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class BilledModel {
-  final  level;
+  final String level;
   final String yeargroup;
+  final String feeName;
   final  String amount;
   final String activityType;
   final String term;
@@ -15,11 +16,13 @@ class BilledModel {
     required this.activityType,
     required this.term,
     required this.schoolId,
+    required this.feeName,
     required this.dateCreated,
   });
   factory BilledModel.fromMap(Map<String, dynamic> map) {
     return BilledModel(
       level: map['level'] ?? '',
+      feeName: map['feeName'] ?? '',
       yeargroup: map['yeargroup'] ?? '',
       schoolId: map['schoolId'] ?? '',
       activityType: map['activityType'] ?? '',
@@ -31,6 +34,7 @@ class BilledModel {
   Map<String, dynamic> toJson() {
     return {
       "level": level,
+      "feeName": feeName,
       "yeargroup": yeargroup,
       "schoolId": schoolId,
       "activityType": activityType,

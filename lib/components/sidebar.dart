@@ -356,12 +356,24 @@ class CustomDrawer extends StatelessWidget {
                                   }
                                 },
                               ),
+
                               _drawerTile(
                                 icon: Icons.view_list,
                                 title: 'System Activity',
                                 onTap: () async {
                                   try {
                                     context.go(Routes.accountActivity);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(
+                                icon: Icons.account_balance_wallet,
+                                title: 'Fees Names',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.feesetup);
                                   } catch (e) {
                                     print(e);
                                   }

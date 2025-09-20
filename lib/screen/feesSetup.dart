@@ -6,6 +6,7 @@ import 'package:ksoftsms/controller/accountProvider.dart';
 import 'package:ksoftsms/controller/dbmodels/accountsModel.dart';
 import 'package:ksoftsms/controller/dbmodels/activityModel.dart';
 import 'package:ksoftsms/controller/dbmodels/billedModel.dart';
+import 'package:ksoftsms/controller/dbmodels/feeSetUpModel.dart';
 import 'package:ksoftsms/controller/loginprovider.dart';
 import 'package:ksoftsms/screen/accountChart.dart';
 import 'package:provider/provider.dart';
@@ -16,23 +17,17 @@ import '../controller/myprovider.dart';
 import '../controller/routes.dart';
 import '../widgets/dropdown.dart';
 
-class Billing extends StatefulWidget {
+class FeesSetup extends StatefulWidget {
   final ComponentModel? component;
-  const Billing({super.key, this.component});
+  const FeesSetup({super.key, this.component});
 
   @override
-  State<Billing> createState() => _BillingState();
+  State<FeesSetup> createState() => _FeesSetupState();
 }
 
-class _BillingState extends State<Billing> {
-  final accountController = TextEditingController();
+class _FeesSetupState extends State<FeesSetup> {
+  final feeNameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  String? selectedLevel;
-  String? selectedTerm;
-  String? selecteddepart;
-  String? selectedfee;
-  String? selectedYearGroup;
-  final List<String> _yeargroup = List.generate(5, (i) => (2022 + i).toString());
 
   String schoolid = "";
   String schoolname = "";
@@ -40,7 +35,7 @@ class _BillingState extends State<Billing> {
 
   @override
   void dispose() {
-    accountController.dispose();
+    feeNameController.dispose();
     super.dispose();
   }
 
@@ -49,12 +44,11 @@ class _BillingState extends State<Billing> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<Myprovider>(context, listen: false);
-       provider.getdata();
-       provider.getfetchRegions();
-       provider.fetchdepart();
-       provider.fetchclass();
-       provider.fetchterms();
-       provider.fetchFess();
+      provider.getdata();
+      provider.getfetchRegions();
+      provider.fetchdepart();
+      provider.fetchclass();
+      provider.fetchterms();
     });
   }
 
@@ -75,7 +69,7 @@ class _BillingState extends State<Billing> {
                     onPressed: () => context.go(Routes.dashboard),
                   ),
                   title: Text(
-                    '${value.currentschool.toUpperCase()} BULK FEES BILLING ',
+                    '${value.currentschool.toUpperCase()} FEES BILLING ',
                     style: const TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
@@ -93,11 +87,9 @@ class _BillingState extends State<Billing> {
                           child: Column(
                             children: [
                               TextFormField(
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                                ],
+
                                 keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                controller: accountController,
+                                controller: feeNameController,
                                 decoration: InputDecoration(
                                   labelText: "Billed Amount ",
                                   hintText: "Billed  Amount ",
@@ -109,56 +101,30 @@ class _BillingState extends State<Billing> {
                                 value == null || value.trim().isEmpty ? "Amount is required" : null,
                               ),
                               const SizedBox(height: 20),
-                              // Debit Account Dropdown
-                              buildDropdown(value: selectedfee, items: value.fees.map((e) => e.name).toList(), label: "FEES", fillColor: inputFill, onChanged: (v) => setState(() => selectedfee = v), validatorMsg: 'Select Fees',),
-                              const SizedBox(height: 20),
-                              buildDropdown(value: selectedLevel, items: value.classdata.map((e) => e.name).toList(), label: "Class", fillColor: inputFill, onChanged: (v) => setState(() => selectedLevel = v), validatorMsg: 'Select class',),
-                              const SizedBox(height: 20),
-                              buildDropdown(value: selecteddepart, items: value.departments.map((e) => e.name).toList(), label: "Department", fillColor: inputFill, onChanged: (v) => setState(() => selecteddepart = v), validatorMsg: 'Select Department',),
-                              // Credit Account Dropdown
-                              const SizedBox(height: 20),
-                              buildDropdown(value: selectedTerm, items: value.terms.map((e)=>e.name).toList(), label: "Term", fillColor: inputFill, onChanged: (v) => setState(() => selectedTerm = v), validatorMsg: "Select year group"),
-                              const SizedBox(height: 20),
-                              buildDropdown(value: selectedYearGroup, items: _yeargroup, label: "Year Group", fillColor: inputFill, onChanged: (v) => setState(() => selectedYearGroup = v), validatorMsg: "Select year group"),
-                              const SizedBox(height: 20),
+
                               // Save Button
                               ElevatedButton.icon(style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00496d), padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12)),
                                 onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     final progress = ProgressHUD.of(context);
                                     progress!.show();
-                                    String amount=accountController.text.trim();
-                                    String ids="${value.schoolid}$selectedYearGroup$selectedTerm$selecteddepart$selectedLevel$selectedfee";
-                                    String id = ids.replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                    String feename=feeNameController.text.trim();
+                                    String id = feename.replaceAll(RegExp(r'\s+'), '').toLowerCase();
 
                                     try {
-                                      final dataexist=await value.db.collection("billed").doc(id).get();
-                                      if(dataexist.exists){
-                                        progress.dismiss();
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                           SnackBar(
-                                            content: Text("$selectedfee  has been billed already"),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
-                                        return;
-                                      }
-                                      final data=BilledModel(level: selectedLevel.toString(), yeargroup: selectedYearGroup.toString(), amount: amount, activityType: "Fee Billing", term: selectedTerm.toString(), schoolId: value.schoolid, dateCreated: DateTime.now(), feeName:selectedfee.toString()).toJson();
-                                      await value.db.collection("billed").doc(id).set(data);
-
+                                      final data=FeeSetUpModel(name: feename, staff: value.name, schoolId: value.schoolid, dateCreated: DateTime.now()).toJson();
+                                      await value.db.collection("feeSetup").doc(id).set(data);
                                       progress.dismiss();
+                                      feeNameController.clear();
 
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                         SnackBar(
-                                          content: Text("$selectedfee - GHS$amount  Saved Successfully"),
+                                        const SnackBar(
+                                          content: Text("Data Saved Successfully"),
                                           backgroundColor: Colors.green,
                                         ),
                                       );
 
-                                      setState(() {
-                                        // _selectedDebitAccount = null;
-                                        // _selectedCreditAccount = null;
-                                      });
+
                                     } catch (e) {
                                       progress.dismiss();
                                       ScaffoldMessenger.of(context).showSnackBar(
