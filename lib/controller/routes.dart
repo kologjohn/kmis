@@ -3,14 +3,17 @@ import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
 import '../components/academicyrmodel.dart';
+import '../components/billing.dart';
 import '../components/dashboard.dart';
 
 import '../screen/academicyr.dart';
 import '../screen/acceslist.dart';
 import '../screen/accesscomponent.dart';
+import '../screen/accountChart.dart';
 import '../screen/class.dart';
 import '../screen/department.dart';
 
+import '../screen/entermarks.dart';
 import '../screen/gradingsystem.dart';
 import '../screen/idformat.dart';
 import '../screen/judgeui.dart';
@@ -22,7 +25,10 @@ import '../screen/registerschool.dart';
 import '../screen/registerstudents.dart';
 import '../screen/regstaff.dart';
 import '../screen/scoreconfig.dart';
+import '../screen/scoringhome.dart';
+import '../screen/staffhomepage.dart';
 import '../screen/subject.dart';
+import '../screen/systemActivity.dart';
 import '../screen/teachersetup.dart';
 import '../screen/term.dart';
 import '../screen/termlist.dart';
@@ -62,6 +68,9 @@ class Routes {
   static const viewschool = "/viewschool";
   static const viewstaff = "/viewstaff";
   static const nextpage = "/nextpage";
+  static const coa = "/coa";
+  static const accountActivity = "/accountActivity";
+  static const billing = "/billing";
 
   static const regstaff = "/regstaff";
   static const accesscomponent = "/accesscomponent";
@@ -116,6 +125,9 @@ class Routes {
   static const viewacademicyr = "/viewacademicyr";
   static const viewidformats = "/viewidformats";
   static const viewteachersetup = "/viewteachersetup";
+  static const staffhome = "/staffhome";
+  static const staffscoring = "/staffscoring";
+  static const entermark = "/entermark";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
@@ -231,5 +243,23 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.regionreg, builder: (c, s) => Regionregistration()),
     GoRoute(path: Routes.idformat, builder: (c, s) => IdformatScreen()),
     GoRoute(path: Routes.viewteachersetup, builder: (c, s) => TeacherListPage()),
+    GoRoute(path: Routes.billing, builder: (c, s) => Billing()),
+    GoRoute(path: Routes.accountActivity, builder: (c, s) => SystemActivity()),
+    GoRoute(path: Routes.coa, builder: (c, s) => AccountsChart()),
+    GoRoute(path: Routes.staffhome, builder: (c, s) => StaffHomePage()),
+    GoRoute(
+      path: Routes.entermark,
+      builder: (context, state) {
+        final args = state.extra as Map<String, dynamic>?; // safely read extra
+        return MarksEntryPage(args: args);
+      },
+    ),
+    GoRoute(
+      path: Routes.staffscoring,
+      builder: (c, s) {
+        final args = s.extra as Map<String, dynamic>?;
+        return StaffScoringPage(args: args);
+      },
+    ),
   ],
 );

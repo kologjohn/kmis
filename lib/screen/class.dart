@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 import '../controller/dbmodels/classmodel.dart';
 import '../controller/myprovider.dart';
 import '../controller/routes.dart';
+import '../widgets/dropdown.dart';
 
 class ClassScreen extends StatefulWidget {
   final ClassModel? classes;
@@ -18,13 +20,21 @@ class ClassScreen extends StatefulWidget {
 class _ClassScreenState extends State<ClassScreen> {
   final classController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String? selecteddepart;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = context.read<Myprovider>();
+      provider.fetchdepart();
+    });
+
+    // Pre-fill if editing
     final data = widget.classes;
     if (data != null) {
       classController.text = data.name;
+      selecteddepart = data.department;
     }
   }
 
@@ -72,14 +82,29 @@ class _ClassScreenState extends State<ClassScreen> {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              buildDropdown(
+                                value: selecteddepart,
+                                items: value.departments
+                                    .map((e) => e.name)
+                                    .toList(),
+                                label: "Department",
+                                fillColor: inputFill,
+                                onChanged: (v) =>
+                                    setState(() => selecteddepart = v),
+                                validatorMsg: 'Select department',
+                              ),
                               const SizedBox(height: 20),
+
+                              // Class Name Input
                               TextFormField(
                                 controller: classController,
                                 decoration: InputDecoration(
                                   labelText: "Class Name",
                                   hintText: "Enter Class Name",
-                                  labelStyle: const TextStyle(color: Colors.white),
-                                  hintStyle: const TextStyle(color: Colors.grey),
+                                  labelStyle:
+                                  const TextStyle(color: Colors.white),
+                                  hintStyle:
+                                  const TextStyle(color: Colors.grey),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Colors.grey[700]!,
@@ -102,7 +127,8 @@ class _ClassScreenState extends State<ClassScreen> {
                                   filled: true,
                                   fillColor: inputFill,
                                 ),
-                                style: const TextStyle(fontSize: 16, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 16, color: Colors.white),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Class name cannot be empty';
@@ -111,22 +137,30 @@ class _ClassScreenState extends State<ClassScreen> {
                                 },
                               ),
                               const SizedBox(height: 20),
+
+                              // Buttons
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   ElevatedButton.icon(
                                     onPressed: () async {
                                       if (_formKey.currentState!.validate()) {
-                                        final progress = ProgressHUD.of(context);
+                                        final progress =
+                                        ProgressHUD.of(context);
                                         progress!.show();
 
-                                        String className = classController.text.trim();
-                                        String idd = className.replaceAll(RegExp(r'\s+'), '').toLowerCase();
-                                        final id = "${value.schoolid}_$idd".replaceAll(" ", "");
+                                        String className =
+                                        classController.text.trim();
+                                        String idd = className
+                                            .replaceAll(RegExp(r'\s+'), '')
+                                            .toLowerCase();
+                                        final id = "${value.schoolid}_$idd"
+                                            .replaceAll(" ", "");
                                         final data = ClassModel(
                                           id: id,
                                           name: className,
                                           schoolId: value.schoolid,
+                                          department: selecteddepart,
                                           timestamp: DateTime.now(),
                                           staff: value.name,
                                         ).toMap();
@@ -137,7 +171,8 @@ class _ClassScreenState extends State<ClassScreen> {
                                             .set(data, SetOptions(merge: true));
 
                                         progress.dismiss();
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(
                                             content: Text(
                                               isEdit
@@ -150,6 +185,7 @@ class _ClassScreenState extends State<ClassScreen> {
 
                                         if (!isEdit) {
                                           classController.clear();
+                                          setState(() => selecteddepart = null);
                                         }
                                       }
                                     },
@@ -166,7 +202,8 @@ class _ClassScreenState extends State<ClassScreen> {
                                         horizontal: 40,
                                         vertical: 15,
                                       ),
-                                      textStyle: const TextStyle(fontSize: 18),
+                                      textStyle:
+                                      const TextStyle(fontSize: 18),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),
@@ -193,7 +230,8 @@ class _ClassScreenState extends State<ClassScreen> {
                                         horizontal: 40,
                                         vertical: 15,
                                       ),
-                                      textStyle: const TextStyle(fontSize: 18),
+                                      textStyle:
+                                      const TextStyle(fontSize: 18),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                       ),

@@ -323,6 +323,67 @@ class CustomDrawer extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
                           child: Text(
+                            "Financial Account",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+
+                        //==============
+                        Card(
+                          color: Colors.transparent,
+                          elevation: 0,
+                          child: ExpansionTile(
+                            collapsedIconColor: Colors.white,
+                            iconColor: Colors.white,
+                            leading: Icon(Icons.people, color: Colors.white60, size: 17,),
+                            title: Text(
+                              'Accounts Setup',
+                              style: TextStyle(color: Colors.white54, fontSize: 14),
+                            ),
+                            children: [
+                              _drawerTile(
+                                icon: Icons.person_add,
+                                title: 'Add Account',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.coa);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(
+                                icon: Icons.view_list,
+                                title: 'System Activity',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.accountActivity);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(
+                                icon: Icons.account_balance_wallet,
+                                title: 'Billing',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.billing);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
+                          child: Text(
                             "Manage Contestants Results",
                             style: TextStyle(
                               color: Colors.white,
@@ -350,7 +411,7 @@ class CustomDrawer extends StatelessWidget {
                                   title: 'View Results',
                                   onTap: () async {
                                     try {
-                                      context.go(Routes.viewscore);
+                                      context.go(Routes.staffhome);
                                     } catch (e) {
                                       print(e);
                                     }
@@ -358,45 +419,9 @@ class CustomDrawer extends StatelessWidget {
                                 ),
                               ),
 
-                              // SizedBox(
-                              //   child: _drawerTile(
-                              //     icon: Icons.insert_page_break,
-                              //     title: 'Enter Judge Results',
-                              //     onTap: () async {
-                              //       try {
-                              //         context.go(Routes.adminresults,
-                              //         );
-                              //       } catch (e) {
-                              //         print(e);
-                              //       }
-                              //     },
-                              //   ),
-                              // ),
 
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Votes',
-                                  onTap: () =>
-                                      context.go(Routes.votes),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'test vote',
-                                  onTap: () =>
-                                      context.go(Routes.testvote),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'view votes  test',
-                                  onTap: () =>
-                                      context.go(Routes.rawvote),
-                                ),
-                              ),
+
+
                             ],
                           ),
                         ),
@@ -430,44 +455,6 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.calendar_month,
-                                  title: 'Contestant Sheet',
-                                  onTap: () =>  context.go(Routes.scoresheet),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Judge Sheet',
-                                  onTap: () => context.go(Routes.judgescoresheet,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'weekly Sheet',
-                                  onTap: () =>  context.go(Routes.weeklysheet,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Eviction',
-                                  onTap: () =>  context.go(Routes.eviction),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Best Criteria',
-                                  onTap: () =>  context.go(Routes.bestcriteria,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
                                   title: 'Terminal report',
                                   onTap: () =>context.go(Routes.terminalreport,
                                   ),
@@ -476,6 +463,7 @@ class CustomDrawer extends StatelessWidget {
                             ],
                           ),
                         ),
+
                         Divider(color: Colors.white24, height: 30),
                         SizedBox(
                           child: _drawerTile(

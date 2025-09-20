@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
@@ -447,12 +448,13 @@ class Myprovider extends LoginProvider {
           .where("department", whereIn: levelNames)
           .get();
 
-      final List<Map<String, String>> teacherInfo = [];
+      final Map<String, Map<String, String>> teacherInfo = {};
+
       for (int i = 0; i < teacherIds.length; i++) {
-        teacherInfo.add({
+        teacherInfo[teacherIds[i]] = {
           "id": teacherIds[i],
           "name": teacherNames[i],
-        });
+        };
       }
 
       for (final studentDoc in studentSnap.docs) {
@@ -654,18 +656,10 @@ class Myprovider extends LoginProvider {
     }
   }
 
-  Future<void> deleteTeacherAndCleanup({
-    required String schoolId,
-    required String staffId,
-    required String academicYear,
-    required String term,
-  }) async {
-    const teachersetupColl = 'teachersetup';
-    const subjectScoringColl = 'subjectScoring';
-
-    final teachersetupDocId = '${schoolId}_${academicYear}_$term';
+  Future<void> deleteteacher(String staffId) async { const teachersetupColl = 'teachersetup';    const subjectScoringColl = 'subjectScoring';
+    final teachersetupDocId = '${staffId}_${academicyrid}_$term';
     final setupRef = db.collection(teachersetupColl).doc(teachersetupDocId);
-
+   print(teachersetupDocId);
     try {
       // 1) Read teacher setup
       final setupSnap = await setupRef.get();
@@ -698,8 +692,6 @@ class Myprovider extends LoginProvider {
       if (subjectIds.isEmpty) {
         debugPrint('No subjects found in teachersetup $teachersetupDocId — nothing to clean.');
       }
-
-      // 3) Query subjectScoring docs for these classes (chunked by 10)
       final int chunkSize = 10;
       final List<List<String>> classChunks = [];
       for (var i = 0; i < classes.length; i += chunkSize) {
@@ -709,7 +701,7 @@ class Myprovider extends LoginProvider {
         ));
       }
 
-      // We'll collect all subjectScoring docs that match the filters
+
       final List<QueryDocumentSnapshot<Map<String, dynamic>>> scoringDocs = [];
 
       for (final chunk in classChunks.isNotEmpty ? classChunks : [<String>[]]) {
@@ -719,11 +711,10 @@ class Myprovider extends LoginProvider {
             fromFirestore: (s, _) => s.data() ?? <String, dynamic>{},
             toFirestore: (m, _) => m);
 
-        q = q.where('schoolId', isEqualTo: schoolId)
-            .where('academicYear', isEqualTo: academicYear)
+        q = q.where('schoolId', isEqualTo: schoolid)
+            .where('academicYear', isEqualTo: academicyrid)
             .where('term', isEqualTo: term);
 
-        // if chunk is empty means no classes — then we still should avoid whereIn
         if (chunk.isNotEmpty) {
           q = q.where('class', whereIn: chunk);
         }
@@ -732,16 +723,12 @@ class Myprovider extends LoginProvider {
         scoringDocs.addAll(snap.docs);
       }
 
-      // 4) Scan for any marks. If any student has marks for any of these subjects -> abort
       final List<Map<String, String>> conflicts = [];
-
       bool _hasMarksInSubjectMap(Map<String, dynamic> subj) {
-        // returns true if there's indication of any entered marks
         bool notZero(dynamic v) {
           if (v == null) return false;
           final s = v.toString().trim();
           if (s.isEmpty) return false;
-          // treat any non-zero string as evidence of score
           if (s == '0' || s == '0.0' || s == '0.00') return false;
           return true;
         }
@@ -756,27 +743,22 @@ class Myprovider extends LoginProvider {
           return true;
         }
 
-        // check nested scores map if present
         if (subj['scores'] is Map) {
           final scoresMap = subj['scores'] as Map;
           for (final v in scoresMap.values) {
             if (notZero(v)) return true;
           }
         }
-
         final status = subj['status']?.toString().toLowerCase();
         if (status != null && status.isNotEmpty && status != 'pending' && status != 'no') {
-          // If status indicates anything other than 'pending' or 'no', treat it as scored
           return true;
         }
-
         return false;
       }
 
       for (final doc in scoringDocs) {
         final data = doc.data();
         final subjectsMap = (data['subjects'] as Map<String, dynamic>?) ?? <String, dynamic>{};
-
         for (final subId in subjectIds) {
           if (!subjectsMap.containsKey(subId)) continue;
           final subjRaw = subjectsMap[subId];
@@ -791,11 +773,10 @@ class Myprovider extends LoginProvider {
               'subjectId': subId,
               'subjectName': subj['subjectName']?.toString() ?? '',
             });
-            // we do NOT break because we want to find at least some sample conflicts
+
           }
         }
       }
-
       if (conflicts.isNotEmpty) {
         // Abort: found scores — do not delete anything
         final example = conflicts.take(5).map((c) => '${c['studentName']}:${c['subjectId']}').join(', ');
@@ -803,11 +784,8 @@ class Myprovider extends LoginProvider {
             'Cannot delete teacher/setup — found existing scores for subjects. Example: $example. '
                 'Found ${conflicts.length} scoring entries.');
       }
-
-      // 5) No conflicts found -> proceed to remove subject entries + teacher references AND delete teachersetup
       WriteBatch batch = db.batch();
       int pendingWrites = 0;
-
       Future<void> _commitBatchIfNeeded() async {
         if (pendingWrites > 0) {
           await batch.commit();
@@ -815,21 +793,15 @@ class Myprovider extends LoginProvider {
           batch = db.batch();
         }
       }
-
       for (final doc in scoringDocs) {
         final data = doc.data();
         final subjectsMap = (data['subjects'] as Map<String, dynamic>?) ?? <String, dynamic>{};
-
         final Map<String, dynamic> updates = <String, dynamic>{};
-
-        // delete each subject key under subjects.<subId>
         for (final subId in subjectIds) {
           if (subjectsMap.containsKey(subId)) {
             updates['subjects.$subId'] = FieldValue.delete();
           }
         }
-
-        // remove teacher entry from teachers array (if present)
         if (data['teachers'] is List) {
           final List<dynamic> teachersList = List<dynamic>.from(data['teachers'] as List<dynamic>);
           final newTeachers = teachersList.where((t) {
@@ -845,7 +817,6 @@ class Myprovider extends LoginProvider {
             updates['teachers'] = newTeachers;
           }
         }
-
         if (updates.isNotEmpty) {
           batch.update(doc.reference, updates);
           pendingWrites++;
@@ -854,11 +825,8 @@ class Myprovider extends LoginProvider {
           }
         }
       }
-
       // commit any remaining student updates
       await _commitBatchIfNeeded();
-
-      // 6) Safe to delete teacher setup doc
       await setupRef.delete();
       debugPrint('deleteTeacherAndCleanup: completed for $teachersetupDocId (teacher $staffId)');
     } catch (e, st) {
@@ -866,5 +834,69 @@ class Myprovider extends LoginProvider {
       rethrow;
     }
   }
+  bool isloadac =false;
+  List<Map<String, dynamic>> marksList = [];
+  bool isloadscore=false;
+
+  Future<void> fetchStaffScoringMarks() async {
+    await getdata();
+    isloadscore = true;
+    notifyListeners();
+
+    const String academicyrid = "20242025";
+    const String className = "B8";
+    const String schoolId = "KS0002";
+    const String teacherId = "KS0002";
+    const String subjectKey = "KS0002_englisheng";
+    try {
+      final querySnapshot = await db
+          .collection('subjectScoring')
+          .where('academicYear', isEqualTo: academicyrid)
+          .where('class', isEqualTo: className)
+          .where('schoolId', isEqualTo: schoolId)
+          .get();
+
+
+      marksList = querySnapshot.docs.map((doc) {
+        final data = doc.data();
+        final docid = doc.id;
+        final teachers = (data['teachers'] as Map<String, dynamic>? ?? {});
+        if (!teachers.containsKey(teacherId)) {
+          return null;
+        }
+        final subjects = (data['subjects'] as Map<String, dynamic>? ?? {});
+        if (!subjects.containsKey(subjectKey)) {
+          return null;
+        }
+
+        final subjectData = subjects[subjectKey] as Map<String, dynamic>;
+        final scores = (subjectData['scores'] as Map<String, dynamic>? ?? {});
+        final sortedScoresList = scores.entries.toList()
+          ..sort((a, b) => a.key.compareTo(b.key));
+        final sortedScoresMap = Map.fromEntries(sortedScoresList);
+        return {
+          'id': docid,
+          'studentName': data['studentName'] ?? '',
+          'studentId': data['studentId'] ?? '',
+          'class': data['class'] ?? '',
+          'photoUrl': data['photoUrl'] ?? '',
+          'scores': sortedScoresMap,
+          'teacher': teachers[teacherId],
+          'subject': subjectData['subjectName'] ?? '',
+        };
+      }).where((e) => e != null).cast<Map<String, dynamic>>().toList();
+    } catch (e) {
+      print("Error fetching staff scoring marks: $e");
+    } finally {
+      isloadscore = false;
+      notifyListeners();
+    }
+  }
+
+
+
+
+
+
 
 }

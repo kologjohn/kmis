@@ -307,7 +307,9 @@ class _TeacherListPageState extends State<TeacherListPage> {
 
                                         if (confirm == true) {
                                           try {
-                                            // await value.deleteTeacher(item.staffid);
+                                             await value.deleteteacher(
+                                                 item.staffid
+                                                );
 
                                             if (context.mounted) {
                                               ScaffoldMessenger.of(context).showSnackBar(

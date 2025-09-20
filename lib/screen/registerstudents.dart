@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import '../controller/dbmodels/contestantsmodel.dart';
 import '../controller/myprovider.dart';
 import '../controller/routes.dart';
+import '../widgets/dropdown.dart';
 
 class RegisterStudent extends StatefulWidget {
   final StudentModel? studentData;
@@ -33,16 +34,16 @@ class _RegisterStudentState extends State<RegisterStudent> {
 
   final List<String> _sex = ['male', "female"];
   final List<String> _status = ['active', 'completed',];
-  final List<String> _yeargroup =
-  List.generate(5, (i) => (2022 + i).toString());
+  final List<String> _yeargroup = List.generate(5, (i) => (2022 + i).toString());
 
   String? selectedSex;
   String? selectedLevel;
+  String? selectedTerm;
   String? selecteddepart;
+  String? selectedYearGroup;
+
   String? selectedRegion;
   String? selectedStatus;
-  String? selectedTerm;
-  String? selectedYearGroup;
   bool showStudentId = false;
   String? _uploadedImageUrl = '';
 
@@ -198,7 +199,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                               ),
                             ),
                           const SizedBox(height: 10),
-                          _buildDropdown(
+                          buildDropdown(
                             value: selectedYearGroup,
                             items: _yeargroup,
                             label: "Year Group",
@@ -312,16 +313,9 @@ class _RegisterStudentState extends State<RegisterStudent> {
                           ),
 
                           const SizedBox(height: 10),
-                          _buildDropdown(
-                            value: selectedSex,
-                            items: _sex,
-                            label: "Sex",
-                            fillColor: inputFill,
-                            onChanged: (v) => setState(() => selectedSex = v),
-                            validatorMsg: 'Select sex',
-                          ),
+                          buildDropdown(value: selectedSex, items: _sex, label: "Sex", fillColor: inputFill, onChanged: (v) => setState(() => selectedSex = v), validatorMsg: 'Select sex',),
                           const SizedBox(height: 10),
-                          _buildDropdown(
+                          buildDropdown(
                             value: selectedRegion,
                             items: value.regionList.map((c) => c.regionname).toList(),
                             label: "Region",
@@ -330,7 +324,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                             validatorMsg: 'Select region',
                           ),
                           const SizedBox(height: 10),
-                          _buildDropdown(
+                          buildDropdown(
                             value: selectedLevel,
                             items: value.classdata.map((e) => e.name).toList(),
                             label: "Class",
@@ -339,7 +333,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                             validatorMsg: 'Select class',
                           ),
                           const SizedBox(height: 10),
-                          _buildDropdown(
+                          buildDropdown(
                             value: selecteddepart,
                             items: value.departments.map((e) => e.name).toList(),
                             label: "Department",
@@ -348,7 +342,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
                             validatorMsg: 'Select department',
                           ),
                           const SizedBox(height: 10),
-                          _buildDropdown(
+                          buildDropdown(
                             value: selectedStatus,
                             items: _status,
                             label: "Status",
@@ -579,35 +573,7 @@ class _RegisterStudentState extends State<RegisterStudent> {
     );
   }
 
-  Widget _buildDropdown({
-    required String? value,
-    required List<String> items,
-    required String label,
-    required Color fillColor,
-    required Function(String?) onChanged,
-    required String validatorMsg,
-  }) {
-    return DropdownButtonFormField<String>(
-      value: value,
-      items: items
-          .map((e) => DropdownMenuItem(
-        value: e,
-        child: Text(e, style: const TextStyle(color: Colors.white)),
-      ))
-          .toList(),
-      dropdownColor: fillColor,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Colors.white),
-        border: const OutlineInputBorder(),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        filled: true,
-        fillColor: fillColor,
-      ),
-      validator: (v) => v == null || v.isEmpty ? validatorMsg : null,
-    );
-  }
+
 
   Widget _buildImagePicker(Myprovider value) {
     return InkWell(
