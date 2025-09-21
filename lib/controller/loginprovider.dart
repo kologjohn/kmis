@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/controller/dbmodels/contestantsmodel.dart';
 import 'package:ksoftsms/controller/dbmodels/feeSetUpModel.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,8 @@ class LoginProvider extends ChangeNotifier {
   List<SchoolModel> schoolList = [];
   List<Staff> staffschools = [];
   List<String> staffaccesslevel = ["admin", "teacher", "super admin"];
+  List<StudentModel> selectedStudents = [];
+  List<StudentModel> searchResults = [];
   String currentschool = "";
   Staff? usermodel;
   String schoolid = "";
@@ -84,6 +87,7 @@ class LoginProvider extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
+      errorMessage=e.toString();
 
       print(e);
     }
@@ -210,6 +214,48 @@ class LoginProvider extends ChangeNotifier {
       print("Failed to fetch class: $e");
     }
   }
+
+  emptysearchResults(){
+    searchResults=[];
+    notifyListeners();
+  }
+  Future<void> searchStudents(String query) async {
+    try {
+      if (query.isEmpty) {
+        searchResults = [];
+        return;
+      }
+      searchResults.clear();
+
+      final snap = await FirebaseFirestore.instance.collection("students").where("name", isGreaterThanOrEqualTo: query).where("name", isLessThanOrEqualTo: "$query\uf8ff").limit(10).get();
+      //searchResults = snap.docs.map((d) => {"id": d.id, ...d.data() as Map<String, dynamic>}).toList();
+      searchResults = snap.docs.map((doc) {
+        return StudentModel.fromMap(doc.data());
+      }).toList();
+
+    } catch (e) {
+      print("Error searching students: $e");
+    }
+    notifyListeners();
+  }
+// inside Myprovider
+  void addStudent(StudentModel student) {
+    if (!selectedStudents.any((s) => s.studentid == student.studentid)) {
+      selectedStudents.add(student);
+      notifyListeners();
+    }
+  }
+
+  void removeStudent(String studentId) {
+    selectedStudents.removeWhere((s) => s.studentid == studentId);
+    notifyListeners();
+  }
+
+  void clearSelectedStudents() {
+    selectedStudents.clear();
+    notifyListeners();
+  }
+
 
 
 

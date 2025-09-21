@@ -379,12 +379,19 @@ class CustomDrawer extends StatelessWidget {
                                   }
                                 },
                               ),
-                              _drawerTile(
-                                icon: Icons.account_balance_wallet,
-                                title: 'Billing',
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Billing',
                                 onTap: () async {
                                   try {
                                     context.go(Routes.billing);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Singel Bolling',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.singlebilling);
                                   } catch (e) {
                                     print(e);
                                   }

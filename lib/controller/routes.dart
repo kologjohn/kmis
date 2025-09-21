@@ -1,10 +1,11 @@
 import 'package:go_router/go_router.dart';
-import 'package:ksoftsms/components/billing.dart';
+import 'package:ksoftsms/screen/billing.dart';
 import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
 import 'package:ksoftsms/screen/accountChart.dart';
 import 'package:ksoftsms/screen/feesSetup.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
+import 'package:ksoftsms/screen/singleBilling.dart';
 import 'package:ksoftsms/screen/systemActivity.dart';
 import '../components/academicyrmodel.dart';
 import '../components/dashboard.dart';
@@ -65,6 +66,7 @@ class Routes {
   static const accountActivity = "/accountActivity";
   static const billing = "/billing";
   static const feesetup = "/feesetup";
+  static const singlebilling = "/singlebilling";
 
   static const registerzone = "/registerzone";
   static const regstaff = "/regstaff";
@@ -136,6 +138,7 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.coa, builder: (c, s) => AccountsChart()),
     GoRoute(path: Routes.accountActivity, builder: (c, s) => SystemActivity()),
     GoRoute(path: Routes.feesetup, builder: (c, s) => FeesSetup()),
+    GoRoute(path: Routes.singlebilling, builder: (c, s) => SingleBilling()),
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
     GoRoute(
       path: Routes.regstaff,

@@ -1,10 +1,13 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ksoftsms/controller/dbmodels/staffmodel.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+
+import '../controller/routes.dart';
 
 class SpacerSignUpPage extends StatefulWidget {
   const SpacerSignUpPage({super.key});
@@ -14,6 +17,19 @@ class SpacerSignUpPage extends StatefulWidget {
 }
 
 class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<Myprovider>(context, listen: false);
+      provider.getdata();
+      if(provider.auth.currentUser != null){
+        context.go(Routes.dashboard);
+      }
+
+    });
+  }
 
   // Helper for package card
   Widget _buildPackageCard({
@@ -851,13 +867,21 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                       InkWell(
                                         onTap: () async {
                                           if (_formKey.currentState!.validate()) {
-
-                                            final email = _emailController.text.trim();
-                                            final password = _passwordController.text.trim();
-                                            final progress = ProgressHUD.of(context);
-                                            progress?.show();
-                                            await value.login(email, password,context);
-                                            progress?.dismiss();
+                                            try {
+                                              final email = _emailController
+                                                  .text.trim();
+                                              final password = _passwordController
+                                                  .text.trim();
+                                              final progress = ProgressHUD.of(
+                                                  context);
+                                              progress?.show();
+                                              await value.login(
+                                                  email, password, context);
+                                              progress?.dismiss();
+                                            }catch(e){
+                                              SnackBar snackBar=SnackBar(content: Text(value.errorMessage));
+                                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                            }
                                           }
                                         },
                                         child: Container(
