@@ -3,6 +3,7 @@ import 'package:ksoftsms/screen/billing.dart';
 import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
 import 'package:ksoftsms/screen/accountChart.dart';
 import 'package:ksoftsms/screen/feesSetup.dart';
+import 'package:ksoftsms/screen/feespayment.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
 import 'package:ksoftsms/screen/singleBilling.dart';
@@ -22,6 +23,7 @@ import '../screen/judgeui.dart';
 
 import '../screen/levelreg.dart';
 import '../screen/multipleschools.dart';
+import '../screen/paymentMethodsForm.dart';
 import '../screen/regionreg.dart';
 import '../screen/registerschool.dart';
 import '../screen/registerstudents.dart';
@@ -67,6 +69,8 @@ class Routes {
   static const billing = "/billing";
   static const feesetup = "/feesetup";
   static const singlebilling = "/singlebilling";
+  static const feepayment = "/feepayment";
+  static const paymentmethods = "/paymentmethods";
 
   static const registerzone = "/registerzone";
   static const regstaff = "/regstaff";
@@ -140,6 +144,8 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.feesetup, builder: (c, s) => FeesSetup()),
     GoRoute(path: Routes.singlebilling, builder: (c, s) => SingleBilling()),
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
+    GoRoute(path: Routes.feepayment, builder: (c, s) => Feepayment()),
+    GoRoute(path: Routes.paymentmethods, builder: (c, s) => PaymentMethodForm()),
     GoRoute(
       path: Routes.regstaff,
       builder: (context, state) {

@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ksoftsms/controller/dbmodels/contestantsmodel.dart';
 import 'package:ksoftsms/controller/dbmodels/feeSetUpModel.dart';
+import 'package:ksoftsms/controller/dbmodels/paymentMethodsModel.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -19,6 +20,8 @@ class LoginProvider extends ChangeNotifier {
   List<String> staffaccesslevel = ["admin", "teacher", "super admin"];
   List<StudentModel> selectedStudents = [];
   List<StudentModel> searchResults = [];
+  List<Map<String, String>> linkedAccounts = []; // holds account id + name
+
   String currentschool = "";
   Staff? usermodel;
   String schoolid = "";
@@ -33,8 +36,10 @@ class LoginProvider extends ChangeNotifier {
   final auth = FirebaseAuth.instance;
   final db = FirebaseFirestore.instance;
   List<String> accounts = [];
+  List<String> currentaccounts = [];
   List<String> accountclass = [];
   List<FeeSetUpModel> fees = [];
+  List<PaymentMethodModel> paymethodlist = [];
 
   List<String> accountsubclass = [];
   login(String email, String password, BuildContext context) async {
@@ -195,8 +200,15 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-
+  Future<void> fetchCurrentAccounts() async {
+    try {
+      final snapshot = await db.collection("mainaccounts").where('subType',isEqualTo: 'Current Assets').get();
+      currentaccounts = snapshot.docs.map((doc) => (doc.data()["name"] ?? "") as String).where((name) => name.isNotEmpty).toList();
+    } catch (e) {
+      print("Error fetching accounts: $e");
+    }
+    notifyListeners();
+  }
   Future<void> fetchFess() async {
     try {
       //loadclassdata = true;
@@ -214,7 +226,25 @@ class LoginProvider extends ChangeNotifier {
       print("Failed to fetch class: $e");
     }
   }
+  Future<void> paymentmethodslist() async {
+    try {
+      //loadclassdata = true;
+      final snapshot = await db.collection("paymentmethod").get();
 
+      paymethodlist = snapshot.docs.map((doc) {
+        return PaymentMethodModel.fromMap(doc.data());
+      }).toList();
+
+    //  loadclassdata = false;
+      notifyListeners();
+    } catch (e) {
+     // loadclassdata = false;
+      notifyListeners();
+      print("Failed to fetch class: $e");
+    }
+    notifyListeners();
+
+  }
   emptysearchResults(){
     searchResults=[];
     notifyListeners();
@@ -251,10 +281,38 @@ class LoginProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchLinkedAccounts(String paymentMethodName) async {
+    linkedAccounts.clear();
+    final snapshot = await FirebaseFirestore.instance
+        .collection("paymentmethod")
+        .where("name", isEqualTo: paymentMethodName)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      print(snapshot.docs.length);
+
+      final data = snapshot.docs.first.data();
+      if (data.containsKey("linkedAccounts")) {
+        final ids = List<String>.from(data["linkedAccounts"]);
+
+        // fetch account names from mainaccounts
+        if (ids.isNotEmpty) {
+            linkedAccounts = ids.map((id) {
+              return {"name": id};
+            }).toList();
+
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+
   void clearSelectedStudents() {
     selectedStudents.clear();
     notifyListeners();
   }
+
 
 
 

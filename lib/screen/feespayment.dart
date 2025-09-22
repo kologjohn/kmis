@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/controller/dbmodels/feePaymentModel.dart';
 import 'package:ksoftsms/controller/dbmodels/singleBilledModel.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,14 +12,14 @@ import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import '../widgets/dropdown.dart';
 
-class SingleBilling extends StatefulWidget {
-  const SingleBilling({super.key});
+class Feepayment extends StatefulWidget {
+  const Feepayment({super.key});
 
   @override
-  State<SingleBilling> createState() => _SingleBillingState();
+  State<Feepayment> createState() => _FeepaymentState();
 }
 
-class _SingleBillingState extends State<SingleBilling> {
+class _FeepaymentState extends State<Feepayment> {
   @override
   void initState() {
     super.initState();
@@ -27,15 +28,20 @@ class _SingleBillingState extends State<SingleBilling> {
       provider.getdata();
       provider.fetchterms();
       provider.fetchFess();
+      provider.paymentmethodslist();
     });
   }
 
   final accountController = TextEditingController();
   final searchController = TextEditingController();
+  final noteController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   String? selectedTerm;
   String? selectedfee;
+  String? selectedpaymentmethod;
+  String? selectedLinkedAccount;
+
 
   @override
   void dispose() {
@@ -43,6 +49,7 @@ class _SingleBillingState extends State<SingleBilling> {
     searchController.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,9 +65,9 @@ class _SingleBillingState extends State<SingleBilling> {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => context.go(Routes.dashboard),
                 ),
-                title: Text(
-                  '${value.currentschool.toUpperCase()} MULTI STUDENT BILLING',
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                title: const Text(
+                  'SCHOOL FEES PAYMENT',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
               ),
               body: Row(
@@ -96,8 +103,6 @@ class _SingleBillingState extends State<SingleBilling> {
                                 },
                               ),
                               const SizedBox(height: 10),
-
-                              // Search results
                               if (value.searchResults.isNotEmpty)
                                 ListView.builder(
                                   shrinkWrap: true,
@@ -134,8 +139,6 @@ class _SingleBillingState extends State<SingleBilling> {
                                     );
                                   },
                                 ),
-
-                              // Selected students
                               if (value.selectedStudents.isNotEmpty)
                                 Column(
                                   children: value.selectedStudents
@@ -165,7 +168,7 @@ class _SingleBillingState extends State<SingleBilling> {
 
                               const SizedBox(height: 20),
 
-                              // amount field
+                              // 💰 Amount field
                               TextFormField(
                                 inputFormatters: [
                                   FilteringTextInputFormatter.allow(
@@ -180,14 +183,53 @@ class _SingleBillingState extends State<SingleBilling> {
                                   labelText: "Billed Amount",
                                   border: OutlineInputBorder(),
                                 ),
-                                validator: (value) =>
-                                value == null || value.trim().isEmpty
+                                validator: (value) => value == null ||
+                                    value.trim().isEmpty
                                     ? "Amount is required"
                                     : null,
                               ),
                               const SizedBox(height: 20),
 
-                              // fees dropdown
+                              buildDropdown(value: selectedpaymentmethod != null && value.paymethodlist.any((e) => e.name == selectedpaymentmethod)
+                                    ? selectedpaymentmethod
+                                    : null, // ✅ only set if it's in the list
+                                items: value.paymethodlist.map((e) => e.name).toList(),
+                                label: "Payment Method",
+                                fillColor: inputFill,
+                                onChanged: (v) async {
+                                  setState(() {
+                                    selectedpaymentmethod = v;
+                                    selectedLinkedAccount = null; // reset linked account when method changes
+                                  });
+                                  if (v != null) {
+                                    await value.fetchLinkedAccounts(v);
+                                  }
+                                },
+                                validatorMsg: 'Select Payment Method',
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              // 🔗 Linked Accounts dropdown
+                              if (value.linkedAccounts.isNotEmpty)
+                                buildDropdown(
+                                  value: selectedLinkedAccount,
+                                  items: value.linkedAccounts
+                                      .map((acc) => acc["name"]!)
+                                      .toList(),
+                                  label: "Receiving Account",
+                                  fillColor: inputFill,
+                                  onChanged: (v) {
+                                    setState(() {
+                                      selectedLinkedAccount = v;
+                                    });
+                                  },
+                                  validatorMsg: "Select Receiving Account",
+                                ),
+                              if (value.linkedAccounts.isNotEmpty)
+                                const SizedBox(height: 20),
+
+
                               buildDropdown(
                                 value: selectedfee,
                                 items: value.fees.map((e) => e.name).toList(),
@@ -199,19 +241,35 @@ class _SingleBillingState extends State<SingleBilling> {
                               ),
                               const SizedBox(height: 20),
 
-                              // term dropdown
                               buildDropdown(
                                 value: selectedTerm,
                                 items: value.terms.map((e) => e.name).toList(),
                                 label: "Term",
                                 fillColor: inputFill,
-                                onChanged: (v) =>
-                                    setState(() => selectedTerm = v),
+                                onChanged: (v) {
+                                  String nn="Being $selectedfee payment  for  $v term".toString();
+                                   noteController.text=nn;
+                                  setState(() => selectedTerm = v);
+
+                                },
                                 validatorMsg: "Select Term",
                               ),
                               const SizedBox(height: 20),
+                              TextFormField(
+                                keyboardType: TextInputType.text,
+                                controller: noteController,
+                                decoration: const InputDecoration(
+                                  labelText: "Note (Optional)",
+                                  border: OutlineInputBorder(),
+                                ),
+                                validator: (value) => value == null ||
+                                    value.trim().isEmpty
+                                    ? "Note is required"
+                                    : null,
+                              ),
 
-                              // Save button
+                              const SizedBox(height: 20),
+
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF00496d),
@@ -227,22 +285,26 @@ class _SingleBillingState extends State<SingleBilling> {
                                     progress!.show();
 
                                     try {
-                                      String amount =
-                                      accountController.text.trim();
+                                      String amount = accountController.text.trim();
+                                      String note = noteController.text.trim();
 
                                       for (var student
                                       in value.selectedStudents) {
-                                        String yearGroup=student.yeargroup;
-                                        String department=student.department;
-                                        String Level=student.level;
-                                        String sid=student.studentid;
-                                        String ids="single-${value.schoolid}$yearGroup$selectedTerm$department$Level$selectedfee$sid";
-                                        String id = ids.replaceAll(RegExp(r'\s+'), '').toLowerCase();
-                                        //String ids="${value.schoolid}$selectedYearGroup$selectedTerm$selecteddepart$selectedLevel$selectedfee";
+                                        String yearGroup = student.yeargroup;
+                                        String department = student.department;
+                                        String Level = student.level;
+                                        String sid = student.studentid;
 
-                                       // String id = "${value.schoolid}${student.studentid}$selectedTerm$selectedfee".replaceAll(RegExp(r'\s+'), '').toLowerCase();
+                                        String ids =
+                                            "single-${value.schoolid}$yearGroup$selectedTerm$department$Level$selectedfee$sid";
+                                        String id = ids
+                                            .replaceAll(RegExp(r'\s+'), '')
+                                            .toLowerCase();
 
-                                        final dataexist = await value.db.collection("singlebilled").doc(id).get();
+                                        final dataexist = await value.db
+                                            .collection("feepayment")
+                                            .doc(id)
+                                            .get();
 
                                         if (dataexist.exists) {
                                           ScaffoldMessenger.of(context)
@@ -257,22 +319,25 @@ class _SingleBillingState extends State<SingleBilling> {
                                           return;
                                         }
 
-                                        final data = SingleBilledModel(
+                                        final data = FeePaymentModel(
                                           level: student.level,
                                           yeargroup: student.yeargroup,
                                           amount: amount,
-                                          activityType: "Fee Billing",
+                                          activityType: "Fee Payment",
                                           term: selectedTerm.toString(),
                                           schoolId: value.schoolid,
                                           dateCreated: DateTime.now(),
                                           feeName: selectedfee.toString(),
                                           studentId: student.studentid,
                                           studentName: student.name ?? "",
-                                          ledgerid: id
+                                          ledgerid: id,
+                                          paymentmethod: selectedpaymentmethod ?? '',
+                                          receivedaccount: selectedLinkedAccount ?? '',
+                                          note: note,
                                         ).toJson();
 
                                         await value.db
-                                            .collection("singlebilled")
+                                            .collection("feepayment")
                                             .doc(id)
                                             .set(data);
                                       }
@@ -281,8 +346,7 @@ class _SingleBillingState extends State<SingleBilling> {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
-                                          content:
-                                          Text("Billing completed"),
+                                          content: Text("Billing completed"),
                                           backgroundColor: Colors.green,
                                         ),
                                       );
@@ -291,7 +355,10 @@ class _SingleBillingState extends State<SingleBilling> {
                                       accountController.clear();
                                       selectedfee = null;
                                       selectedTerm = null;
-                                      setState(() {}); // refresh dropdowns
+                                      selectedpaymentmethod = null;
+                                      selectedLinkedAccount = null;
+                                      value.linkedAccounts.clear();
+                                      setState(() {});
                                     } catch (e) {
                                       progress.dismiss();
                                       ScaffoldMessenger.of(context)

@@ -1,3 +1,5 @@
+// Ledger posting for singlebilled (top-up or unbilled students)
+
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid"; // install with: npm install uuid
@@ -7,6 +9,105 @@ if (!admin.apps.length) {
 }
 
 const db = admin.firestore();
+
+export const createLedgerOnSingleBilling = onDocumentCreated(
+  "singlebilled/{singleBillId}",
+  async (event) => {
+    const snapshot = event.data;
+    if (!snapshot) {
+      console.log("No singlebilled document found.");
+      return;
+    }
+
+    const billData = snapshot.data();
+    if (!billData) {
+      console.log("Empty singlebilled data.");
+      return;
+    }
+
+    const billRef = snapshot.ref;
+    const { studentId, schoolId, amount, term, activityType, feeName, level, yeargroup,ledgerid } = billData;
+    try {
+      // Get student
+      const studentDoc = await db.collection("students").doc(`${schoolId}_${studentId}`).get();
+      if (!studentDoc.exists) {
+        await billRef.update({
+          ledgerStatus: "failed",
+          ledgerMessage: `Student ${studentId} not found`,
+        });
+        return;
+      }
+      const student = studentDoc.data();
+
+      // Get system activity
+      const activitySnap = await db.collection("systemActivity").where("name", "==", activityType).limit(1).get();
+      if (activitySnap.empty) {
+        await db.collection("errors").add({
+          message: `SystemActivity with name '${activityType}' not found.`,
+          singleBillId: event.params.singleBillId,
+          timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        await billRef.update({
+          ledgerStatus: "failed",
+          ledgerMessage: `SystemActivity '${activityType}' not found.`,
+        });
+        return;
+      }
+      const activityData = activitySnap.docs[0].data();
+      const { crAccount, crAccountClass, drAccount, drAccountClass, staff, crAccountSubClass, drAccountSubClass } = activityData;
+
+      // Ledger entry
+      const transactionId = uuidv4();
+      const note = `Being ${feeName} single billed  for ${term} Term`;
+      const status=true;
+     // const ledgerId = `${event.params.singleBillId}_${studentId}`;
+      const ledgerRef = db.collection("ledger").doc(ledgerid);
+      await ledgerRef.set({
+        transactionId,
+        studentId,
+        studentName: student.name || null,
+        schoolId,
+        activityType,
+        feeName,
+        term,
+        note,
+        status,
+        level,
+        staff,
+        yeargroup,
+        amount: String(amount),
+        singleBillId: event.params.singleBillId,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        accounts: {
+          debit: {
+            account: drAccount ?? null,
+            accountClass: drAccountClass ?? null,
+            value: String(amount),
+            subClass: drAccountSubClass ?? null,
+          },
+          credit: {
+            account: crAccount ?? null,
+            accountClass: crAccountClass ?? null,
+            value: String(amount),
+            subClass: crAccountSubClass ?? null,
+          },
+        },
+      });
+
+      await billRef.update({
+        ledgerStatus: "success",
+        ledgerMessage: `Ledger created for student ${studentId}.`,
+      });
+      console.log(`Ledger created for singlebilled student ${studentId}`);
+    } catch (error) {
+      console.error("Error creating singlebilled ledger entry:", error);
+      await billRef.update({
+        ledgerStatus: "failed",
+        ledgerMessage: `Error: ${error.message}`,
+      });
+    }
+  }
+);
 
 export const createLedgerOnBilling = onDocumentCreated(
   "billed/{billId}",
@@ -76,9 +177,11 @@ export const createLedgerOnBilling = onDocumentCreated(
         const transactionId = uuidv4();
 
         // Use billId + studentId for ledger doc ID
+              const note = `Being ${feeName} billed  for ${term} Term`;
+
         const ledgerId = `${event.params.billId}_${studentDoc.id}`;
         const ledgerRef = db.collection("ledger").doc(ledgerId);
-
+        const status=true;
         batch.set(ledgerRef, {
           transactionId,
           studentId: studentDoc.id,
@@ -87,8 +190,10 @@ export const createLedgerOnBilling = onDocumentCreated(
           activityType,
           feeName,
           term,
+          note,
           level,
           staff,
+          status,
           yeargroup,
           amount: String(amount), // ensure stored as string
           billedId: event.params.billId,

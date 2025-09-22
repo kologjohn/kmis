@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-class SingleBilledModel {
+class FeePaymentModel {
   final String studentId;
   final String studentName;
   final String level;
@@ -11,8 +11,14 @@ class SingleBilledModel {
   final String term;
   final String schoolId;
   final String ledgerid;
+  final String paymentmethod;
+  final String receivedaccount;
+  final String note;
   final DateTime? dateCreated;
-  SingleBilledModel({
+  FeePaymentModel({
+    required this.note,
+    required this.paymentmethod,
+    required this.receivedaccount,
     required this.studentId,
     required this.studentName,
     required this.level,
@@ -25,8 +31,11 @@ class SingleBilledModel {
     required this.ledgerid,
     required this.dateCreated,
   });
-  factory SingleBilledModel.fromMap(Map<String, dynamic> map) {
-    return SingleBilledModel(
+  factory FeePaymentModel.fromMap(Map<String, dynamic> map) {
+    return FeePaymentModel(
+      note: map['note'] ?? '',
+      receivedaccount: map['receivedaccount'] ?? '',
+      paymentmethod: map['paymentmethod'] ?? '',
       ledgerid: map['ledgerid'] ?? '',
       studentName: map['studentName'] ?? '',
       studentId: map['studentId'] ?? '',
@@ -42,6 +51,9 @@ class SingleBilledModel {
   }
   Map<String, dynamic> toJson() {
     return {
+      "note": note,
+      "receivedaccount": receivedaccount,
+      "paymentmethod": paymentmethod,
       "ledgerid": ledgerid,
       "studentName": studentName,
       "studentId": studentId,
