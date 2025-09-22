@@ -336,15 +336,13 @@ class _FeepaymentState extends State<Feepayment> {
                                           note: note,
                                           staff: value.name,
                                         ).toJson();
+
                                         await value.db.collection("feepayment").doc(id).set(data);
                                       }
 
                                       progress.dismiss();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text("Billing completed"),
-                                          backgroundColor: Colors.green,
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Payment Received completed"),
+                                        backgroundColor: Colors.green,
                                         ),
                                       );
 
