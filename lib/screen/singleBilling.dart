@@ -232,16 +232,15 @@ class _SingleBillingState extends State<SingleBilling> {
 
                                       for (var student
                                       in value.selectedStudents) {
-                                        String id =
-                                        "${value.schoolid}${student.studentid}$selectedTerm$selectedfee"
-                                            .replaceAll(
-                                            RegExp(r'\s+'), '')
-                                            .toLowerCase();
+                                        String yearGroup=student.yeargroup;
+                                        String department=student.department;
+                                        String Level=student.level;
+                                        String ids="${value.schoolid}$yearGroup$selectedTerm$department$Level$selectedfee";
+                                        String id = ids.replaceAll(RegExp(r'\s+'), '').toLowerCase();
 
-                                        final dataexist = await value.db
-                                            .collection("singlebilled")
-                                            .doc(id)
-                                            .get();
+                                       // String id = "${value.schoolid}${student.studentid}$selectedTerm$selectedfee".replaceAll(RegExp(r'\s+'), '').toLowerCase();
+
+                                        final dataexist = await value.db.collection("singlebilled").doc(id).get();
 
                                         if (dataexist.exists) {
                                           ScaffoldMessenger.of(context)
