@@ -334,12 +334,9 @@ class _FeepaymentState extends State<Feepayment> {
                                           paymentmethod: selectedpaymentmethod ?? '',
                                           receivedaccount: selectedLinkedAccount ?? '',
                                           note: note,
+                                          staff: value.name,
                                         ).toJson();
-
-                                        await value.db
-                                            .collection("feepayment")
-                                            .doc(id)
-                                            .set(data);
+                                        await value.db.collection("feepayment").doc(id).set(data);
                                       }
 
                                       progress.dismiss();

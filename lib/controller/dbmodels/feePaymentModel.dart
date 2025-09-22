@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class FeePaymentModel {
   final String studentId;
+  final String staff;
   final String studentName;
   final String level;
   final String yeargroup;
@@ -16,6 +17,7 @@ class FeePaymentModel {
   final String note;
   final DateTime? dateCreated;
   FeePaymentModel({
+    required this.staff,
     required this.note,
     required this.paymentmethod,
     required this.receivedaccount,
@@ -33,6 +35,7 @@ class FeePaymentModel {
   });
   factory FeePaymentModel.fromMap(Map<String, dynamic> map) {
     return FeePaymentModel(
+      staff: map['staff'] ?? '',
       note: map['note'] ?? '',
       receivedaccount: map['receivedaccount'] ?? '',
       paymentmethod: map['paymentmethod'] ?? '',
@@ -51,6 +54,7 @@ class FeePaymentModel {
   }
   Map<String, dynamic> toJson() {
     return {
+      "staff": staff,
       "note": note,
       "receivedaccount": receivedaccount,
       "paymentmethod": paymentmethod,
