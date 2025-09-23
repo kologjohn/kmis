@@ -3,16 +3,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:ksoftsms/controller/dbmodels/contestantsmodel.dart';
 import 'package:ksoftsms/controller/dbmodels/feeSetUpModel.dart';
 import 'package:ksoftsms/controller/dbmodels/paymentMethodsModel.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dbmodels/feePaymentModel.dart';
 import 'dbmodels/schoolmodel.dart';
 import 'dbmodels/staffmodel.dart';
 
 class LoginProvider extends ChangeNotifier {
+  String today = DateFormat("MMMM d, y").format(DateTime.now());
   List<String> staffSchoolIds=[];
   List<String> schoolnames=[];
   List<SchoolModel> schoolList = [];
@@ -21,7 +24,8 @@ class LoginProvider extends ChangeNotifier {
   List<StudentModel> selectedStudents = [];
   List<StudentModel> searchResults = [];
   List<Map<String, String>> linkedAccounts = []; // holds account id + name
-
+  Map<String,dynamic> receiptrecords = {};
+  final numberFormat = NumberFormat("#,##0.00", "en_US");
   String currentschool = "";
   Staff? usermodel;
   String schoolid = "";
@@ -40,9 +44,17 @@ class LoginProvider extends ChangeNotifier {
   List<String> accountclass = [];
   List<FeeSetUpModel> fees = [];
   List<PaymentMethodModel> paymethodlist = [];
-  String receiptno = "";
+   String receiptno="";
   List<String> accountsubclass = [];
-  login(String email, String password, BuildContext context) async {
+  String receiptName="";
+  String receiptpaymentmethod="";
+  String receiptdate="";
+
+  String receiptnote="";
+  String receipt="";
+  double receiptTotal=0;
+
+   login(String email, String password, BuildContext context) async {
     try {
       final loginhere = await auth.signInWithEmailAndPassword(
         email: email,
@@ -97,7 +109,7 @@ class LoginProvider extends ChangeNotifier {
       print(e);
     }
   }
-  getdata() async {
+   getdata() async {
     final prefs = await SharedPreferences.getInstance();
     schoolid = prefs.getString('schoolid') ?? '';
     currentschool = prefs.getString('school') ?? '';
@@ -108,10 +120,11 @@ class LoginProvider extends ChangeNotifier {
     term = prefs.getString('term') ?? '';
     staffSchoolIds = prefs.getStringList("staffschools") ?? [];
     schoolnames = prefs.getStringList("schoolnames") ?? [];
-    print(currentschool);
+    receiptno=prefs.getString("receiptno")??"";
+   print(schoolid);
     notifyListeners();
   }
-  setSchool(String school, String schoolid) async {
+   setSchool(String school, String schoolid) async {
     try{
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("school", school);
@@ -121,7 +134,7 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-  staffcount() async {
+   staffcount() async {
     await getdata();
     try {
       print(schoolid);
@@ -134,7 +147,7 @@ class LoginProvider extends ChangeNotifier {
       return 0;
     }
   }
-  Future<bool> staffexistbyphone(String phone) async {
+   Future<bool> staffexistbyphone(String phone) async {
     try {
       final detail = await db
           .collection("staff")
@@ -152,7 +165,7 @@ class LoginProvider extends ChangeNotifier {
       return false;
     }
   }
-  Future<bool> staffexistbyemail(String email) async {
+   Future<bool> staffexistbyemail(String email) async {
     try {
       final detail = await db
           .collection("staff")
@@ -170,7 +183,7 @@ class LoginProvider extends ChangeNotifier {
       return false;
     }
   }
-  Future<void> fetchtermyear(String schoolId, SharedPreferences prefs) async {
+   Future<void> fetchtermyear(String schoolId, SharedPreferences prefs) async {
     try {
       final snapshot = await db.collection("schools").doc(schoolId).get();
 
@@ -185,11 +198,11 @@ class LoginProvider extends ChangeNotifier {
       debugPrint("Error fetching term/year: $e");
     }
   }
-  void setAccounts(List<String> accounts) {
+   void setAccounts(List<String> accounts) {
     accounts = accounts;
     notifyListeners();
   }
-  Future<void> fetchAccounts() async {
+   Future<void> fetchAccounts() async {
     try {
       final snapshot = await db.collection("mainaccounts").get();
       accounts = snapshot.docs.map((doc) => (doc.data()["name"] ?? "") as String).where((name) => name.isNotEmpty).toList();
@@ -200,7 +213,7 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-  Future<void> fetchCurrentAccounts() async {
+   Future<void> fetchCurrentAccounts() async {
     try {
       final snapshot = await db.collection("mainaccounts").where('subType',isEqualTo: 'Current Assets').get();
       currentaccounts = snapshot.docs.map((doc) => (doc.data()["name"] ?? "") as String).where((name) => name.isNotEmpty).toList();
@@ -209,7 +222,7 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-  Future<void> fetchFess() async {
+   Future<void> fetchFess() async {
     try {
       //loadclassdata = true;
       notifyListeners();
@@ -226,7 +239,7 @@ class LoginProvider extends ChangeNotifier {
       print("Failed to fetch class: $e");
     }
   }
-  Future<void> paymentmethodslist() async {
+   Future<void> paymentmethodslist() async {
     try {
       //loadclassdata = true;
       final snapshot = await db.collection("paymentmethod").get();
@@ -245,11 +258,11 @@ class LoginProvider extends ChangeNotifier {
     notifyListeners();
 
   }
-  emptysearchResults(){
+   emptysearchResults(){
     searchResults=[];
     notifyListeners();
   }
-  Future<void> searchStudents(String query) async {
+   Future<void> searchStudents(String query) async {
     try {
       if (query.isEmpty) {
         searchResults = [];
@@ -268,19 +281,18 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-  void addStudent(StudentModel student) {
+   void addStudent(StudentModel student) {
     if (!selectedStudents.any((s) => s.studentid == student.studentid)) {
       selectedStudents.add(student);
       notifyListeners();
     }
   }
-
-  void removeStudent(String studentId) {
+   void removeStudent(String studentId) {
     selectedStudents.removeWhere((s) => s.studentid == studentId);
     notifyListeners();
   }
 
-  Future<void> fetchLinkedAccounts(String paymentMethodName) async {
+   Future<void> fetchLinkedAccounts(String paymentMethodName) async {
     linkedAccounts.clear();
     final snapshot = await FirebaseFirestore.instance
         .collection("paymentmethod")
@@ -305,24 +317,55 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-  void clearSelectedStudents() {
+   void clearSelectedStudents() {
     selectedStudents.clear();
     notifyListeners();
   }
    generatereceiptnumber()async{
+    SharedPreferences spref=await SharedPreferences.getInstance();
     try{
       final now = DateTime.now();
       final dateKey = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
       final lastreceiptnumber= await db.collection("feepayment").where('schoolId',isEqualTo: schoolid).get();
       String numberPart = schoolid.replaceAll(RegExp(r'[^0-9]'), '');
       receiptno="$numberPart$dateKey${(lastreceiptnumber.docs.length + 1)}";
-      notifyListeners();
-
+      await spref.setString("receiptno", receiptno);
     }catch(e){
       print(e);
     }
      notifyListeners();
    }
+   myreceipt()async{
+    try{
+        await getdata();
+        final data=await db.collection("feepayment").doc(receiptno).get();
+        receiptName=data.data()!['studentName'];
+        receiptrecords=data.data()!['fees'];
+        receiptpaymentmethod=data.data()!['paymentmethod'];
+         receiptnote=receiptrecords.keys.toString().toString();
+        final ts = data['dateCreated'];
+        DateTime date = ts.toDate();
+         receiptdate = DateFormat("MMMM d, y").format(date);
+         double receiptval=0;
+        receiptTotal=receiptval;
+
+        for(var values in receiptrecords.values){
+           receiptval+=double.parse(values.toString());
+         }
+        receiptTotal=receiptval;
+        print(receiptTotal.toStringAsFixed(2));
+         print(receiptTotal);
+    }catch(e){
+      print(e);
+    }
+    notifyListeners();
+
+
+   }
+
+
+
+
 
 
 
