@@ -29,6 +29,9 @@ class _SystemActivityState extends State<SystemActivity> {
   String? _selectedCreditAccount;
   String? _selectedCreditAccountClass;
   String? _selectedDebitAccountClass;
+  String? _selectedDebitAccountSubClass;
+  String? _selectedCreditAccountSubClass;
+
   String schoolid = "";
   String schoolname = "";
   String userid = "";
@@ -109,6 +112,7 @@ class _SystemActivityState extends State<SystemActivity> {
                                 onChanged: (val) {
                                   int dd=value.accounts.indexOf(val.toString());
                                   _selectedDebitAccountClass=value.accountclass[dd];
+                                  _selectedDebitAccountSubClass=value.accountsubclass[dd];
                                   print(_selectedDebitAccountClass);
                                   setState(() => _selectedDebitAccount = val);
                                 },
@@ -134,6 +138,7 @@ class _SystemActivityState extends State<SystemActivity> {
                                 onChanged: (val) {
                                   int dd=value.accounts.indexOf(val.toString());
                                   _selectedCreditAccountClass=value.accountclass[dd];
+                                  _selectedCreditAccountSubClass=value.accountsubclass[dd];
                                   print(_selectedCreditAccountClass);
                                   setState(() => _selectedCreditAccount = val);
                                 },
@@ -161,12 +166,11 @@ class _SystemActivityState extends State<SystemActivity> {
                                     String activityname=accountController.text.trim();
                                     //String id="${value.schoolid}";
 
-                                    String id = "${value.schoolid.toString().toLowerCase()}_${activityname.replaceAll(RegExp(r'\\s+'), '').toLowerCase()}";
-
-                                    print(id);
+                                    String ids = "${value.schoolid.toString().toLowerCase()}_${activityname.replaceAll(RegExp(r'\\s+'), '').toLowerCase()}";
+                                    String id=ids.replaceAll(RegExp(r'[^\w\s]+'),'');
 
                                     try {
-                                      final data=ActivityModel(name: activityname, schoolId: value.schoolid, drAccount: _selectedDebitAccount.toString(), crAccount: _selectedCreditAccount.toString(), staff: value.name, dateCreated: DateTime.now(), crAccountClass: _selectedCreditAccountClass.toString(), drAccountClass: _selectedDebitAccountClass.toString()).toJson();
+                                      final data=ActivityModel(name: activityname, schoolId: value.schoolid, drAccount: _selectedDebitAccount.toString(), crAccount: _selectedCreditAccount.toString(), staff: value.name, dateCreated: DateTime.now(), crAccountClass: _selectedCreditAccountClass.toString(), drAccountClass: _selectedDebitAccountClass.toString(), crAccountSubClass: _selectedCreditAccountSubClass.toString(), drAccountSubClass: _selectedDebitAccountSubClass.toString()).toJson();
                                       await value.db.collection("systemActivity").doc(id).set(data);
 
                                       progress.dismiss();

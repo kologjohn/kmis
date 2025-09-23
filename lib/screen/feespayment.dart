@@ -1,0 +1,367 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/controller/dbmodels/feePaymentModel.dart';
+import 'package:ksoftsms/controller/dbmodels/singleBilledModel.dart';
+import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+import 'package:ksoftsms/controller/dbmodels/billedModel.dart';
+import 'package:ksoftsms/controller/myprovider.dart';
+import 'package:ksoftsms/controller/routes.dart';
+import '../widgets/dropdown.dart';
+
+class Feepayment extends StatefulWidget {
+  const Feepayment({super.key});
+
+  @override
+  State<Feepayment> createState() => _FeepaymentState();
+}
+
+class _FeepaymentState extends State<Feepayment> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
+      final provider = Provider.of<Myprovider>(context, listen: false);
+      provider.getdata();
+      provider.fetchterms();
+      provider.fetchFess();
+      provider.paymentmethodslist();
+      final now = DateTime.now();
+      final dateKey = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
+      final lastreceiptnumber= await provider.db.collection("feepayment").get();
+      print(lastreceiptnumber.docs.length);
+    });
+  }
+
+  final accountController = TextEditingController();
+  final searchController = TextEditingController();
+  final noteController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
+  String? selectedTerm;
+  String? selectedfee;
+  String? selectedpaymentmethod;
+  String? selectedLinkedAccount;
+
+
+  @override
+  void dispose() {
+    accountController.dispose();
+    searchController.dispose();
+    super.dispose();
+  }
+
+
+  @override
+  Widget build(BuildContext context) {
+    final inputFill = const Color(0xFFffffff);
+    return ProgressHUD(
+      child: Builder(builder: (context) {
+        return Consumer<Myprovider>(
+          builder: (BuildContext context, value, Widget? child) {
+            return Scaffold(
+              appBar: AppBar(
+                backgroundColor: const Color(0xFF00273a),
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => context.go(Routes.dashboard),
+                ),
+                title: const Text(
+                  'SCHOOL FEES PAYMENT',
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                ),
+              ),
+              body: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.all(20),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              TextField(
+                                controller: searchController,
+                                decoration: InputDecoration(
+                                  labelText: "Search Student by Name",
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(Icons.search),
+                                    onPressed: () => value.searchStudents(
+                                        searchController.text.trim()),
+                                  ),
+                                  border: const OutlineInputBorder(),
+                                ),
+                                onChanged: (q) {
+                                  if (q.isEmpty) {
+                                    value.emptysearchResults();
+                                  } else {
+                                    value.searchStudents(q);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 10),
+                              if (value.searchResults.isNotEmpty)
+                                ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: value.searchResults.length,
+                                  itemBuilder: (context, index) {
+                                    final student = value.searchResults[index];
+                                    return Container(
+                                      decoration: const BoxDecoration(
+                                        border: Border(
+                                          bottom: BorderSide(
+                                              width: 2, color: Colors.grey),
+                                        ),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(student.name ?? ""),
+                                        subtitle:
+                                        Text("ID: ${student.studentid}"),
+                                        trailing: Icon(
+                                          value.selectedStudents.any((s) =>
+                                          s.studentid ==
+                                              student.studentid)
+                                              ? Icons.check_circle
+                                              : Icons.add_circle_outline,
+                                          color: value.selectedStudents.any((s) =>
+                                          s.studentid ==
+                                              student.studentid)
+                                              ? Colors.green
+                                              : Colors.grey,
+                                        ),
+                                        onTap: () {
+                                          value.addStudent(student);
+                                        },
+                                      ),
+                                    );
+                                  },
+                                ),
+                              if (value.selectedStudents.isNotEmpty)
+                                Column(
+                                  children: value.selectedStudents
+                                      .map(
+                                        (s) => Card(
+                                      color: Colors.blue[50],
+                                      margin: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      child: ListTile(
+                                        title: Text(s.name ?? ""),
+                                        subtitle: Text(
+                                            "Class: ${s.level}, Year: ${s.yeargroup}"),
+                                        trailing: IconButton(
+                                          icon: const Icon(
+                                              Icons.remove_circle,
+                                              color: Colors.red),
+                                          onPressed: () {
+                                            value.removeStudent(
+                                                s.studentid);
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                      .toList(),
+                                ),
+
+                              const SizedBox(height: 20),
+
+                              TextFormField(
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d+\.?\d{0,2}'),
+                                  ),
+                                ],
+                                keyboardType:
+                                const TextInputType.numberWithOptions(
+                                    decimal: true),
+                                controller: accountController,
+                                decoration: const InputDecoration(
+                                  labelText: "Billed Amount",
+                                  border: OutlineInputBorder(),
+                                ),
+                                validator: (value) => value == null ||
+                                    value.trim().isEmpty
+                                    ? "Amount is required"
+                                    : null,
+                              ),
+                              const SizedBox(height: 20),
+
+                              buildDropdown(value: selectedpaymentmethod != null && value.paymethodlist.any((e) => e.name == selectedpaymentmethod)
+                                    ? selectedpaymentmethod
+                                    : null, // ✅ only set if it's in the list
+                                items: value.paymethodlist.map((e) => e.name).toList(),
+                                label: "Payment Method",
+                                fillColor: inputFill,
+                                onChanged: (v) async {
+                                  setState(() {
+                                    selectedpaymentmethod = v;
+                                    selectedLinkedAccount = null; // reset linked account when method changes
+                                  });
+                                  if (v != null) {
+                                    await value.fetchLinkedAccounts(v);
+                                  }
+                                },
+                                validatorMsg: 'Select Payment Method',
+                              ),
+
+                              const SizedBox(height: 10),
+
+                              if (value.linkedAccounts.isNotEmpty)
+                                buildDropdown(
+                                  value: selectedLinkedAccount,
+                                  items: value.linkedAccounts.map((acc) => acc["name"]!).toList(),
+                                  label: "Receiving Account",
+                                  fillColor: inputFill,
+                                  onChanged: (v) {
+                                    setState(() {
+                                      selectedLinkedAccount = v;
+                                    });
+                                  },
+                                  validatorMsg: "Select Receiving Account",
+                                ),
+                              if (value.linkedAccounts.isNotEmpty)
+                                const SizedBox(height: 10),
+                              buildDropdown(value: selectedfee, items: value.fees.map((e) => e.name).toList(), label: "FEES", fillColor: inputFill, onChanged: (v) => setState(() => selectedfee = v), validatorMsg: 'Select Fees'),
+                              const SizedBox(height: 10),
+
+                              buildDropdown(value: selectedTerm, items: value.terms.map((e) => e.name).toList(), label: "Term", fillColor: inputFill, onChanged: (v) {
+                                  String nn="Being $selectedfee payment  for  $v term".toString();
+                                   noteController.text=nn;
+                                  setState(() => selectedTerm = v);
+
+                                },
+                                validatorMsg: "Select Term",
+                              ),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                keyboardType: TextInputType.text,
+                                controller: noteController,
+                                decoration: const InputDecoration(
+                                  labelText: "Note (Optional)",
+                                  border: OutlineInputBorder(),
+                                ),
+                                validator: (value) => value == null ||
+                                    value.trim().isEmpty
+                                    ? "Note is required"
+                                    : null,
+                              ),
+
+                              const SizedBox(height: 20),
+
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF00496d),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 30,
+                                    vertical: 12,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate() &&
+                                      value.selectedStudents.isNotEmpty) {
+                                    final progress = ProgressHUD.of(context);
+                                    progress!.show();
+
+                                    try {
+                                      String amount = accountController.text.trim();
+                                      String note = noteController.text.trim();
+
+                                      for (var student
+                                      in value.selectedStudents) {
+                                        String yearGroup = student.yeargroup;
+                                        String department = student.department;
+                                        String Level = student.level;
+                                        String sid = student.studentid;
+
+
+                                        String ids =
+                                            "single-${value.schoolid}$yearGroup$selectedTerm$department$Level$selectedfee$sid";
+                                        String id = ids
+                                            .replaceAll(RegExp(r'\s+'), '')
+                                            .toLowerCase();
+
+                                        final dataexist = await value.db
+                                            .collection("feepayment")
+                                            .doc(id)
+                                            .get();
+
+                                        if (dataexist.exists) {
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("${student.name} already billed for $selectedfee"), backgroundColor: Colors.orange,));
+                                          progress.dismiss();
+                                          return;
+                                        }
+
+                                        final data = FeePaymentModel(
+                                          level: student.level,
+                                          yeargroup: student.yeargroup,
+                                          amount: amount,
+                                          activityType: "Fee Payment",
+                                          term: selectedTerm.toString(),
+                                          schoolId: value.schoolid,
+                                          dateCreated: DateTime.now(),
+                                          feeName: selectedfee.toString(),
+                                          studentId: student.studentid,
+                                          studentName: student.name ?? "",
+                                          ledgerid: id,
+                                          paymentmethod: selectedpaymentmethod ?? '',
+                                          receivedaccount: selectedLinkedAccount ?? '',
+                                          note: note,
+                                          staff: value.name,
+                                        ).toJson();
+
+                                        await value.db.collection("feepayment").doc(id).set(data);
+                                      }
+
+                                      progress.dismiss();
+                                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Payment Received completed"),
+                                        backgroundColor: Colors.green,
+                                        ),
+                                      );
+
+                                      value.clearSelectedStudents();
+                                      accountController.clear();
+                                      selectedfee = null;
+                                      selectedTerm = null;
+                                      selectedpaymentmethod = null;
+                                      selectedLinkedAccount = null;
+                                      value.linkedAccounts.clear();
+                                      setState(() {});
+                                    } catch (e) {
+                                      progress.dismiss();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text("Failed: $e"),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                icon: const Icon(Icons.save,
+                                    color: Colors.white),
+                                label: const Text("Bill Students",
+                                    style: TextStyle(color: Colors.white)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }
+}

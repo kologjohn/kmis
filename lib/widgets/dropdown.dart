@@ -20,7 +20,7 @@ Widget buildDropdown({
     onChanged: onChanged,
     decoration: InputDecoration(
       labelText: label,
-      labelStyle: const TextStyle(color: Colors.white),
+      labelStyle: const TextStyle(color: Colors.black),
       border: const OutlineInputBorder(),
       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       filled: true,

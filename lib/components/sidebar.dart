@@ -356,6 +356,7 @@ class CustomDrawer extends StatelessWidget {
                                   }
                                 },
                               ),
+
                               _drawerTile(
                                 icon: Icons.view_list,
                                 title: 'System Activity',
@@ -369,10 +370,46 @@ class CustomDrawer extends StatelessWidget {
                               ),
                               _drawerTile(
                                 icon: Icons.account_balance_wallet,
-                                title: 'Billing',
+                                title: 'Fees Names',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.feesetup);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Billing',
                                 onTap: () async {
                                   try {
                                     context.go(Routes.billing);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Single Billing',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.singlebilling);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Payment Methods',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.paymentmethods);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Fee Payment',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.feepayment);
                                   } catch (e) {
                                     print(e);
                                   }

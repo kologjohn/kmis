@@ -7,6 +7,8 @@ class ActivityModel {
   final String crAccount;
   final String crAccountClass;
   final String drAccountClass;
+  final String drAccountSubClass;
+  final String crAccountSubClass;
   final String staff;
   final DateTime? dateCreated;
 
@@ -18,11 +20,15 @@ class ActivityModel {
     required this.staff,
     required this.crAccountClass,
     required this.drAccountClass,
+    required this.crAccountSubClass,
+    required this.drAccountSubClass,
     required this.dateCreated,
   });
 
   factory ActivityModel.fromMap(Map<String, dynamic> map) {
     return ActivityModel(
+      crAccountSubClass: map['crAccountSubClass'] ?? '',
+      drAccountSubClass: map['drAccountSubClass'] ?? '',
       staff: map['staff'] ?? '',
       crAccountClass: map['crAccountClass'] ?? '',
       drAccountClass: map['drAccountClass'] ?? '',
@@ -36,6 +42,8 @@ class ActivityModel {
 
   Map<String, dynamic> toJson() {
     return {
+      "crAccountSubClass": crAccountSubClass,
+      "drAccountSubClass": drAccountSubClass,
       "crAccountClass": crAccountClass,
       "drAccountClass": drAccountClass,
       "staff": staff,
