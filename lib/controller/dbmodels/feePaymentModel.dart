@@ -1,78 +1,75 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+
 class FeePaymentModel {
-  final String studentId;
-  final String staff;
-  final String studentName;
   final String level;
   final String yeargroup;
-  final String feeName;
-  final  String amount;
   final String activityType;
   final String term;
   final String schoolId;
+  final DateTime dateCreated;
+  final String studentId;
+  final String studentName;
   final String ledgerid;
   final String paymentmethod;
   final String receivedaccount;
   final String note;
-  final DateTime? dateCreated;
+  final String staff;
+  final Map<String, double> fees; // ✅ NEW
+
   FeePaymentModel({
-    required this.staff,
-    required this.note,
-    required this.paymentmethod,
-    required this.receivedaccount,
-    required this.studentId,
-    required this.studentName,
     required this.level,
     required this.yeargroup,
-    required this.amount,
     required this.activityType,
     required this.term,
     required this.schoolId,
-    required this.feeName,
-    required this.ledgerid,
     required this.dateCreated,
+    required this.studentId,
+    required this.studentName,
+    required this.ledgerid,
+    required this.paymentmethod,
+    required this.receivedaccount,
+    required this.note,
+    required this.staff,
+    required this.fees, // ✅ required now
   });
-  factory FeePaymentModel.fromMap(Map<String, dynamic> map) {
-    return FeePaymentModel(
-      staff: map['staff'] ?? '',
-      note: map['note'] ?? '',
-      receivedaccount: map['receivedaccount'] ?? '',
-      paymentmethod: map['paymentmethod'] ?? '',
-      ledgerid: map['ledgerid'] ?? '',
-      studentName: map['studentName'] ?? '',
-      studentId: map['studentId'] ?? '',
-      level: map['level'] ?? '',
-      feeName: map['feeName'] ?? '',
-      yeargroup: map['yeargroup'] ?? '',
-      schoolId: map['schoolId'] ?? '',
-      activityType: map['activityType'] ?? '',
-      term: map['term'] ?? '',
-      amount: map['amount']?.toString() ?? '0',
-      dateCreated: map['dateCreated'] != null ? (map['dateCreated'] as Timestamp).toDate() : null,
-    );
-  }
+
   Map<String, dynamic> toJson() {
     return {
-      "staff": staff,
-      "note": note,
-      "receivedaccount": receivedaccount,
-      "paymentmethod": paymentmethod,
-      "ledgerid": ledgerid,
-      "studentName": studentName,
-      "studentId": studentId,
       "level": level,
-      "feeName": feeName,
       "yeargroup": yeargroup,
-      "schoolId": schoolId,
       "activityType": activityType,
       "term": term,
-      "amount": amount,
-      "dateCreated": dateCreated != null
-          ? Timestamp.fromDate(dateCreated!)
-          : FieldValue.serverTimestamp(),
+      "schoolId": schoolId,
+      "dateCreated": dateCreated,
+      "studentId": studentId,
+      "studentName": studentName,
+      "ledgerid": ledgerid,
+      "paymentmethod": paymentmethod,
+      "receivedaccount": receivedaccount,
+      "note": note,
+      "staff": staff,
+      "fees": fees, // ✅ stored as map in Firestore
     };
   }
 
-
+  factory FeePaymentModel.fromJson(Map<String, dynamic> json) {
+    return FeePaymentModel(
+      level: json["level"] ?? "",
+      yeargroup: json["yeargroup"] ?? "",
+      activityType: json["activityType"] ?? "",
+      term: json["term"] ?? "",
+      schoolId: json["schoolId"] ?? "",
+      dateCreated: (json["dateCreated"] as Timestamp).toDate(),
+      studentId: json["studentId"] ?? "",
+      studentName: json["studentName"] ?? "",
+      ledgerid: json["ledgerid"] ?? "",
+      paymentmethod: json["paymentmethod"] ?? "",
+      receivedaccount: json["receivedaccount"] ?? "",
+      note: json["note"] ?? "",
+      staff: json["staff"] ?? "",
+      fees: Map<String, double>.from(
+        json["fees"] ?? {},
+      ), // ✅ convert back to map
+    );
+  }
 }
