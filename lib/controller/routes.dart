@@ -3,29 +3,33 @@ import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
 import '../components/academicyrmodel.dart';
-import '../components/billing.dart';
 import '../components/dashboard.dart';
 
 import '../screen/academicyr.dart';
 import '../screen/acceslist.dart';
 import '../screen/accesscomponent.dart';
 import '../screen/accountChart.dart';
+import '../screen/billing.dart';
 import '../screen/class.dart';
 import '../screen/department.dart';
 
 import '../screen/entermarks.dart';
+import '../screen/feesSetup.dart';
+import '../screen/feespayment.dart';
 import '../screen/gradingsystem.dart';
 import '../screen/idformat.dart';
 import '../screen/judgeui.dart';
 
 import '../screen/levelreg.dart';
 import '../screen/multipleschools.dart';
+import '../screen/paymentMethodsForm.dart';
 import '../screen/regionreg.dart';
 import '../screen/registerschool.dart';
 import '../screen/registerstudents.dart';
 import '../screen/regstaff.dart';
 import '../screen/scoreconfig.dart';
 import '../screen/scoringhome.dart';
+import '../screen/singleBilling.dart';
 import '../screen/staffhomepage.dart';
 import '../screen/subject.dart';
 import '../screen/systemActivity.dart';
@@ -128,6 +132,10 @@ class Routes {
   static const staffhome = "/staffhome";
   static const staffscoring = "/staffscoring";
   static const entermark = "/entermark";
+  static const paymentmethods = "/paymentmethods";
+  static const feepayment = "/feepayment";
+  static const feesetup = "/feesetup";
+  static const singlebilling = "/singlebilling";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
@@ -247,10 +255,15 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.accountActivity, builder: (c, s) => SystemActivity()),
     GoRoute(path: Routes.coa, builder: (c, s) => AccountsChart()),
     GoRoute(path: Routes.staffhome, builder: (c, s) => StaffHomePage()),
+    GoRoute(path: Routes.paymentmethods, builder: (c, s) => PaymentMethodForm()),
+    GoRoute(path: Routes.feepayment, builder: (c, s) => Feepayment()),
+    GoRoute(path: Routes.feesetup, builder: (c, s) => FeesSetup()),
+    GoRoute(path: Routes.singlebilling, builder: (c, s) => SingleBilling()),
+
     GoRoute(
       path: Routes.entermark,
       builder: (context, state) {
-        final args = state.extra as Map<String, dynamic>?; // safely read extra
+        final args = state.extra as Map<String, dynamic>;
         return MarksEntryPage(args: args);
       },
     ),

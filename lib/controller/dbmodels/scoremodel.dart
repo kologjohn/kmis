@@ -1,3 +1,4 @@
+/*
 class ScoremodelConfig {
   final String? id;
   final String? staff;
@@ -43,4 +44,87 @@ class ScoremodelConfig {
 
   @override
   String toString() => "CA: $continuous%, Exam: $exam%";
+}
+*/
+class ScoremodelConfig {
+  final String? id;
+  final String? staff;
+  final String schoolId;
+  final String continuous;   // stored as string
+  final String exam;         // stored as string
+  final String minContinuous;
+  final String maxContinuous;
+  final String minExam;
+  final String maxExam;
+
+  ScoremodelConfig({
+    this.id,
+    this.staff,
+    required this.schoolId,
+    required this.continuous,
+    required this.exam,
+    required this.minContinuous,
+    required this.maxContinuous,
+    required this.minExam,
+    required this.maxExam,
+  }) {
+    // convert to doubles for validation
+    final cont = double.tryParse(continuous) ?? 0;
+    final ex = double.tryParse(exam) ?? 0;
+    final contMin = double.tryParse(minContinuous) ?? 0;
+    final contMax = double.tryParse(maxContinuous) ?? 0;
+    final exMin = double.tryParse(minExam) ?? 0;
+    final exMax = double.tryParse(maxExam) ?? 0;
+
+    // validate CA range
+    if (cont < contMin || cont > contMax) {
+      throw Exception(
+          "Continuous must be between $minContinuous and $maxContinuous");
+    }
+
+    // validate Exam range
+    if (ex < exMin || ex > exMax) {
+      throw Exception("Exam must be between $minExam and $maxExam");
+    }
+
+    // validate sum rule
+    if ((cont + ex).toStringAsFixed(2) != "100.00") {
+      throw Exception("Continuous + Exam must sum to 100");
+    }
+  }
+
+  /// Factory for Firestore documents (includes doc.id)
+  factory ScoremodelConfig.fromFirestore(Map<String, dynamic> map, String id) {
+    return ScoremodelConfig(
+      id: id,
+      staff: map['staff'],
+      schoolId: map['schoolId'] ?? "",
+      continuous: map['continuous']?.toString() ?? "0",
+      exam: map['exam']?.toString() ?? "0",
+      minContinuous: map['minContinuous']?.toString() ?? "0",
+      maxContinuous: map['maxContinuous']?.toString() ?? "0",
+      minExam: map['minExam']?.toString() ?? "0",
+      maxExam: map['maxExam']?.toString() ?? "0",
+    );
+  }
+
+  /// Convert to Map for saving
+  Map<String, dynamic> toMap() {
+    return {
+      "id": id,
+      "staff": staff,
+      "schoolId": schoolId,
+      "continuous": continuous,
+      "exam": exam,
+      "minContinuous": minContinuous,
+      "maxContinuous": maxContinuous,
+      "minExam": minExam,
+      "maxExam": maxExam,
+    };
+  }
+
+  @override
+  String toString() =>
+      "CA: $continuous% (min: $minContinuous, max: $maxContinuous), "
+          "Exam: $exam% (min: $minExam, max: $maxExam)";
 }

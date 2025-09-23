@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../controller/myprovider.dart';
 import '../controller/routes.dart';
 import 'actionbuttons.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 class StaffHomePage extends StatefulWidget {
   const StaffHomePage({super.key});
 
@@ -24,7 +24,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
           extendBodyBehindAppBar: true,
           appBar: AppBar(
             title: Text(
-              'Welcome ${provider.name}',
+              'Welcome ${provider.name}~ ${provider.auth.currentUser?.email ?? "No user"}',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -57,7 +57,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
                   return _buildMessage("No subjects assigned yet.");
                 }
 
-                // ✅ fetch subjects array directly from the document
+                //fetch subjects array directly from the document
                 final data = snapshot.data!;
                 List<dynamic> assignedSubjects = data.get('subjects') ?? [];
 

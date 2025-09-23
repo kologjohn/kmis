@@ -41,7 +41,7 @@ class LoginProvider extends ChangeNotifier {
   List<String> accountclass = [];
   List<FeeSetUpModel> fees = [];
   List<PaymentMethodModel> paymethodlist = [];
-
+  String receiptno = "";
   List<String> accountsubclass = [];
   login(String email, String password, BuildContext context) async {
     try {
@@ -272,7 +272,6 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-// inside Myprovider
   void addStudent(StudentModel student) {
     if (!selectedStudents.any((s) => s.studentid == student.studentid)) {
       selectedStudents.add(student);
@@ -310,12 +309,25 @@ class LoginProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
-
-
   void clearSelectedStudents() {
     selectedStudents.clear();
     notifyListeners();
   }
+   generatereceiptnumber()async{
+    try{
+      final now = DateTime.now();
+      final dateKey = "${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}";
+      final lastreceiptnumber= await db.collection("feepayment").where('schoolId',isEqualTo: schoolid).get();
+      String numberPart = schoolid.replaceAll(RegExp(r'[^0-9]'), '');
+      receiptno="$numberPart$dateKey${(lastreceiptnumber.docs.length + 1)}";
+      notifyListeners();
+
+    }catch(e){
+      print(e);
+    }
+     notifyListeners();
+   }
+
 
 
 

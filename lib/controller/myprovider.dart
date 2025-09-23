@@ -58,6 +58,8 @@ class Myprovider extends LoginProvider {
   bool isLoadingTeacherList = false;
   DocumentSnapshot? firstTeacherDocument;
   DocumentSnapshot? lastTeacherDocument;
+  List<ScoremodelConfig> scoreConfigList = [];
+
   Future<void> fetchterms() async {
     try {
       loadterms = true;
@@ -210,6 +212,25 @@ class Myprovider extends LoginProvider {
       print("Error fetching score config: $e");
     }
   }
+  Future<void> scoringconfig(String schoolId) async {
+    try {
+      final snapshot = await db
+          .collection("scoreconfig")
+          .where("schoolId", isEqualTo: schoolId)
+          .get();
+      scoreConfigList = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return ScoremodelConfig.fromFirestore(data, doc.id);
+      }).toList();
+      notifyListeners();
+      if (scoreConfigList.isEmpty) {
+        throw Exception("No score configuration found for school $schoolId");
+      }
+    } catch (e) {
+      throw Exception("Failed to fetch score config: $e");
+    }
+  }
+
   Future<void> getfetchRegions() async {
     try {
       isLoadingRegions = true;
@@ -883,6 +904,8 @@ class Myprovider extends LoginProvider {
           'scores': sortedScoresMap,
           'teacher': teachers[teacherId],
           'subject': subjectData['subjectName'] ?? '',
+          'term': term,
+          'academicyrid': academicyrid,
         };
       }).where((e) => e != null).cast<Map<String, dynamic>>().toList();
     } catch (e) {
@@ -892,11 +915,6 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
-
-
-
-
-
 
 
 }

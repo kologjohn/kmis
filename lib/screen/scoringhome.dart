@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../controller/myprovider.dart';
 import '../controller/routes.dart';
 import 'actionbuttons.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class StaffScoringPage extends StatefulWidget {
   final Map<String, dynamic>? args;
   const StaffScoringPage({super.key,required this.args});
@@ -16,26 +16,24 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchText = "";
   String level = "";
+  String subject = "";
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final args = GoRouterState.of(context).extra as Map<String, dynamic>?;
-      final subject = args?['subject'] ?? '';
-      final level = args?['level'] ?? '';
-
+      subject = args?['subject'] ?? '';
+      level = args?['level'] ?? '';
       final provider = Provider.of<Myprovider>(context, listen: false);
       provider.fetchStaffScoringMarks();
     });
-
     _searchController.addListener(() {
       setState(() {
         _searchText = _searchController.text.trim().toLowerCase();
       });
     });
   }
-
   @override
   void dispose() {
     _searchController.dispose();
@@ -46,8 +44,6 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.sizeOf(context).width;
     double maxWidth = 900;
-
-
     return Consumer<Myprovider>(
       builder: (BuildContext context, value, Widget? child) {
         final filteredMarks = value.marksList.where((m) {
@@ -65,9 +61,7 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
           appBar: AppBar(
             backgroundColor: const Color(0xFF2D2F45),
             foregroundColor: Colors.white,
-            title: Text(
-              "Scoring",
-              style: const TextStyle(
+            title: Text("${value.name}~${value.auth.currentUser?.email ?? "No user"}~${value.academicyrid}~${value.term}",style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -143,8 +137,22 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
                                     style: const TextStyle(color: Colors.white70),
                                   ),
                                   Text(
-                                    'Class: ${mark['classId'] ?? ''}',
+                                    'Class: ${mark['class'] ?? ''}',
                                     style: const TextStyle(color: Colors.white70),
+                                  ),
+                                  Wrap(
+                                    runSpacing: 10,
+                                    spacing: 10.0,
+                                    children: [
+                                      Text(
+                                        'subject: ${mark['subject'] ?? ''}',
+                                        style: const TextStyle(color: Colors.white70),
+                                      ),
+                                      Text(
+                                        'Year: ${mark['academicyrid'] ?? ''}',
+                                        style: const TextStyle(color: Colors.white70),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -154,7 +162,8 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
                                   extra: {
                                     "studentId": mark['studentId'],
                                     "studentName": mark['studentName'],
-                                    "classId": mark['classId'],
+                                    "class": mark['class'],
+                                    "subject": mark['subject'],
                                     "photoUrl": mark['photoUrl'],
                                     "scores": mark['scores'],
                                   },
