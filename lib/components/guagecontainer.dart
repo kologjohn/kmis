@@ -19,7 +19,15 @@ class GaugeContainer extends StatelessWidget {
       width: cwidth,
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFFffffff),
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFe8fbf0),// very light cyan
+              Colors.white,
+
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
         // boxShadow: [
         //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
         // ],

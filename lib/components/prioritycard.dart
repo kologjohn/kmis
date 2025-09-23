@@ -18,7 +18,15 @@ class PriorityDonutChart extends StatelessWidget {
             width: cwidth,
             height: 250,
             decoration: BoxDecoration(
-              color: const Color(0xFFffffff),
+                gradient: LinearGradient(
+                  colors: [
+                    // very light cyan
+                    Colors.white,
+                    Color(0xFFf0f5fe),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
               // boxShadow: const [
               //   BoxShadow(
               //       offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),

@@ -17,7 +17,15 @@ class HourMinutes extends StatelessWidget {
           width: cwidth,
           height: 250,
           decoration: BoxDecoration(
-            color: Color(0xFFffffff),
+              gradient: LinearGradient(
+                colors: [
+                  // very light cyan
+                  Colors.white,
+                  Color(0xFFe1ecfb),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              )
             // boxShadow: [
             //   BoxShadow(
             //       offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),

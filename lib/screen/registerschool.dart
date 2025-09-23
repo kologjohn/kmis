@@ -241,7 +241,6 @@ class _RegisterSchoolState extends State<RegisterSchool> {
                                   backgroundColor: Colors.green,
                                 ),
                               );
-
                               // value.imagefile = null;
 
                               // if (!isEdit) {
