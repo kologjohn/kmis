@@ -15,7 +15,15 @@ class SummaryDonutChart extends StatelessWidget {
       width: cwidth,
       height: 250,
       decoration: BoxDecoration(
-        color: Color(0xFFffffff),
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFFe8fbf0),
+              Colors.white,
+
+            ],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          )
         // boxShadow: [
         //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
         // ],
