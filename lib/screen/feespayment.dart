@@ -23,20 +23,25 @@ class _FeepaymentState extends State<Feepayment> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async{
       final provider = Provider.of<Myprovider>(context, listen: false);
       provider.getdata();
       provider.fetchterms();
       provider.fetchFess();
       provider.paymentmethodslist();
+      provider.generatereceiptnumber();
+      receiptNumberController.text = provider.receiptno;
+
+
     });
   }
 
+  final receiptNumberController = TextEditingController();
   final accountController = TextEditingController();
   final searchController = TextEditingController();
   final noteController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
+  String? receiptNumber;
   String? selectedTerm;
   String? selectedfee;
   String? selectedpaymentmethod;
@@ -65,7 +70,7 @@ class _FeepaymentState extends State<Feepayment> {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => context.go(Routes.dashboard),
                 ),
-                title: const Text(
+                title:  Text(
                   'SCHOOL FEES PAYMENT',
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 ),
@@ -83,6 +88,24 @@ class _FeepaymentState extends State<Feepayment> {
                           key: _formKey,
                           child: Column(
                             children: [
+                              TextFormField(
+                                controller: receiptNumberController,
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  labelText: "Receipt Number",
+                                  suffixIcon: IconButton(
+                                    icon: const Icon(Icons.refresh),
+                                    onPressed: () {
+                                      value.generatereceiptnumber(); // call provider method
+                                      receiptNumberController.text = value.receiptno; // update field
+                                    },
+                                  ),
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+
+                              const SizedBox(height: 10),
+
                               TextField(
                                 controller: searchController,
                                 decoration: InputDecoration(
@@ -168,7 +191,6 @@ class _FeepaymentState extends State<Feepayment> {
 
                               const SizedBox(height: 20),
 
-                              // 💰 Amount field
                               TextFormField(
                                 inputFormatters: [
                                   FilteringTextInputFormatter.allow(
@@ -208,15 +230,12 @@ class _FeepaymentState extends State<Feepayment> {
                                 validatorMsg: 'Select Payment Method',
                               ),
 
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 10),
 
-                              // 🔗 Linked Accounts dropdown
                               if (value.linkedAccounts.isNotEmpty)
                                 buildDropdown(
                                   value: selectedLinkedAccount,
-                                  items: value.linkedAccounts
-                                      .map((acc) => acc["name"]!)
-                                      .toList(),
+                                  items: value.linkedAccounts.map((acc) => acc["name"]!).toList(),
                                   label: "Receiving Account",
                                   fillColor: inputFill,
                                   onChanged: (v) {
@@ -227,26 +246,11 @@ class _FeepaymentState extends State<Feepayment> {
                                   validatorMsg: "Select Receiving Account",
                                 ),
                               if (value.linkedAccounts.isNotEmpty)
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 10),
+                              buildDropdown(value: selectedfee, items: value.fees.map((e) => e.name).toList(), label: "FEES", fillColor: inputFill, onChanged: (v) => setState(() => selectedfee = v), validatorMsg: 'Select Fees'),
+                              const SizedBox(height: 10),
 
-
-                              buildDropdown(
-                                value: selectedfee,
-                                items: value.fees.map((e) => e.name).toList(),
-                                label: "FEES",
-                                fillColor: inputFill,
-                                onChanged: (v) =>
-                                    setState(() => selectedfee = v),
-                                validatorMsg: 'Select Fees',
-                              ),
-                              const SizedBox(height: 20),
-
-                              buildDropdown(
-                                value: selectedTerm,
-                                items: value.terms.map((e) => e.name).toList(),
-                                label: "Term",
-                                fillColor: inputFill,
-                                onChanged: (v) {
+                              buildDropdown(value: selectedTerm, items: value.terms.map((e) => e.name).toList(), label: "Term", fillColor: inputFill, onChanged: (v) {
                                   String nn="Being $selectedfee payment  for  $v term".toString();
                                    noteController.text=nn;
                                   setState(() => selectedTerm = v);
@@ -290,31 +294,11 @@ class _FeepaymentState extends State<Feepayment> {
 
                                       for (var student
                                       in value.selectedStudents) {
-                                        String yearGroup = student.yeargroup;
-                                        String department = student.department;
-                                        String Level = student.level;
-                                        String sid = student.studentid;
-
-                                        String ids =
-                                            "single-${value.schoolid}$yearGroup$selectedTerm$department$Level$selectedfee$sid";
-                                        String id = ids
-                                            .replaceAll(RegExp(r'\s+'), '')
-                                            .toLowerCase();
-
-                                        final dataexist = await value.db
-                                            .collection("feepayment")
-                                            .doc(id)
-                                            .get();
+                                        String id =receiptNumberController.text.trim().toString();
+                                        final dataexist = await value.db.collection("feepayment").doc(id).get();
 
                                         if (dataexist.exists) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  "${student.name} already billed for $selectedfee"),
-                                              backgroundColor: Colors.orange,
-                                            ),
-                                          );
+                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Receipt Number ${id} has been issued already "), backgroundColor: Colors.orange,));
                                           progress.dismiss();
                                           return;
                                         }
