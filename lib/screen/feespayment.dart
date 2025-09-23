@@ -31,8 +31,6 @@ class _FeepaymentState extends State<Feepayment> {
       provider.paymentmethodslist();
       provider.generatereceiptnumber();
       receiptNumberController.text = provider.receiptno;
-
-
     });
   }
 
@@ -214,7 +212,7 @@ class _FeepaymentState extends State<Feepayment> {
 
                               buildDropdown(value: selectedpaymentmethod != null && value.paymethodlist.any((e) => e.name == selectedpaymentmethod)
                                     ? selectedpaymentmethod
-                                    : null, // ✅ only set if it's in the list
+                                    : null,
                                 items: value.paymethodlist.map((e) => e.name).toList(),
                                 label: "Payment Method",
                                 fillColor: inputFill,
@@ -233,19 +231,15 @@ class _FeepaymentState extends State<Feepayment> {
                               const SizedBox(height: 10),
 
                               if (value.linkedAccounts.isNotEmpty)
-                                buildDropdown(
-                                  value: selectedLinkedAccount,
-                                  items: value.linkedAccounts.map((acc) => acc["name"]!).toList(),
-                                  label: "Receiving Account",
-                                  fillColor: inputFill,
-                                  onChanged: (v) {
-                                    setState(() {
+                                buildDropdown(value: selectedLinkedAccount, items: value.linkedAccounts.map((acc) => acc["name"]!).toList(), label: "Receiving Account", fillColor: inputFill, onChanged: (v) {
+                                  setState(() {
                                       selectedLinkedAccount = v;
                                     });
                                   },
                                   validatorMsg: "Select Receiving Account",
                                 ),
                               if (value.linkedAccounts.isNotEmpty)
+
                                 const SizedBox(height: 10),
                               buildDropdown(value: selectedfee, items: value.fees.map((e) => e.name).toList(), label: "FEES", fillColor: inputFill, onChanged: (v) => setState(() => selectedfee = v), validatorMsg: 'Select Fees'),
                               const SizedBox(height: 10),
@@ -254,7 +248,6 @@ class _FeepaymentState extends State<Feepayment> {
                                   String nn="Being $selectedfee payment  for  $v term".toString();
                                    noteController.text=nn;
                                   setState(() => selectedTerm = v);
-
                                 },
                                 validatorMsg: "Select Term",
                               ),
@@ -271,7 +264,6 @@ class _FeepaymentState extends State<Feepayment> {
                                     ? "Note is required"
                                     : null,
                               ),
-
                               const SizedBox(height: 20),
 
                               ElevatedButton.icon(
@@ -298,20 +290,51 @@ class _FeepaymentState extends State<Feepayment> {
                                         final dataexist = await value.db.collection("feepayment").doc(id).get();
 
                                         if (dataexist.exists) {
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Receipt Number ${id} has been issued already "), backgroundColor: Colors.orange,));
+                                          final existingData = dataexist.data() as Map<String, dynamic>;
+                                          final existingFees = Map<String, dynamic>.from(existingData["fees"] ?? {});
+                                          // Only add if fee does not already exist
+                                          if (!existingFees.containsKey(selectedfee)) {
+                                            existingFees[selectedfee.toString()] = double.tryParse(amount) ?? 0;
+                                            await value.db.collection("feepayment").doc(id).update({"fees": existingFees});
+                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fee '${selectedfee}' added to Receipt $id"), backgroundColor: Colors.green,));
+                                          } else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text("Fee '$selectedfee' already exists in Receipt $id"),
+                                                backgroundColor: Colors.orange,
+                                              ),
+                                            );
+                                          }
+
                                           progress.dismiss();
                                           return;
                                         }
 
+
+                                        // final data = FeePaymentModel(
+                                        //   level: student.level,
+                                        //   yeargroup: student.yeargroup,
+                                        //   amount: amount,
+                                        //   activityType: "Fee Payment",
+                                        //   term: selectedTerm.toString(),
+                                        //   schoolId: value.schoolid,
+                                        //   dateCreated: DateTime.now(),
+                                        //   feeName: selectedfee.toString(),
+                                        //   studentId: student.studentid,
+                                        //   studentName: student.name ?? "",
+                                        //   ledgerid: id,
+                                        //   paymentmethod: selectedpaymentmethod ?? '',
+                                        //   receivedaccount: selectedLinkedAccount ?? '',
+                                        //   note: note,
+                                        //   staff: value.name,
+                                        // ).toJson();
                                         final data = FeePaymentModel(
                                           level: student.level,
                                           yeargroup: student.yeargroup,
-                                          amount: amount,
                                           activityType: "Fee Payment",
                                           term: selectedTerm.toString(),
                                           schoolId: value.schoolid,
                                           dateCreated: DateTime.now(),
-                                          feeName: selectedfee.toString(),
                                           studentId: student.studentid,
                                           studentName: student.name ?? "",
                                           ledgerid: id,
@@ -319,7 +342,12 @@ class _FeepaymentState extends State<Feepayment> {
                                           receivedaccount: selectedLinkedAccount ?? '',
                                           note: note,
                                           staff: value.name,
+                                          fees: {
+                                            selectedfee.toString(): double.tryParse(amount) ?? 0,
+                                          }, // ✅ add first fee
                                         ).toJson();
+
+                                        //await docRef.set(data);
 
                                         await value.db.collection("feepayment").doc(id).set(data);
                                       }
