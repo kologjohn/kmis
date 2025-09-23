@@ -221,13 +221,13 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.85),
                     borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
+                    // boxShadow: [
+                    //   BoxShadow(
+                    //     color: Colors.grey.withOpacity(0.1),
+                    //     blurRadius: 8,
+                    //     offset: Offset(0, 2),
+                    //   ),
+                    //],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -249,7 +249,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                   ),
                 ),
                 const SizedBox(height: 18),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: CarouselSlider(
                     options: CarouselOptions(
@@ -268,14 +268,14 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                             width: double.infinity,
                             margin: const EdgeInsets.symmetric(horizontal: 0),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(18),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  blurRadius: 10,
-                                  offset: Offset(0, 2),
-                                ),
-                              ],
+                              //borderRadius: BorderRadius.circular(18),
+                              // boxShadow: [
+                              //   BoxShadow(
+                              //     color: Colors.grey.withOpacity(0.2),
+                              //     blurRadius: 10,
+                              //     offset: Offset(0, 2),
+                              //   ),
+                              // ],
                               image: DecorationImage(
                                 image: AssetImage(imgPath),
                                 fit: BoxFit.cover,
@@ -359,15 +359,15 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                       horizontal: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.85),
-                      borderRadius: BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.1),
-                          blurRadius: 6,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
+                      //color: Colors.white.withOpacity(0.85),
+                      // borderRadius: BorderRadius.circular(10),
+                      // boxShadow: [
+                      //   BoxShadow(
+                      //     color: Colors.grey.withOpacity(0.1),
+                      //     blurRadius: 6,
+                      //     offset: Offset(0, 2),
+                      //   ),
+                      // ],
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -444,7 +444,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
           left: 5.0,
         ),
         child: Container(
-          decoration: BoxDecoration(color: const Color(0xFFFDFEFF)),
+          decoration: BoxDecoration(color: const Color(0xFFffffff)),
           child: LayoutBuilder(
             builder: (context, constraints) {
               return ProgressHUD(
@@ -855,8 +855,6 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
                                         alignment: Alignment.centerRight,
                                         child: InkWell(
                                           onTap: () async{
-
-
                                             // Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordPage()));
                                           },
                                           child: const Text('Forgot password?', style: TextStyle(fontSize: 14)),
@@ -975,6 +973,7 @@ class _SpacerSignUpPageState extends State<SpacerSignUpPage> {
           ),
         ],
       ),
+      backgroundColor: Color(0xFFffffff),
       body: isMobile
           ? Column(
         children: [
