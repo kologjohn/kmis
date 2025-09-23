@@ -4,6 +4,7 @@ import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
 import 'package:ksoftsms/screen/accountChart.dart';
 import 'package:ksoftsms/screen/feesSetup.dart';
 import 'package:ksoftsms/screen/feespayment.dart';
+import 'package:ksoftsms/screen/receipt.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
 import 'package:ksoftsms/screen/singleBilling.dart';
@@ -160,7 +161,7 @@ final GoRouter router = GoRouter(
     return LevelListScreen(levelData: level);
     },),
     GoRoute(path: Routes.dashboard, builder: (c, s) => DashboardLayout()),
-    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
+    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolReceipt()),
     GoRoute(path: Routes.jscore, builder: (c, s) => JudgeGroundScreen()),
     GoRoute(
       path: Routes.term,

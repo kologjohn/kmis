@@ -29,7 +29,7 @@ class _SchoolReceiptState extends State<SchoolReceipt> {
                         Container(
                           height: 60,
                           width: 60,
-                          color: Color(0xFF00273a),
+                          color: Color(0xFF00496d),
                           child: const Center(
                             child: Text(
                               "Logo",
@@ -67,15 +67,16 @@ class _SchoolReceiptState extends State<SchoolReceipt> {
                     const SizedBox(height: 20),
                     Container(
                       height: 30,
-                      color: Color(0xFF00273a),
+                      color: Color(0xFF00496d),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 60),
                     const Center(
                       child: Text(
                         "School Fees Receipt",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          color: Color(0xFF00496d)
                         ),
                       ),
                     ),
@@ -109,7 +110,7 @@ class _SchoolReceiptState extends State<SchoolReceipt> {
                         ),
                       ],
                     ),
-                    const Divider(height: 40),
+                    const Divider(height: 40, color: Color(0xFF00496d),),
 
                     Row(
                       children: [
@@ -122,13 +123,13 @@ class _SchoolReceiptState extends State<SchoolReceipt> {
                                 style: TextStyle(fontWeight: FontWeight.bold),
                                 children: [
                                   TextSpan(
-                                    text: "Yinbey Junior",
+                                    text: "Yambalga Joseph Yinbey",
                                     style: TextStyle(fontWeight: FontWeight.normal),
                                   ),
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 8),
                             const Text.rich(
                               TextSpan(
                                 text: "Payment Type: ",
@@ -141,7 +142,7 @@ class _SchoolReceiptState extends State<SchoolReceipt> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 8),
                             const Text.rich(
                               TextSpan(
                                 text: "Payment for: ",
@@ -169,21 +170,25 @@ class _SchoolReceiptState extends State<SchoolReceipt> {
                         TableRow(
                           decoration: BoxDecoration(color: Colors.grey.shade200),
                           children: const [
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text("Description",
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                            Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text("Description",
+                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
                             ),
-                            Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text("Amount (USD)",
-                                  style: TextStyle(fontWeight: FontWeight.bold)),
+                            Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text("Amount (GHC)",
+                                    style: TextStyle(fontWeight: FontWeight.bold)),
+                              ),
                             ),
                           ],
                         ),
-                        tableRow("Tuition Fee (Spring 2050)", "\$2,500.00"),
-                        tableRow("Activity Fee", "\$150.00"),
-                        tableRow("Library Fee", "\$50.00"),
+                        tableRow("School Fee (First Term 2025)", "2,500.00"),
+                        tableRow("Library Fee", "150.00"),
+                        tableRow("Sports Fee", "50.00"),
                         TableRow(
                           decoration: BoxDecoration(color: Colors.grey.shade100),
                           children: const [
@@ -194,13 +199,59 @@ class _SchoolReceiptState extends State<SchoolReceipt> {
                             ),
                             Padding(
                               padding: EdgeInsets.all(8.0),
-                              child: Text("\$2,700.00",
+                              child: Text("2,700.00",
                                   style: TextStyle(fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
                       ],
                     ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text.rich(
+                              TextSpan(
+                                text: "Payment Method: ",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                children: [
+                                  TextSpan(
+                                    text: "Credit Card",
+                                    style: TextStyle(fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            const Text.rich(
+                              TextSpan(
+                                text: "Payment Date: ",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                children: [
+                                  TextSpan(
+                                    text: "January 15, 2050",
+                                    style: TextStyle(fontWeight: FontWeight.normal),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Thank you for your payment. For any further inquiries, please contact us at info@kologsoft.com or call 0553354349.",
+                          style: TextStyle(fontSize: 13),
+                        ),
+                      ],
+                    )
                   ],
                 ),
               ),
