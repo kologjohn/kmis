@@ -53,6 +53,7 @@ class Myprovider extends LoginProvider {
   bool loadacademicyear =false;
   XFile? imagefile;
   String imageUrl = "";
+  int studentcount_in_school = 0;
   Future<void> fetchterms() async {
     try {
       loadterms = true;
@@ -157,7 +158,6 @@ class Myprovider extends LoginProvider {
         return Staff.fromMap(data, doc.id);
       }).toList();
       loadstaff = false;
-      print(stafflist);
       notifyListeners();
     } catch (e) {
       print("Error fetching staff: $e");
@@ -231,6 +231,7 @@ class Myprovider extends LoginProvider {
           regionname: data['name'] ?? '',
           schoolId: data['schoolId'] ?? '',
           time: parsedTime ?? DateTime.now(),
+          staff: data['staff'] ?? '',
         );
       }).toList();
 
@@ -275,11 +276,10 @@ class Myprovider extends LoginProvider {
   Future<void> fetchomponents() async {
     isloadcomponents = true;
     notifyListeners();
-
     try {
       final snapshot = await db
           .collection("assesscomponent")
-          .orderBy("timestamp", descending: true)
+          .orderBy("dateCreated", descending: true)
           .get();
 
       accessComponents = snapshot.docs.map((doc) {
@@ -296,15 +296,33 @@ class Myprovider extends LoginProvider {
     isloadcomponents = false;
     notifyListeners();
   }
+  Future<Map<String, dynamic>> getIdFormat(String schoolId) async {
+    final query = await db.collection('idformats').where('schoolId', isEqualTo: schoolId).limit(1).get();
+    if (query.docs.isEmpty) {
+      throw Exception("No ID format found for school $schoolId");
+    }
+    final data = query.docs.first.data() as Map<String, dynamic>;
+    String name = data['name'] as String;
+    int lastNumber = (data['lastnumber'] ?? 0) as int;
+    return {
+      "name": name,
+      "lastnumber": lastNumber,
+    };
+  }
   Future<void> saveTeacherSetupMulti({
     required List<String> teacherIds,
     required String schoolId,
     required String academicYear,
     required String term,
+    required String classes,
     required List<DepartmentModel> levels,
     required List<SubjectModel> subjects,
     required List<ComponentModel> components,
-  }) async {savingSetup = true;   notifyListeners();    const int _batchLimit = 450;
+  }) async {
+    savingSetup = true;
+    notifyListeners();
+    const int _batchLimit = 450;
+
     try {
       if (teacherIds.isEmpty) throw Exception("No teachers selected.");
       if (levels.isEmpty) throw Exception("No levels selected.");
@@ -312,7 +330,85 @@ class Myprovider extends LoginProvider {
       if (academicYear.trim().isEmpty || term.trim().isEmpty) {
         throw Exception("Academic year and term are required.");
       }
-      //STEP 1: Save TeacherSetup docs
+
+      // STEP 1: Create SubjectScoring docs (one per student per term)
+          {
+        int writes = 0;
+        WriteBatch batch = db.batch();
+
+        for (final level in levels) {
+          final studentSnap = await db
+              .collection("students")
+              .where("schoolId", isEqualTo: schoolId)
+              .where("department", isEqualTo: level.name)
+              .where("level", isEqualTo: classes)
+              .get();
+
+          if (studentSnap.docs.isEmpty) continue;
+
+          for (final studentDoc in studentSnap.docs) {
+            final studentData = studentDoc.data() as Map<String, dynamic>;
+            final studentId = studentDoc.id;
+            final studentName = studentData['name'] ?? '';
+            final region = studentData['region'] ?? '';
+            final photoUrl = studentData['photoUrl'] ?? '';
+
+            // ✅ one doc per student per academic year + term
+            final scoringId = "${studentId}_${academicYear}_${term}";
+            final scoringRef = db.collection("subjectScoring").doc(scoringId);
+
+            // build subjects array
+            final List<Map<String, dynamic>> subjectEntries = subjects.map((s) {
+              final Map<String, String> initialScores = {
+                for (var c in components) c.name: "0"
+              };
+
+              final criteriaTotal = components.fold<int>(
+                0,
+                    (sum, c) => sum + int.tryParse(c.totalMark)!,
+              ).toString();
+
+              return {
+                "subjectId": s.id,
+                "subjectName": s.name,
+                "criteriatotal": criteriaTotal,
+                "scores": initialScores,
+                "status": "pending",
+                "totalScore": "0",
+                "grade": "",
+                "remark": "",
+                "timestamp": DateTime.now(),
+              };
+            }).toList();
+
+            final scoringData = {
+              "studentId": studentId,
+              "studentName": studentName,
+              "academicYear": academicYear,
+              "term": term,
+              "level": level.name,
+              "region": region,
+              "schoolId": schoolId,
+              "photoUrl": photoUrl,
+              "subjects": subjectEntries, // ✅ all subjects stored here
+              "createdAt": FieldValue.serverTimestamp(),
+            };
+
+            batch.set(scoringRef, scoringData, SetOptions(merge: true));
+
+            writes++;
+            if (writes >= _batchLimit) {
+              await batch.commit();
+              batch = db.batch();
+              writes = 0;
+            }
+          }
+        }
+
+        if (writes > 0) await batch.commit();
+      }
+
+      // STEP 2: Save TeacherSetup docs
           {
         int writes = 0;
         WriteBatch batch = db.batch();
@@ -322,15 +418,17 @@ class Myprovider extends LoginProvider {
 
           final teacherSetup = TeacherSetup(
             staffid: teacherId,
-            staffname: "",
+            staffname: name,
+            classname: classes,
             schoolId: schoolId,
             academicyear: academicYear,
             term: term,
-            levels: levels,
-            subjects: subjects,
+            levels: levels,     // all levels selected
+            subjects: subjects, // all subjects selected
           );
 
-          final teacherSetupRef = db.collection("teacherSetup").doc(teacherSetupId);
+          final teacherSetupRef =
+          db.collection("teacherSetup").doc(teacherSetupId);
 
           batch.set(
             teacherSetupRef,
@@ -348,55 +446,6 @@ class Myprovider extends LoginProvider {
 
         if (writes > 0) await batch.commit();
       }
-
-      // STEP Create SubjectScoring docs for each student/subject
-          {
-        int writes = 0;
-        WriteBatch batch = db.batch();
-
-        for (final level in levels) {
-          final studentSnap = await db.collection("students").where("schoolId", isEqualTo: schoolId).where("level", isEqualTo: level.name).get();
-          if (studentSnap.docs.isEmpty) continue;
-          for (final studentDoc in studentSnap.docs) {
-            final studentData = studentDoc.data() as Map<String, dynamic>;
-            final studentId = studentDoc.id;
-            final studentName = studentData['name'] ?? '';
-            final region = studentData['region'] ?? '';
-            final photoUrl = studentData['photoUrl'] ?? '';
-            for (final subject in subjects) {
-              final scoring = SubjectScoring.create(
-                studentId: studentId,
-                studentName: studentName,
-                academicYear: academicYear,
-                term: term,
-                level: level.name,
-                region: region,
-                schoolId: schoolId,
-                photoUrl: photoUrl,
-                subjectId: subject.id,
-                components: components,
-              );
-
-              final scoringRef = db.collection("subjectScoring").doc(scoring.id);
-
-              batch.set(
-                scoringRef,
-                scoring.toJson(),
-                SetOptions(merge: true),
-              );
-
-              writes++;
-              if (writes >= _batchLimit) {
-                await batch.commit();
-                batch = db.batch();
-                writes = 0;
-              }
-            }
-          }
-        }
-
-        if (writes > 0) await batch.commit();
-      }
     } catch (e, stack) {
       debugPrint("Error in saveTeacherSetupMulti: $e");
       debugPrintStack(stackTrace: stack);
@@ -406,6 +455,7 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
+
   pickImageFromGallery(BuildContext context) async {
     try {
       final XFile? selectedImage = await ImagePicker().pickImage(

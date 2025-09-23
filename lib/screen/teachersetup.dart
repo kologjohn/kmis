@@ -5,18 +5,16 @@ import 'package:provider/provider.dart';
 import '../controller/myprovider.dart';
 import '../controller/dbmodels/componentmodel.dart';
 import '../controller/dbmodels/subjectmodel.dart';
-
 import '../controller/dbmodels/staffmodel.dart';
-
+import '../controller/routes.dart';
 import 'dropdown.dart';
 
-/// Multi-select  model
+/// Multi-select model
 class MultiSelectItem<T> {
   final T value;
   final String label;
   MultiSelectItem({required this.value, required this.label});
 }
-
 class MultiSelectField<T> extends StatelessWidget {
   final String label;
   final List<MultiSelectItem<T>> items;
@@ -41,7 +39,7 @@ class MultiSelectField<T> extends StatelessWidget {
         return StatefulBuilder(
           builder: (ctx2, setStateDialog) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF00496d),
+              backgroundColor: const Color(0xFF2D2F45),
               title: Text(label, style: const TextStyle(color: Colors.white)),
               content: SingleChildScrollView(
                 child: Column(
@@ -68,8 +66,7 @@ class MultiSelectField<T> extends StatelessWidget {
               ),
               actions: [
                 TextButton(
-                  child:
-                  const Text("Cancel", style: TextStyle(color: Colors.red)),
+                  child: const Text("Cancel", style: TextStyle(color: Colors.red)),
                   onPressed: () => Navigator.pop(ctx),
                 ),
                 ElevatedButton(
@@ -99,9 +96,9 @@ class MultiSelectField<T> extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         decoration: BoxDecoration(
-          color:  Color(0xFFffffff),
+          color: const Color(0xFF2D2F45),
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Color(0xFF00496d)),
+          border: Border.all(color: Colors.white24),
         ),
         child: Row(
           children: [
@@ -110,11 +107,11 @@ class MultiSelectField<T> extends StatelessWidget {
                 selectedLabels.isNotEmpty
                     ? selectedLabels.join(", ")
                     : (hintText.isNotEmpty ? hintText : "Select $label"),
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color: Colors.white70),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down, color: Colors.black54),
+            const Icon(Icons.arrow_drop_down, color: Colors.white70),
           ],
         ),
       ),
@@ -135,11 +132,9 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
 
   List<String> selectedSubjects = [];
   List<String> selectedLevels = [];
-  List<Map<String, dynamic>> selectedComponents = [];
+  List<ComponentModel> selectedComponents = [];
   List<String> selectedTeachers = [];
-  String? academicYear;
-  String? term;
-
+  String? _selectclass;
   @override
   void initState() {
     super.initState();
@@ -149,24 +144,20 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
       provider.fetchdepart();
       provider.fetchsubjects();
       provider.fetchstaff();
+      provider.fetchclass();
     });
   }
-  int get totalSelectedMarks {
-    return selectedComponents.fold(
-      0,
-          (sum, comp) =>
-      sum + (int.tryParse(comp['totalmark']?.toString() ?? "0") ?? 0),
-    );
-  }
+
   ButtonStyle _btnStyle() {
     return ElevatedButton.styleFrom(
-      backgroundColor: Color(0xFF00496d),
+      backgroundColor: Colors.blueAccent,
       foregroundColor: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
       textStyle: const TextStyle(fontSize: 16),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
     );
   }
+
   void _showMsg(BuildContext ctx, String msg, bool isError) {
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(
@@ -178,6 +169,7 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
 
   @override
   Widget build(BuildContext context) {
+    final inputFill = const Color(0xFF2C2C3C);
     return Consumer<Myprovider>(
       builder: (context, value, child) {
         final subjectItems = value.subjectList
@@ -197,165 +189,177 @@ class _TeacherSetupPageState extends State<TeacherSetupPage> {
 
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: const Color(0xFF00273a),
+            backgroundColor: const Color(0xFF2D2F45),
             title: const Text("Teacher Setup (Multi)",
                 style: TextStyle(color: Colors.white)),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () => context.go(Routes.dashboard),
+            ),
           ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                color: const Color(0xFFffffff),
-                margin: const EdgeInsets.all(30.0),
-                constraints: const BoxConstraints(maxWidth: 600),
-                child: Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      children: [
-
-                        // Teachers
-                        MultiSelectField<String>(
-                          label: "Teachers",
-                          items: teacherItems,
-                          selectedValues: selectedTeachers,
-                          hintText: "Select Teachers",
-                          onConfirm: (val) {
-                            setState(() => selectedTeachers = val);
-                          },
-                        ),
-                        const SizedBox(height: 15),
-
-                        //Subjects
-                        MultiSelectField<String>(
-                          label: "Subjects",
-                          items: subjectItems,
-                          selectedValues: selectedSubjects,
-                          hintText: "Select Subjects",
-                          onConfirm: (val) {
-                            setState(() => selectedSubjects = val);
-                          },
-                        ),
-                        const SizedBox(height: 15),
-
-                        // Levels
-                        MultiSelectField<String>(
-                          label: "Levels",
-                          items: levelItems,
-                          selectedValues: selectedLevels,
-                          hintText: "Select Levels",
-                          onConfirm: (val) {
-                            setState(() => selectedLevels = val);
-                          },
-                        ),
-                        const SizedBox(height: 15),
-
-                        // Components
-                        Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: value.accessComponents.map((comp) {
-                            bool isSelected = selectedComponents.contains(comp);
-                            return ChoiceChip(
-                              label: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(comp.name ?? '',
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 13)),
-                                  Text("Mark: ${comp.totalMark}",
-                                      style: const TextStyle(
-                                          color: Colors.yellowAccent, fontSize: 11)),
-                                ],
-                              ),
-                              selected: isSelected,
-                              selectedColor: Colors.blueAccent,
-                              backgroundColor: const Color(0xFF00496d),
-                              onSelected: (sel) {
-                                setState(() {
-                                  if (sel) {
-                                    selectedComponents.add(comp as Map<String, dynamic>);
-                                  } else {
-                                    selectedComponents.remove(comp);
-                                  }
-                                });
-                              },
-                            );
-                          }).toList(),
-                        ),
-                        const SizedBox(height: 20),
-                        if (selectedComponents.isNotEmpty)
-                          Text("Total Marks: $totalSelectedMarks",
-                              style: const TextStyle(
-                                  color: Colors.greenAccent,
-                                  fontWeight: FontWeight.bold)),
-
-                        const SizedBox(height: 30),
-
-                        // Save
-                        ElevatedButton.icon(
-                          onPressed: value.savingSetup
-                              ? null
-                              : () async {
-                            if ([academicYear, term].contains(null) ||
-                                selectedTeachers.isEmpty ||
-                                selectedSubjects.isEmpty ||
-                                selectedLevels.isEmpty ||
-                                selectedComponents.isEmpty) {
-                              _showMsg(context, "Fill all fields", true);
-                              return;
-                            }
-
-                            try {
-                              value.savingSetup = true;
-                              await value.saveTeacherSetupMulti(
-                                teacherIds: selectedTeachers,
-                                schoolId: value.schoolid!,
-                                academicYear: academicYear!,
-                                term: term!,
-                                levels: value.departments
-                                    .where(
-                                        (lvl) => selectedLevels.contains(lvl.id))
-                                    .toList(),
-                                subjects: value.subjectList
-                                    .where(
-                                        (s) => selectedSubjects.contains(s.id))
-                                    .toList(),
-                                components: selectedComponents
-                                    .map((c) => ComponentModel.fromMap(c))
-                                    .toList(),
-                              );
-                              _showMsg(context, "Setup saved", false);
-                            } catch (e) {
-                              _showMsg(context, "Error: $e", true);
-                            } finally {
-                              value.savingSetup = false;
-                            }
-                          },
-                          icon: value.savingSetup
-                              ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white))
-                              : const Icon(Icons.save),
-                          label: Text(value.savingSetup
-                              ? "Saving..."
-                              : "Save Teacher Setup"),
-                          style: _btnStyle(),
-                        ),
-
-                      ],
-                    ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  ChoiceChip(
+                    label: Text("${value.year } - ${value.term}"),
+                    selected: true,
+                    selectedColor: Colors.blueAccent,
+                    labelStyle: const TextStyle(color: Colors.white),
+                    onSelected: (_) {},
                   ),
-                ),
+                  const SizedBox(height: 15),
+                  // Teachers
+                  MultiSelectField<String>(
+                    label: "Teachers",
+                    items: teacherItems,
+                    selectedValues: selectedTeachers,
+                    hintText: "Select Teachers",
+                    onConfirm: (val) {
+                      setState(() => selectedTeachers = val);
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  // Subjects
+                  MultiSelectField<String>(
+                    label: "Subjects",
+                    items: subjectItems,
+                    selectedValues: selectedSubjects,
+                    hintText: "Select Subjects",
+                    onConfirm: (val) {
+                      setState(() => selectedSubjects = val);
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  // Levels
+                  MultiSelectField<String>(
+                    label: "Levels",
+                    items: levelItems,
+                    selectedValues: selectedLevels,
+                    hintText: "Select Levels",
+                    onConfirm: (val) {
+                      setState(() => selectedLevels = val);
+                    },
+                  ),
+                  const SizedBox(height: 15),
+                  DropdownButtonFormField<String>(
+                    value: _selectclass,
+                    items: value.classdata.map((cat) {
+                      return DropdownMenuItem(
+                        value: cat.name,
+                        child: Text(cat.name, style: const TextStyle(color: Colors.white)),
+                      );
+                    }).toList(),
+                    dropdownColor: inputFill,
+                    onChanged: (val) => setState(() => _selectclass = val),
+                    decoration: _inputDecoration("class", null, inputFill),
+                    validator: (value) => value == null ? 'Please select class' : null,
+                  ),
+                  // Components (CA, Exams, etc.)
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: value.accessComponents.map((comp) {
+                      final isSelected = selectedComponents.contains(comp);
+                      return ChoiceChip(
+                        label: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(comp.name,
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 13)),
+                            Text("Mark: ${comp.totalMark}",
+                                style: const TextStyle(
+                                    color: Colors.yellowAccent, fontSize: 11)),
+                          ],
+                        ),
+                        selected: isSelected,
+                        selectedColor: Colors.blueAccent,
+                        backgroundColor: const Color(0xFF2D2F45),
+                        onSelected: (sel) {
+                          setState(() {
+                            if (sel) {
+                              selectedComponents.add(comp);
+                            } else {
+                              selectedComponents.remove(comp);
+                            }
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 30),
+
+                  // Save Button
+                  ElevatedButton.icon(
+                    onPressed: value.savingSetup
+                        ? null: () async {
+                      if ( selectedTeachers.isEmpty ||
+                          selectedSubjects.isEmpty ||
+                          selectedLevels.isEmpty ||
+                          selectedComponents.isEmpty) {
+                        _showMsg(context, "Fill all fields", true);
+                        return;
+                      }
+
+                      try {
+                        value.savingSetup = true;
+                        await value.saveTeacherSetupMulti(
+                          teacherIds: selectedTeachers,
+                          schoolId: value.schoolid,
+                          academicYear: value.year,
+                          term: value.term,
+                          levels: value.departments
+                              .where(
+                                  (lvl) => selectedLevels.contains(lvl.id))
+                              .toList(),
+                          subjects: value.subjectList
+                              .where((s) =>
+                              selectedSubjects.contains(s.id))
+                              .toList(),
+                          components: selectedComponents,
+                          classes: _selectclass!,
+                        );
+                        _showMsg(context, "Setup saved", false);
+                      } catch (e) {
+                        _showMsg(context, "Error: $e", true);
+                      } finally {
+                        value.savingSetup = false;
+                      }
+                    },
+                    icon: value.savingSetup
+                        ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.save),
+                    label: Text(
+                        value.savingSetup ? "Saving..." : "Save Teacher Setup"),
+                    style: _btnStyle(),
+                  ),
+                ],
               ),
             ),
           ),
         );
       },
+    );
+  }
+  InputDecoration _inputDecoration(String label, String? hint, Color fill) {
+    return InputDecoration(
+      labelText: label,
+      hintText: hint,
+      labelStyle: const TextStyle(color: Colors.white),
+      hintStyle: const TextStyle(color: Colors.grey),
+      border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[700]!)),
+      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey[700]!)),
+      focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: Colors.blueAccent)),
+      contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+      filled: true,
+      fillColor: fill,
     );
   }
 }

@@ -27,11 +27,9 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
     examController =
         TextEditingController(text: widget.config?.exam.toString() ?? '');
   }
-
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.config != null;
-
     return ProgressHUD(
       child: Builder(
         builder: (context) {
@@ -39,7 +37,7 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
             builder: (context, provider, _) {
               return Scaffold(
                 appBar: AppBar(
-                  backgroundColor: const Color(0xFF00273a),
+                  backgroundColor: const Color(0xFF2D2F45),
                   title: Text(
                     isEdit ? "Edit Score Config" : "New Score Config",
                     style: const TextStyle(color: Colors.white),
@@ -50,11 +48,11 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      color: const Color(0xFFffffff),
+                      color: const Color(0xFF2D2F45),
                       margin: const EdgeInsets.all(30.0),
-                      constraints: const BoxConstraints(maxWidth: 600),
+                      constraints: const BoxConstraints(maxWidth: 800),
                       child: Padding(
-                        padding: const EdgeInsets.all(30.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -64,13 +62,7 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                 decoration: const InputDecoration(
                                   labelText: "Continuous (%)",
                                   hintText: "Enter continuous score",
-                                  //labelStyle: TextStyle(color: Colors.white),
-                                  labelStyle: TextStyle(color: Colors.black54, fontSize: 12),
-                                  hintStyle: TextStyle(color: Colors.black54, fontSize: 12),
-                                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
-                                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                  labelStyle: TextStyle(color: Colors.white),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -91,13 +83,7 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                 decoration: const InputDecoration(
                                   labelText: "Exam (%)",
                                   hintText: "Enter exam score",
-                                  //labelStyle: TextStyle(color: Colors.white),
-                                  labelStyle: TextStyle(color: Colors.black54, fontSize: 12),
-                                  hintStyle: TextStyle(color: Colors.black54, fontSize: 12),
-                                  border: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-                                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.grey)),
-                                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Color(0xFF00496d))),
-                                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                  labelStyle: TextStyle(color: Colors.white),
                                 ),
                                 keyboardType: TextInputType.number,
                                 validator: (value) {
@@ -120,30 +106,32 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                     progress?.show();
 
                                     try {
-                                      final continuous = double.parse(
-                                          continuousController.text.trim());
-                                      final exam =
-                                      double.parse(examController.text.trim());
+                                      double continuous =
+                                      double.parse(continuousController.text.trim());
+                                      double exam = double.parse(examController.text.trim());
 
-                                      if (continuous + exam != 100) {
+                                      //safer comparison (rounded to 2 decimals)
+                                      double total =exam + continuous;
+                                      if (total != 100.0) {
                                         progress?.dismiss();
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
-                                            content: Text(
-                                                "Continuous + Exam must equal 100%"),
+                                            content: Text("Continuous + Exam must equal 100%"),
                                             backgroundColor: Colors.red,
                                           ),
                                         );
                                         return;
                                       }
 
-                             final id = widget.config?.id ?? ("${provider.schoolid}${continuous}${exam}").replaceAll(RegExp(r'\s+'), '')
-                                              .toLowerCase();
+                                      String idd = ("$continuous$exam")
+                                          .replaceAll(RegExp(r'\s+'), '')
+                                          .toLowerCase();
+                                      final id = widget.config?.id ?? "${provider.schoolid}$idd";
 
                                       final scoreConfig = ScoremodelConfig(
-                                        id: id.toString(),
+                                        id: id,
                                         schoolId: provider.schoolid,
+                                        // store as string (per your requirement)
                                         continuous: continuous.toString(),
                                         exam: exam.toString(),
                                       ).toMap();
@@ -154,8 +142,7 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                           .set(scoreConfig, SetOptions(merge: true));
 
                                       progress?.dismiss();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
+                                      ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text(isEdit
                                               ? "Config updated successfully"
@@ -172,8 +159,7 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                       }
                                     } catch (e) {
                                       progress?.dismiss();
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
+                                      ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text("Error: $e"),
                                           backgroundColor: Colors.red,
@@ -182,18 +168,16 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
                                     }
                                   }
                                 },
-                                icon:
-                                Icon(isEdit ? Icons.update : Icons.save),
-                                label:
-                                Text(isEdit ? "Update Config" : "Save Config"),
+                                icon: Icon(isEdit ? Icons.update : Icons.save),
+                                label: Text(isEdit ? "Update Config" : "Save Config"),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFF00496d),
+                                  backgroundColor: Colors.blueAccent,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 40, vertical: 15),
-                                  textStyle: const TextStyle(fontSize: 16),
+                                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                                  textStyle: const TextStyle(fontSize: 18),
                                 ),
-                              ),
+                              )
+
                             ],
                           ),
                         ),

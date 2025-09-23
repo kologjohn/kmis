@@ -20,7 +20,7 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
   final subjectController = TextEditingController();
   final codeController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final inputFill = const Color(0xFFffffff);
+  final inputFill = const Color(0xFF2C2C3C);
 
   String? selectedLevel;
 
@@ -50,7 +50,7 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
         builder: (context, value, child) {
           return Scaffold(
             appBar: AppBar(
-              backgroundColor: const Color(0xFF00273a),
+              backgroundColor: const Color(0xFF2D2F45),
               title: Text(
                 isEdit ? "Edit Subject" : "Register Subject",
                 style: const TextStyle(color: Colors.white),
@@ -63,213 +63,120 @@ class _SubjectRegistrationState extends State<SubjectRegistration> {
             ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.all(20),
-              child: Align(
-                alignment: Alignment.topCenter,
-                child: Container(
-                  color: const Color(0xFFffffff),
-                  margin: const EdgeInsets.all(30.0),
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Padding(
-                    padding: const EdgeInsets.all(30.0),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          /// subject name
-                          TextFormField(
-                            controller: subjectController,
-                            decoration: InputDecoration(
-                              labelText: "Subject Name",
-                              hintText: "Subject Name",
-                              labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
-                              hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey[700]!,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey[700]!,
-                                ),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF00496d),
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 12,
-                              ),
-                              filled: false,
-                              fillColor: inputFill,
-                            ),
-                            validator: (value) =>
-                            value == null || value.trim().isEmpty
-                                ? "Subject name cannot be empty"
-                                : null,
-                          ),
-                          const SizedBox(height: 20),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    /// subject name
+                    TextFormField(
+                      controller: subjectController,
+                      decoration: InputDecoration(
+                        labelText: "Subject Name",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        filled: true,
+                        fillColor: inputFill,
+                      ),
+                      validator: (value) =>
+                      value == null || value.trim().isEmpty
+                          ? "Subject name cannot be empty"
+                          : null,
+                    ),
+                    const SizedBox(height: 20),
 
-                          /// subject code
-                          TextFormField(
-                            controller: codeController,
-                            decoration: InputDecoration(
-                              labelText: "Subject Code",
-                              hintText: "Subject Code",
-                              labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
-                              hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey[700]!,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey[700]!,
-                                ),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF00496d),
-                                ),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 10,
-                                horizontal: 12,
-                              ),
-                              filled: false,
-                              fillColor: inputFill,
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-
-                          /// level dropdown (from ClassModel)
-                          DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: "Select Level",
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey[700]!,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.grey[700]!,
-                                ),
-                              ),
-                              focusedBorder: const OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color(0xFF00496d),
-                                ),
-                              ),
-                            ),
-                            value: selectedLevel,
-                            items: value.classdata
-                                .map((cls) => DropdownMenuItem(
-                              value: cls.name,
-                              child: Text(cls.name),
-                            ))
-                                .toList(),
-                            onChanged: (val) => setState(() => selectedLevel = val),
-                            validator: (val) =>
-                            val == null ? "Please select a level" : null,
-                          ),
-                          const SizedBox(height: 20),
-
-                          /// buttons
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Wrap(
-                                spacing: 10,
-                                runSpacing: 10,
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () async {
-                                      if (_formKey.currentState!.validate()) {
-                                        final progress = ProgressHUD.of(context);
-                                        progress!.show();
-
-                                        final id = "${subjectController.text.trim()}${value.schoolid.trim()}".replaceAll(" ", "") .toLowerCase();
-
-                                        final subjectData = SubjectModel(
-                                          id:id,
-                                          name: subjectController.text.trim(),
-                                          code: codeController.text.trim(),
-                                          level: selectedLevel ?? '',
-                                          schoolId: value.schoolid,
-                                          timestamp: DateTime.now(),
-                                        ).toMap();
-
-
-                                        await value.db
-                                            .collection("subjects")
-                                            .doc(id)
-                                            .set(subjectData, SetOptions(merge: true));
-
-                                        progress.dismiss();
-
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
-                                            content: Text(isEdit
-                                                ? "Subject updated successfully"
-                                                : "Subject registered successfully"),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
-
-                                        if (!isEdit) {
-                                          subjectController.clear();
-                                          codeController.clear();
-                                          setState(() => selectedLevel = null);
-                                        }
-                                      }
-                                    },
-                                    icon: Icon(isEdit ? Icons.update : Icons.save),
-                                    label: Text(
-                                        isEdit ? "Update Subject" : "Register Subject"),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF00496d),
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 40,
-                                        vertical: 15,
-                                      ),
-                                      textStyle: const TextStyle(fontSize: 16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      elevation: 5,
-                                    ),
-                                  ),
-                                  ElevatedButton.icon(
-                                    onPressed: () => context.go(Routes.viewsubjects),
-                                    icon: const Icon(Icons.list),
-                                    label: const Text("View Subjects"),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Color(0xFF00496d),
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 40,
-                                        vertical: 15,
-                                      ),
-                                      textStyle: const TextStyle(fontSize: 16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      elevation: 5,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
-                        ],
+                    /// subject code
+                    TextFormField(
+                      controller: codeController,
+                      decoration: InputDecoration(
+                        labelText: "Subject Code",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        filled: true,
+                        fillColor: inputFill,
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 20),
+
+                    /// level dropdown (from ClassModel)
+                    DropdownButtonFormField<String>(
+                      decoration: const InputDecoration(
+                        labelText: "Select Level",
+                        border: OutlineInputBorder(),
+                      ),
+                      value: selectedLevel,
+                      items: value.classdata
+                          .map((cls) => DropdownMenuItem(
+                        value: cls.name,
+                        child: Text(cls.name),
+                      ))
+                          .toList(),
+                      onChanged: (val) => setState(() => selectedLevel = val),
+                      validator: (val) =>
+                      val == null ? "Please select a level" : null,
+                    ),
+                    const SizedBox(height: 20),
+
+                    /// buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              final progress = ProgressHUD.of(context);
+                              progress!.show();
+                             String subject = subjectController.text.trim().replaceAll(" ", "") .toLowerCase();
+                             String code = codeController.text.trim().replaceAll(" ", "") .toLowerCase();
+                              final id = "${value.schoolid}_$subject$code";
+
+                              final subjectData = SubjectModel(
+                                id:id,
+                                name: subjectController.text.trim(),
+                                code: codeController.text.trim(),
+                                level: selectedLevel ?? '',
+                                schoolId: value.schoolid,
+                                timestamp: DateTime.now(),
+                              ).toMap();
+
+
+                              await value.db
+                                  .collection("subjects")
+                                  .doc(id)
+                                  .set(subjectData, SetOptions(merge: true));
+
+                              progress.dismiss();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(isEdit
+                                      ? "Subject updated successfully"
+                                      : "Subject registered successfully"),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+
+                              if (!isEdit) {
+                                subjectController.clear();
+                                codeController.clear();
+                                setState(() => selectedLevel = null);
+                              }
+                            }
+                          },
+                          icon: Icon(isEdit ? Icons.update : Icons.save),
+                          label: Text(
+                              isEdit ? "Update Subject" : "Register Subject"),
+                        ),
+                        const SizedBox(width: 16),
+                        ElevatedButton.icon(
+                          onPressed: () => context.go(Routes.viewsubjects),
+                          icon: const Icon(Icons.list),
+                          label: const Text("View Subjects"),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),

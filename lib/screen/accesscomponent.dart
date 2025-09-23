@@ -33,7 +33,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
 
   @override
   Widget build(BuildContext context) {
-    final inputFill = const Color(0xFFffffff);
+    final inputFill = const Color(0xFF2C2C3C);
     return ProgressHUD(
       child: Builder(
         builder: (context) {
@@ -41,7 +41,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
             builder: (BuildContext context, Myprovider value, Widget? child) {
               return Scaffold(
                 appBar: AppBar(
-                  backgroundColor: const Color(0xFF00273a),
+                  backgroundColor: const Color(0xFF2D2F45),
                   leading: IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
                     onPressed: () => context.go(Routes.dashboard),
@@ -61,11 +61,11 @@ class _RevenueGridPageState extends State<AccessComponent> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Container(
-                      color: const Color(0xFFffffff),
+                      color: const Color(0xFF2D2F45),
                       margin: const EdgeInsets.all(30.0),
-                      constraints: const BoxConstraints(maxWidth: 600),
+                      constraints: const BoxConstraints(maxWidth: 800),
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(30.0),
+                        padding: const EdgeInsets.all(10.0),
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -77,8 +77,11 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                 decoration: InputDecoration(
                                   labelText: "Component Name",
                                   hintText: "Enter Component Name",
-                                  labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
-                                  hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+                                  labelStyle:
+                                  const TextStyle(color: Colors.white),
+                                  hintStyle: const TextStyle(
+                                    color: Colors.grey,
+                                  ),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Colors.grey[700]!,
@@ -91,7 +94,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                   ),
                                   focusedBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0xFF00496d),
+                                      color: Colors.blueAccent,
                                     ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
@@ -101,7 +104,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                   filled: true,
                                   fillColor: inputFill,
                                 ),
-                                style: const TextStyle(fontSize: 14),
+                                style: const TextStyle(fontSize: 16),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Component name cannot be empty';
@@ -116,8 +119,11 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                 decoration: InputDecoration(
                                   labelText: "Total Mark",
                                   hintText: "Enter Total Mark",
-                                  labelStyle: const TextStyle(color: Colors.black54, fontSize: 12),
-                                  hintStyle: const TextStyle(color: Colors.black54, fontSize: 12),
+                                  labelStyle:
+                                  const TextStyle(color: Colors.white),
+                                  hintStyle: const TextStyle(
+                                    color: Colors.grey,
+                                  ),
                                   border: OutlineInputBorder(
                                     borderSide: BorderSide(
                                       color: Colors.grey[700]!,
@@ -130,7 +136,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                   ),
                                   focusedBorder: const OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0xFF00496d),
+                                      color: Colors.blueAccent,
                                     ),
                                   ),
                                   contentPadding: const EdgeInsets.symmetric(
@@ -140,7 +146,7 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                   filled: true,
                                   fillColor: inputFill,
                                 ),
-                                style: const TextStyle(fontSize: 14),
+                                style: const TextStyle(fontSize: 16),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Total mark cannot be empty';
@@ -153,124 +159,121 @@ class _RevenueGridPageState extends State<AccessComponent> {
                               ),
                               const SizedBox(height: 20),
                               // Save + View Buttons
-                              Column(
+                              Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Wrap(
-                                    spacing: 10,
-                                    runSpacing: 10,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 30, vertical: 10),
-                                        decoration: BoxDecoration(
-                                          color: Color(0xFF00496d),
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            borderRadius: BorderRadius.circular(8),
-                                            onTap: () async {
-                                              if (_formKey.currentState!
-                                                  .validate()) {
-                                                final progress =
-                                                ProgressHUD.of(context);
-                                                progress!.show();
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 30, vertical: 15),
+                                    decoration: BoxDecoration(
+                                      color: Colors.blueAccent,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(8),
+                                        onTap: () async {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            final progress =
+                                            ProgressHUD.of(context);
+                                            progress!.show();
 
-                                                try {
-                                                  String categoryName =componentname.text.trim();
-                                                  String totalMark = totalmark.text.trim();
-                                                  String totalMar = totalmark.text.trim();
-                                                  String id = "${value.schoolid}_${totalMar.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
+                                            try {
+                                              String categoryName =componentname.text.trim();
+                                              String totalMark = totalmark.text.trim();
+                                              String totalMar = totalmark.text.trim();
+                                              String id = "${value.schoolid}_${categoryName.replaceAll(RegExp(r'\s+'), '').toLowerCase()}${totalMar.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
 
-                                                  final data = ComponentModel(
-                                                    name: categoryName,
-                                                    totalMark: totalMark,
-                                                    dateCreated: DateTime.now(),
-                                                    schoolId: value.schoolid,
-                                                  );
+                                              final data = ComponentModel(
+                                                name: categoryName,
+                                                totalMark: totalMark,
+                                                dateCreated: DateTime.now(),
+                                                schoolId: value.schoolid,
+                                                staff: value.name,
+                                              );
 
-                                                  // Save as Map
-                                                  await value.db.collection("assesscomponent").doc(id).set(data.toJson());
-                                                  progress.dismiss();
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    const SnackBar(
-                                                      content: Text(
-                                                          "Data Saved Successfully"),
-                                                      backgroundColor: Colors.green,
-                                                    ),
-                                                  );
-
-                                                  setState(() {
-                                                    level = null;
-                                                  });
-                                                  componentname.clear();
-                                                  totalmark.clear();
-                                                } catch (e) {
-                                                  progress.dismiss();
-                                                  debugPrint(
-                                                      "❌ Error saving data: $e");
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                    SnackBar(
-                                                      content: Text(
-                                                          "Failed to save data: $e"),
-                                                      backgroundColor: Colors.red,
-                                                    ),
-                                                  );
-                                                }
-                                              }
-                                            },
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: const [
-                                                Icon(Icons.save,
-                                                    color: Colors.white),
-                                                SizedBox(width: 8),
-                                                Text(
-                                                  'Save Access',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      color: Colors.white),
+                                              // Save as Map
+                                              await value.db.collection("assesscomponent").doc(id).set(data.toJson());
+                                              progress.dismiss();
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                      "Data Saved Successfully"),
+                                                  backgroundColor: Colors.green,
                                                 ),
-                                              ],
+                                              );
+
+                                              setState(() {
+                                                level = null;
+                                              });
+                                              componentname.clear();
+                                              totalmark.clear();
+                                            } catch (e) {
+                                              progress.dismiss();
+                                              debugPrint(
+                                                  "❌ Error saving data: $e");
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      "Failed to save data: $e"),
+                                                  backgroundColor: Colors.red,
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: const [
+                                            Icon(Icons.save,
+                                                color: Colors.white),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              'Save Access',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () =>
+                                        context.go(Routes.accesslist),
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24, vertical: 12),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF2D2F45),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                            color: Colors.blueAccent, width: 1),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: const [
+                                          Icon(Icons.list, color: Colors.white),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            "View Access",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
-                                        ),
+                                        ],
                                       ),
-                                      InkWell(
-                                        onTap: () =>
-                                            context.go(Routes.accesslist),
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 30, vertical: 10),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFffffff),
-                                            borderRadius: BorderRadius.circular(12),
-                                            border: Border.all(
-                                                color: Color(0xFF00496d), width: 1),
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: const [
-                                              Icon(Icons.list, color: Color(0xFF00496d)),
-                                              SizedBox(width: 8),
-                                              Text(
-                                                "View Access",
-                                                style: TextStyle(
-                                                  color: Color(0xFF00496d),
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 20),

@@ -93,6 +93,14 @@ class CustomDrawer extends StatelessWidget {
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.military_tech,
+                                  title: 'Id format',
+                                  onTap: () =>
+                                      context.go(Routes.idformat),
+                                ),
+                              ),
+                              SizedBox(
+                                child: _drawerTile(
+                                  icon: Icons.military_tech,
                                   title: 'Academic year',
                                   onTap: ()=>context.go(Routes.academicyr),
                                 ),
@@ -315,6 +323,104 @@ class CustomDrawer extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
                           child: Text(
+                            "Financial Account",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ),
+
+                        //==============
+                        Card(
+                          color: Colors.transparent,
+                          elevation: 0,
+                          child: ExpansionTile(
+                            collapsedIconColor: Colors.white,
+                            iconColor: Colors.white,
+                            leading: Icon(Icons.people, color: Colors.white60, size: 17,),
+                            title: Text(
+                              'Accounts Setup',
+                              style: TextStyle(color: Colors.white54, fontSize: 14),
+                            ),
+                            children: [
+                              _drawerTile(
+                                icon: Icons.person_add,
+                                title: 'Add Account',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.coa);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+
+                              _drawerTile(
+                                icon: Icons.view_list,
+                                title: 'System Activity',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.accountActivity);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(
+                                icon: Icons.account_balance_wallet,
+                                title: 'Fees Names',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.feesetup);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Billing',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.billing);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Single Billing',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.singlebilling);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Payment Methods',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.paymentmethods);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                              _drawerTile(icon: Icons.account_balance_wallet, title: 'Fee Payment',
+                                onTap: () async {
+                                  try {
+                                    context.go(Routes.feepayment);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 8.0, top: 20, bottom: 4),
+                          child: Text(
                             "Manage Contestants Results",
                             style: TextStyle(
                               color: Colors.white,
@@ -419,13 +525,13 @@ class CustomDrawer extends StatelessWidget {
                               style: TextStyle(color: Colors.white54),
                             ),
                             children: [
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Contestant Sheet',
-                                  onTap: () =>  context.go(Routes.scoresheet),
-                                ),
-                              ),
+                              // SizedBox(
+                              //   child: _drawerTile(
+                              //     icon: Icons.calendar_month,
+                              //     title: 'Contestant Sheet',
+                              //     onTap: () =>  context.go(Routes.scoresheet),
+                              //   ),
+                              // ),
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.calendar_month,
@@ -468,6 +574,7 @@ class CustomDrawer extends StatelessWidget {
                             ],
                           ),
                         ),
+
                         Divider(color: Colors.white24, height: 30),
                         SizedBox(
                           child: _drawerTile(

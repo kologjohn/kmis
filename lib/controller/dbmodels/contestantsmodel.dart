@@ -10,7 +10,7 @@ class StudentModel {
   final String level;
   final String department;
   final String term;
-  final String companyid;
+  final String schoolId;
   final String dob;            // date of birth as string
   final String address;
   final String? email;
@@ -18,6 +18,7 @@ class StudentModel {
   final String timestamp;      // registration time as string
   final String photourl;
   final String status;         // single string: active, dropped, completed, etc.
+  final String yeargroup;         // single string: active, dropped, completed, etc.
 
   StudentModel({
     required this.id,
@@ -31,13 +32,14 @@ class StudentModel {
     required this.level,
     required this.department,
     required this.term,
-    required this.companyid,
+    required this.schoolId,
     required this.dob,
     required this.address,
     this.email,
     required this.phone,
     required this.timestamp,
     required this.photourl,
+    required this.yeargroup,
     this.status = "active", // default
   });
 
@@ -55,7 +57,7 @@ class StudentModel {
       'level': level,
       'department': department,
       'term': term,
-      'companyid': companyid,
+      'schoolId': schoolId,
       'dob': dob,
       'address': address,
       'email': email,
@@ -63,6 +65,7 @@ class StudentModel {
       'timestamp': timestamp,
       'photourl': photourl,
       'status': status, // string, not list
+      'yeargroup': yeargroup, // string, not list
     };
   }
 
@@ -80,13 +83,14 @@ class StudentModel {
       level: map['level'] ?? '',
       department: map['department'] ?? '',
       term: map['term'] ?? '',
-      companyid: map['companyid'] ?? '',
+      schoolId: map['companyid'] ?? '',
       dob: map['dob'] ?? '',
       address: map['address'] ?? '',
       email: map['email'],
       phone: map['phone'] ?? '',
       timestamp: map['timestamp'] ?? '',
       photourl: map['photourl'] ?? '',
+      yeargroup: map['yeargroup'] ?? '',
       status: map['status'] ?? 'active',
     );
   }

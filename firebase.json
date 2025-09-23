@@ -38,6 +38,17 @@
       }
     }
   },
+  "hosting": {
+    "source": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
+  },
   "functions": [
     {
       "source": "functions",
@@ -50,16 +61,5 @@
         "*.local"
       ]
     }
-  ],
-  "hosting": {
-    "source": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "frameworksBackend": {
-      "region": "us-central1"
-    }
-  }
+  ]
 }

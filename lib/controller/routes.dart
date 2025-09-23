@@ -1,8 +1,13 @@
 import 'package:go_router/go_router.dart';
+import 'package:ksoftsms/screen/billing.dart';
 import 'package:ksoftsms/controller/dbmodels/classmodel.dart';
-import 'package:ksoftsms/screen/receipt.dart';
+import 'package:ksoftsms/screen/accountChart.dart';
+import 'package:ksoftsms/screen/feesSetup.dart';
+import 'package:ksoftsms/screen/feespayment.dart';
 
 import 'package:ksoftsms/screen/signup.dart';
+import 'package:ksoftsms/screen/singleBilling.dart';
+import 'package:ksoftsms/screen/systemActivity.dart';
 import '../components/academicyrmodel.dart';
 import '../components/dashboard.dart';
 
@@ -13,10 +18,13 @@ import '../screen/class.dart';
 import '../screen/department.dart';
 
 import '../screen/gradingsystem.dart';
+import '../screen/idformat.dart';
 import '../screen/judgeui.dart';
 
 import '../screen/levelreg.dart';
 import '../screen/multipleschools.dart';
+import '../screen/paymentMethodsForm.dart';
+import '../screen/regionreg.dart';
 import '../screen/registerschool.dart';
 import '../screen/registerstudents.dart';
 import '../screen/regstaff.dart';
@@ -28,7 +36,6 @@ import '../screen/termlist.dart';
 import '../screen/viewacademicyr.dart';
 import '../screen/viewclass.dart';
 import '../screen/viewdepartment.dart';
-import '../screen/viewschool.dart';
 import '../screen/viewsubject.dart';
 import 'dbmodels/departmodel.dart';
 import 'dbmodels/levelmodel.dart';
@@ -37,11 +44,11 @@ import 'dbmodels/scoremodel.dart';
 import 'dbmodels/staffmodel.dart';
 import 'dbmodels/subjectmodel.dart';
 import 'dbmodels/termmodel.dart';
-import 'myprovider.dart';
 
 class Routes {
 
   static const registerstudent = "/registerstudent";
+  static const idformat = "/idformat";
   static const term = "/term";
   static const depart = "/depart";
   static const classes = "/classes";
@@ -57,7 +64,13 @@ class Routes {
   static const viewschool = "/viewschool";
   static const viewstaff = "/viewstaff";
   static const nextpage = "/nextpage";
-
+  static const coa = "/coa";
+  static const accountActivity = "/accountActivity";
+  static const billing = "/billing";
+  static const feesetup = "/feesetup";
+  static const singlebilling = "/singlebilling";
+  static const feepayment = "/feepayment";
+  static const paymentmethods = "/paymentmethods";
 
   static const registerzone = "/registerzone";
   static const regstaff = "/regstaff";
@@ -68,14 +81,9 @@ class Routes {
   static const dashboard = "/dashboard";
   static const sexreg = "/sexreg";
   static const seasonreg = "/seasonreg";
-  static const episodereg = "/episodereg";
   static const marks = "/marks";
 
-  static const weekreg = "/weekreg";
-  static const scoresheet = "/scoresheet";
-  static const judgesetup = "/judgesetup";
   static const scores = "/scores";
-  static const judgeselect = "/judgeselect";
   static const setupjudge = "/setupjudge";
   static const episodeh = "/episodeh";
   static const jscore = "/jscore";
@@ -90,7 +98,6 @@ class Routes {
   static const regionreg = "/regionreg";
   static const clearscores = "/clearscores";
   static const accesslist = "/accesslist";
-  static const autoform2 = "/autoform2";
   static const viewvotes = "/viewvotes";
   static const bestcriteria = "/bestcriteria";
   static const judgelist = "/judgelist";
@@ -112,12 +119,13 @@ class Routes {
   static const setupteacher = "/setupteacher";
   static const academicyr = "/academicyr";
   static const viewacademicyr = "/viewacademicyr";
+  static const viewidformats = "/viewidformats";
   // Role → Allowed routes mapping
   static const roleAllowedRoutes = {
     "Judge": [
       Routes.judgelandingpage,
       Routes.scores,
-      Routes.autoform2,
+      // Routes.autoform2,
       Routes.viewmarks,
     ],
   };
@@ -130,7 +138,14 @@ final GoRouter router = GoRouter(
 
 
   routes: [
+    GoRoute(path: Routes.billing, builder: (c, s) => Billing()),
+    GoRoute(path: Routes.coa, builder: (c, s) => AccountsChart()),
+    GoRoute(path: Routes.accountActivity, builder: (c, s) => SystemActivity()),
+    GoRoute(path: Routes.feesetup, builder: (c, s) => FeesSetup()),
+    GoRoute(path: Routes.singlebilling, builder: (c, s) => SingleBilling()),
     GoRoute(path: Routes.login, builder: (c, s) => SpacerSignUpPage()),
+    GoRoute(path: Routes.feepayment, builder: (c, s) => Feepayment()),
+    GoRoute(path: Routes.paymentmethods, builder: (c, s) => PaymentMethodForm()),
     GoRoute(
       path: Routes.regstaff,
       builder: (context, state) {
@@ -138,17 +153,14 @@ final GoRouter router = GoRouter(
         return Regstaff();
       },
     ),
-
     GoRoute(
     path: Routes.levelreg,
     builder: (context, state) {
     final level = state.extra as LevelModel?;
     return LevelListScreen(levelData: level);
     },),
-
     GoRoute(path: Routes.dashboard, builder: (c, s) => DashboardLayout()),
-    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolReceipt()),
-
+    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolList()),
     GoRoute(path: Routes.jscore, builder: (c, s) => JudgeGroundScreen()),
     GoRoute(
       path: Routes.term,
@@ -210,5 +222,7 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.setupteacher, builder: (c, s) => TeacherSetupPage()),
     GoRoute(path: Routes.viewacademicyr, builder: (c, s) => ViewAcademicyr()),
     GoRoute(path: Routes.registerstudent, builder: (c, s) => RegisterStudent()),
+    GoRoute(path: Routes.regionreg, builder: (c, s) => Regionregistration()),
+    GoRoute(path: Routes.idformat, builder: (c, s) => IdformatScreen()),
   ],
 );
