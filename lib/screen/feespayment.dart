@@ -3,11 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ksoftsms/controller/dbmodels/feePaymentModel.dart';
-import 'package:ksoftsms/controller/dbmodels/singleBilledModel.dart';
 import 'package:provider/provider.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:ksoftsms/controller/dbmodels/billedModel.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:ksoftsms/controller/routes.dart';
 import '../widgets/dropdown.dart';
@@ -29,8 +25,11 @@ class _FeepaymentState extends State<Feepayment> {
       provider.fetchterms();
       provider.fetchFess();
       provider.paymentmethodslist();
-      provider.generatereceiptnumber();
-      receiptNumberController.text = provider.receiptno;
+     // provider.generatereceiptnumber();
+      //provider.receipt("receiptno");
+      print("Receipt: ${provider.receiptno}");
+
+     // receiptNumberController.text = provider.receiptno;
     });
   }
 
@@ -78,14 +77,13 @@ class _FeepaymentState extends State<Feepayment> {
                 children: [
                        SingleChildScrollView(
                     padding: const EdgeInsets.all(20),
-                    child: Container(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 600),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
+                          child: Padding(
+                           padding: const EdgeInsets.all(20),
+                           child: Container(
+                              constraints: const BoxConstraints(maxWidth: 400),
+                             child: Form(
+                              key: _formKey,
+                              child: Column(
                               children: [
                                 TextFormField(
                                   controller: receiptNumberController,
@@ -94,8 +92,8 @@ class _FeepaymentState extends State<Feepayment> {
                                     labelText: "Receipt Number",
                                     suffixIcon: IconButton(
                                       icon: const Icon(Icons.refresh),
-                                      onPressed: () {
-                                        value.generatereceiptnumber(); // call provider method
+                                      onPressed: () async{
+                                        await value.generatereceiptnumber(); // call provider method
                                         receiptNumberController.text = value.receiptno; // update field
                                       },
                                     ),
@@ -312,23 +310,7 @@ class _FeepaymentState extends State<Feepayment> {
                                           }
 
 
-                                          // final data = FeePaymentModel(
-                                          //   level: student.level,
-                                          //   yeargroup: student.yeargroup,
-                                          //   amount: amount,
-                                          //   activityType: "Fee Payment",
-                                          //   term: selectedTerm.toString(),
-                                          //   schoolId: value.schoolid,
-                                          //   dateCreated: DateTime.now(),
-                                          //   feeName: selectedfee.toString(),
-                                          //   studentId: student.studentid,
-                                          //   studentName: student.name ?? "",
-                                          //   ledgerid: id,
-                                          //   paymentmethod: selectedpaymentmethod ?? '',
-                                          //   receivedaccount: selectedLinkedAccount ?? '',
-                                          //   note: note,
-                                          //   staff: value.name,
-                                          // ).toJson();
+
                                           final data = FeePaymentModel(
                                             level: student.level,
                                             yeargroup: student.yeargroup,
@@ -384,12 +366,15 @@ class _FeepaymentState extends State<Feepayment> {
                                   label: const Text("Bill Students",
                                       style: TextStyle(color: Colors.white)),
                                 ),
+                                ElevatedButton(onPressed: ()async{
+                                  //await value.setreceiptnumber(receiptNumberController.text.trim());
+                                  context.go(Routes.nextpage);
+                                }, child: Text("Print Receipt"))
                               ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                                                       ),
+                                                        ),
+                           ),
+                                                    ),
                   ),
                 ],
               ),
