@@ -74,6 +74,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
                     assignedList.add({
                       "class": classEntry['name'],
                       "subject": subjectEntry['name'],
+                      "subjectkey": subjectEntry['id'],
                       "department": classEntry['department'],
                     });
                   }
@@ -108,6 +109,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
                               "subject": entry['subject'],
                               "level": entry['class'],
                               "department": entry['department'],
+                              "subjectkey": entry['subjectkey'],
                             },
                           );
                         },

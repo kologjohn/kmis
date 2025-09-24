@@ -209,6 +209,7 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
   String _searchText = "";
   String level = "";
   String subject = "";
+  String subjectkey = "";
 
   @override
   void initState() {
@@ -217,10 +218,14 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
       final args = widget.args ?? {};
       subject = args['subject'] ?? '';
       level = args['level'] ?? '';
+      subjectkey = args['subjectkey'] ?? '';
       final provider = Provider.of<Myprovider>(context, listen: false);
-      provider.fetchStaffScoringMarks();
+      provider.fetchStaffScoringMarks(
+          className: level,
+          teacherId: 'KS0002',
+          subjectKey: subjectkey,
+          );
     });
-
     _searchController.addListener(() {
       setState(() {
         _searchText = _searchController.text.trim().toLowerCase();

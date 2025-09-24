@@ -972,64 +972,110 @@ class Myprovider extends LoginProvider {
   bool isloadac =false;
   List<Map<String, dynamic>> marksList = [];
   bool isloadscore=false;
-
-  Future<void> fetchStaffScoringMarks() async {
+  Future<void> fetchStaffScoringMarks({required String className,required String subjectKey,required String teacherId,}) async {
     await getdata();
     isloadscore = true;
     notifyListeners();
 
-    const String academicyrid = "20242025";
-    const String className = "B8";
-    const String schoolId = "KS0002";
-    const String teacherId = "KS0002";
-    const String subjectKey = "KS0002_englisheng";
     try {
-      final querySnapshot = await db
+      final snap = await db
           .collection('subjectScoring')
-          .where('academicYear', isEqualTo: academicyrid)
+          .where('academicYear', isEqualTo: "20242025")
+          .where('term', isEqualTo: "First")
           .where('class', isEqualTo: className)
-          .where('schoolId', isEqualTo: schoolId)
+          .where('schoolId', isEqualTo: schoolid)
           .get();
 
+      marksList = snap.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        final id = doc.id;
 
-      marksList = querySnapshot.docs.map((doc) {
-        final data = doc.data();
-        final docid = doc.id;
-        final teachers = (data['teachers'] as Map<String, dynamic>? ?? {});
-        if (!teachers.containsKey(teacherId)) {
+
+        final subjects = Map<String, dynamic>.from(data['subjects'] ?? {});
+
+
+        Map<String, dynamic> subjectData = {};
+        if (subjects.containsKey(subjectKey)) {
+          subjectData = Map<String, dynamic>.from(subjects[subjectKey] ?? {});
+        } else {
+          for (final v in subjects.values) {
+            if (v is Map) {
+              final name = (v['subjectName'] ?? v['name'] ?? '').toString();
+              if (name.toLowerCase() == subjectKey.toLowerCase()) {
+                subjectData = Map<String, dynamic>.from(v);
+                break;
+              }
+            }
+          }
+        }
+        if (subjectData.isEmpty) {
+          print("$id skipped: subject '$subjectKey' not found");
           return null;
         }
-        final subjects = (data['subjects'] as Map<String, dynamic>? ?? {});
-        if (!subjects.containsKey(subjectKey)) {
-          return null;
+        final subjTeachers = Map<String, dynamic>.from(subjectData['teachers'] ?? {});
+        Map<String, dynamic> teacherData = {};
+        if (subjTeachers.containsKey(teacherId)) {
+          teacherData = Map<String, dynamic>.from(subjTeachers[teacherId] ?? {});
+        } else {
+          for (final v in subjTeachers.values) {
+            if (v is Map && v['tcherid'] == teacherId) {
+              teacherData = Map<String, dynamic>.from(v);
+              break;
+            }
+          }
         }
 
-        final subjectData = subjects[subjectKey] as Map<String, dynamic>;
-        final scores = (subjectData['scores'] as Map<String, dynamic>? ?? {});
-        final sortedScoresList = scores.entries.toList()
-          ..sort((a, b) => a.key.compareTo(b.key));
-        final sortedScoresMap = Map.fromEntries(sortedScoresList);
+
+        if (teacherData.isEmpty) {
+          final topTeachers = Map<String, dynamic>.from(data['teachers'] ?? {});
+          if (topTeachers.containsKey(teacherId)) {
+            teacherData = Map<String, dynamic>.from(topTeachers[teacherId] ?? {});
+          } else {
+            for (final v in topTeachers.values) {
+              if (v is Map && v['tcherid'] == teacherId) {
+                teacherData = Map<String, dynamic>.from(v);
+                break;
+              }
+            }
+          }
+        }
+
+        if (teacherData.isEmpty) {
+          return null;
+        }
+        // scores ---
+        final scores = Map<String, dynamic>.from(subjectData['scores'] ?? {});
+        final sortedScores = Map.fromEntries(
+          scores.entries.toList()..sort((a, b) => a.key.compareTo(b.key)),
+        );
+
         return {
-          'id': docid,
+          'id': id,
           'studentName': data['studentName'] ?? '',
           'studentId': data['studentId'] ?? '',
           'class': data['class'] ?? '',
-          'photoUrl': data['photoUrl'] ?? '',
-          'scores': sortedScoresMap,
-          'teacher': teachers[teacherId],
-          'subject': subjectData['subjectName'] ?? '',
-          'term': term,
-          'academicyrid': academicyrid,
+          'photoUrl': data['photourl'] ?? '',
+          'scores': sortedScores,
+          'teacherId': teacherData['tcherid'] ?? '',
+          'teacherName': teacherData['tchername'] ?? '',
+          'teacherEmail': teacherData['tcheremail'] ?? '',
+          'subject': subjectData['subjectName'] ?? subjectData['name'] ?? '',
+          'subjectId': subjectData['subjectId'] ?? subjectData['id'] ?? subjectKey,
+          'term': data['term'] ?? '',
+          'academicyrid': data['academicYear'] ?? academicyrid,
+          'department': data['department'] ?? '',
+          'level': data['level'] ?? '',
         };
-      }).where((e) => e != null).cast<Map<String, dynamic>>().toList();
+      }).whereType<Map<String, dynamic>>().toList();
     } catch (e) {
-      print("Error fetching staff scoring marks: $e");
+      print("fetchStaffScoringMarks error: $e");
     } finally {
       isloadscore = false;
       notifyListeners();
     }
   }
-  Future<Map<String, dynamic>?> fetchGradingSystem(String schoolId, {String? department}) async {
+
+ Future<Map<String, dynamic>?> fetchGradingSystem(String schoolId, {String? department}) async {
     try {
       final deptId = department != null
           ? "${schoolId}_${department.toLowerCase()}"
@@ -1069,8 +1115,7 @@ class Myprovider extends LoginProvider {
     String? maxca,
     String? maxexams,
     String? department,
-  }) async {
-    try {
+  }) async {    try {
       //student subject record
       final subjectId = "${schoolid}_${subject.toLowerCase()}";
       final studentDocRef = db
