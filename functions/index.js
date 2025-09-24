@@ -1,3 +1,104 @@
+import { onDocumentUpdated } from "firebase-functions/v2/firestore";
+// Ledger posting for singlebilled (top-up or unbilled students)
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import admin from "firebase-admin";
+import { v4 as uuidv4 } from "uuid"; // install with: npm install uuid
+
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
+
+const db = admin.firestore();
+// Trigger: create ledger for newly added fee names in feepayment (on update)
+export const createLedgerOnFeePaymentUpdate = onDocumentUpdated(
+  "feepayment/{paymentId}",
+  async (event) => {
+    const before = event.data.before.data();
+    const after = event.data.after.data();
+    if (!after) return;
+    const paymentRef = event.data.after.ref;
+    const { studentId, schoolId, term, receivedaccount, fees, level, yeargroup } = after;
+    const prevFees = before?.fees || {};
+    try {
+      // Get student
+      const studentDoc = await db.collection("students").doc(`${schoolId}_${studentId}`).get();
+      if (!studentDoc.exists) return;
+      const student = studentDoc.data();
+
+      // Get system activity for 'fee payment'
+      const activitySnap = await db.collection("systemActivity").where("name", "==", "Fee Payment").limit(1).get();
+      if (activitySnap.empty) return;
+      const activityData = activitySnap.docs[0].data();
+      const { crAccount, crAccountClass, crAccountSubClass } = activityData;
+
+      // Get mainaccounts data for debit account
+      let debitAccountClass = null;
+      let debitSubClass = null;
+      if (receivedaccount) {
+        const mainAccDoc = await db.collection("mainaccounts").where("name", "==", receivedaccount).get();
+        if (!mainAccDoc.empty) {
+          const mainAccData = mainAccDoc.docs[0].data();
+          debitAccountClass = mainAccData.accountType ?? null;
+          debitSubClass = mainAccData.subType ?? null;
+        }
+      }
+
+      // Only create ledger for newly added fee names
+      const batch = db.batch();
+      let ledgerCount = 0;
+      for (const [feeType, amount] of Object.entries(fees || {})) {
+        if (typeof amount !== "number" || amount <= 0) continue;
+        if (feeType in prevFees) continue; // skip existing fee names
+        const ledgerId = `${event.params.paymentId}_${studentId}_${feeType.replace(/\s+/g, "_")}`;
+        const ledgerRef = db.collection("ledger").doc(ledgerId);
+        batch.set(ledgerRef, {
+          transactionId: uuidv4(),
+          studentId,
+          studentName: student.name || null,
+          schoolId,
+          activityType: "fee payment",
+          feeName: feeType,
+          term,
+          level,
+          yeargroup,
+          amount: String(amount),
+          paymentId: event.params.paymentId,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          accounts: {
+            debit: {
+              account: receivedaccount ?? null,
+              accountClass: debitAccountClass,
+              value: String(amount),
+              subClass: debitSubClass,
+            },
+            credit: {
+              account: crAccount ?? null,
+              accountClass: crAccountClass ?? null,
+              value: String(amount),
+              subClass: crAccountSubClass ?? null,
+            },
+          },
+        });
+        ledgerCount++;
+      }
+      if (ledgerCount > 0) {
+        await batch.commit();
+        await paymentRef.update({
+          ledgerStatus: "success",
+          ledgerMessage: `Ledger created for ${ledgerCount} new fee types for student ${studentId}.`,
+        });
+      }
+    } catch (error) {
+      await paymentRef.update({
+        ledgerStatus: "failed",
+        ledgerMessage: `Error: ${error.message}`,
+      });
+    }
+  }
+);
+
+
+// Trigger: create ledger for newly added fee names in feepayment
 // Ledger posting for feepayment collection
 export const createLedgerOnFeePayment = onDocumentCreated(
   "feepayment/{paymentId}",
@@ -13,7 +114,7 @@ export const createLedgerOnFeePayment = onDocumentCreated(
       return;
     }
     const paymentRef = snapshot.ref;
-  const { studentId, schoolId, amount, term, receivedaccount, feeName, level, yeargroup } = paymentData;
+  const { studentId, schoolId, term, receivedaccount, fees, level, yeargroup } = paymentData;
     try {
       // Get student
       const studentDoc = await db.collection("students").doc(`${schoolId}_${studentId}`).get();
@@ -24,8 +125,7 @@ export const createLedgerOnFeePayment = onDocumentCreated(
         });
         return;
       }
-      const student = studentDoc.data();
-
+  const student = studentDoc.data();
       // Get system activity for 'fee payment'
       const activitySnap = await db
         .collection("systemActivity")
@@ -59,44 +159,58 @@ export const createLedgerOnFeePayment = onDocumentCreated(
         }
       }
 
-      // Ledger entry
-      const transactionId = uuidv4();
-      const ledgerId = `${event.params.paymentId}_${studentId}`;
-      const ledgerRef = db.collection("ledger").doc(ledgerId);
-      await ledgerRef.set({
-        transactionId,
-        studentId,
-        studentName: student.name || null,
-        schoolId,
-        activityType: "fee payment",
-        feeName,
-        term,
-        level,
-        yeargroup,
-        amount: String(amount),
-        paymentId: event.params.paymentId,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        accounts: {
-          debit: {
-            account: receivedaccount ?? null,
-            accountClass: debitAccountClass,
-            value: String(amount),
-            subClass: debitSubClass,
+      // Create a ledger entry for each fee type in the fees map
+      const batch = db.batch();
+      let ledgerCount = 0;
+      for (const [feeType, amount] of Object.entries(fees || {})) {
+        if (typeof amount !== "number" || amount <= 0) continue;
+        const transactionId = uuidv4();
+        const ledgerId = `${event.params.paymentId}_${studentId}_${feeType.replace(/\s+/g, "_")}`;
+        const ledgerRef = db.collection("ledger").doc(ledgerId);
+        batch.set(ledgerRef, {
+          transactionId,
+          studentId,
+          studentName: student.name || null,
+          schoolId,
+          activityType: "fee payment",
+          feeName: feeType,
+          term,
+          level,
+          yeargroup,
+          amount: String(amount),
+          paymentId: event.params.paymentId,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          accounts: {
+            debit: {
+              account: receivedaccount ?? null,
+              accountClass: debitAccountClass,
+              value: String(amount),
+              subClass: debitSubClass,
+            },
+            credit: {
+              account: crAccount ?? null,
+              accountClass: crAccountClass ?? null,
+              value: String(amount),
+              subClass: crAccountSubClass ?? null,
+            },
           },
-          credit: {
-            account: crAccount ?? null,
-            accountClass: crAccountClass ?? null,
-            value: String(amount),
-            subClass: crAccountSubClass ?? null,
-          },
-        },
-      });
-
-      await paymentRef.update({
-        ledgerStatus: "success",
-        ledgerMessage: `Ledger created for fee payment by student ${studentId}.`,
-      });
-      console.log(`Ledger created for fee payment by student ${studentId}`);
+        });
+        ledgerCount++;
+      }
+      if (ledgerCount > 0) {
+        await batch.commit();
+        await paymentRef.update({
+          ledgerStatus: "success",
+          ledgerMessage: `Ledger created for ${ledgerCount} fee types for student ${studentId}.`,
+        });
+        console.log(`Ledger created for ${ledgerCount} fee types for student ${studentId}`);
+      } else {
+        await paymentRef.update({
+          ledgerStatus: "failed",
+          ledgerMessage: `No valid fee types found for student ${studentId}.`,
+        });
+        console.log(`No valid fee types found for student ${studentId}`);
+      }
     } catch (error) {
       console.error("Error creating feepayment ledger entry:", error);
       await paymentRef.update({
@@ -106,17 +220,7 @@ export const createLedgerOnFeePayment = onDocumentCreated(
     }
   }
 );
-// Ledger posting for singlebilled (top-up or unbilled students)
 
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
-import admin from "firebase-admin";
-import { v4 as uuidv4 } from "uuid"; // install with: npm install uuid
-
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-
-const db = admin.firestore();
 
 export const createLedgerOnSingleBilling = onDocumentCreated(
   "singlebilled/{singleBillId}",

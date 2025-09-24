@@ -5,6 +5,7 @@ import '../controller/myprovider.dart';
 import '../controller/routes.dart';
 import 'actionbuttons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 class StaffHomePage extends StatefulWidget {
   const StaffHomePage({super.key});
 
@@ -44,7 +45,7 @@ class _StaffHomePageState extends State<StaffHomePage> {
                 end: Alignment.bottomRight,
               ),
             ),
-            child: FutureBuilder(
+            child: FutureBuilder<DocumentSnapshot>(
               future: provider.db
                   .collection("teacherSetup")
                   .doc("KS0002_${provider.academicyrid}_${provider.term}")
@@ -57,13 +58,16 @@ class _StaffHomePageState extends State<StaffHomePage> {
                   return _buildMessage("No subjects assigned yet.");
                 }
 
-                //fetch subjects array directly from the document
-                final data = snapshot.data!;
-                List<dynamic> assignedSubjects = data.get('subjects') ?? [];
+                final data = snapshot.data!.data() as Map<String, dynamic>;
+                final Map<String, dynamic> subjectsMap =
+                Map<String, dynamic>.from(data['subjects'] ?? {});
 
-                if (assignedSubjects.isEmpty) {
+                if (subjectsMap.isEmpty) {
                   return _buildMessage("No subjects assigned yet.");
                 }
+
+                // Convert map values into a list
+                final assignedSubjects = subjectsMap.values.toList();
 
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -80,26 +84,27 @@ class _StaffHomePageState extends State<StaffHomePage> {
                     ),
                     itemCount: assignedSubjects.length,
                     itemBuilder: (context, index) {
-                      final subject = assignedSubjects[index] as Map<String, dynamic>;
-                      final color = Colors.primaries[index % Colors.primaries.length];
+                      final subject =
+                      assignedSubjects[index] as Map<String, dynamic>;
+                      final color =
+                      Colors.primaries[index % Colors.primaries.length];
 
                       return InkWell(
                         borderRadius: BorderRadius.circular(20),
                         splashColor: color.withOpacity(0.3),
                         onTap: () {
-
                           context.go(
                             Routes.staffscoring,
                             extra: {
                               "subject": subject['name'],
-                              "level": subject['level'],
+                              "level": subject['level'] ?? "Unknown",
                             },
                           );
                         },
                         child: _buildClickableCard(
                           context,
                           icon: Icons.book_rounded,
-                          title: "${subject['name']} (${subject['level']})",
+                          title: "${subject['name']} (${subject['level'] ?? ""})",
                           color: color,
                         ),
                       );

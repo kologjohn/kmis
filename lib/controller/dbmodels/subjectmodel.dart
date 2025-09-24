@@ -53,5 +53,12 @@ class SubjectModel {
       timestamp: parsedTime,
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+
+    };
+  }
 }
 

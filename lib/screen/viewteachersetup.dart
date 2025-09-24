@@ -46,7 +46,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
       final fields = [
         item.staffname,
         item.classname.map((c) => c.name).join(","),
-        item.levels?.map((l) => l.name).join(",") ?? "",
       ].map((e) => e.toLowerCase()).toList();
       return fields.any((f) => f.contains(query));
     }).toList();
@@ -167,7 +166,7 @@ class _TeacherListPageState extends State<TeacherListPage> {
                     final index = idx + startIndex;
                     final item = pageItems[idx];
 
-                    final levels = item.levels?.map((l) => l.name).toList() ?? [];
+
                     final classes = item.classname.map((c) => c.name).toList();
                     final subjects = item.subjects.map((s) => s.name).toList();
 
@@ -223,16 +222,7 @@ class _TeacherListPageState extends State<TeacherListPage> {
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold)),
                                 const SizedBox(height: 4),
-                                Wrap(
-                                  spacing: 8,
-                                  children: levels
-                                      .map((lvl) => Chip(
-                                    label: Text(lvl,
-                                        style: const TextStyle(color: Colors.white)),
-                                    backgroundColor: Colors.blueGrey.shade700,
-                                  ))
-                                      .toList(),
-                                ),
+
                                 const SizedBox(height: 8),
                                 Text("Classes:",
                                     style: const TextStyle(
