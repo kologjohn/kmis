@@ -217,12 +217,6 @@ class _TeacherListPageState extends State<TeacherListPage> {
                               // Expanded section
                               if (isExpanded) ...[
                                 const Divider(color: Colors.white38, height: 16),
-                                Text("Levels:",
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold)),
-                                const SizedBox(height: 4),
-
                                 const SizedBox(height: 8),
                                 Text("Classes:",
                                     style: const TextStyle(

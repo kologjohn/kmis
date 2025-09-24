@@ -336,14 +336,82 @@ class Myprovider extends LoginProvider {
       "lastnumber": lastNumber,
     };
   }
-  Future<void> fetchTeacherSetupList({int limit = 10, bool reset = false, bool nextPage = true,}) async {
-    try {
+
+  // Future<void> fetchTeacherSetupList({int limit = 10, bool reset = false, bool nextPage = true,}) async {
+  //   try {
+  //     isLoadingTeacherList = true;
+  //     notifyListeners();
+  //     Query query = db
+  //         .collection("teacherSetup")
+  //         .orderBy("timestamp", descending: false)
+  //         .limit(limit);
+  //     if (!reset && lastTeacherDocument != null && nextPage) {
+  //       query = query.startAfterDocument(lastTeacherDocument!);
+  //     } else if (!reset && firstTeacherDocument != null && !nextPage) {
+  //       query = query.endBeforeDocument(firstTeacherDocument!).limitToLast(limit);
+  //     }
+  //
+  //     final snapshot = await query.get();
+  //
+  //     if (snapshot.docs.isNotEmpty) {
+  //       // Save pagination cursors
+  //       firstTeacherDocument = snapshot.docs.first;
+  //       lastTeacherDocument = snapshot.docs.last;
+  //       teacherSetupList = snapshot.docs.map((doc) {
+  //         final data = doc.data() as Map<String, dynamic>;
+  //
+  //         return TeacherSetup(
+  //           staffid: data['staffid'] ?? '',
+  //           staffname: data['staffname'] ?? '',
+  //           schoolId: data['schoolId'] ?? '',
+  //           academicyear: data['academicyear'] ?? '',
+  //           term: data['term'] ?? '',
+  //           component: (data['component'] as List<dynamic>?)
+  //               ?.map((c) => ComponentModel.fromMap(c as Map<String, dynamic>)).toList()?? [],
+  //           classname: (data['classname'] as List<dynamic>? ?? []).map((c) => ClassModel(
+  //             id: c['id'] ?? '',
+  //             name: c['name'] ?? '',
+  //             staff: name,
+  //           ))
+  //               .toList(),
+  //           status: data['status'] ?? 'active',
+  //           complete: data['complete'] ?? 'no',
+  //           email: data['email'],
+  //           phone: data['phone'],
+  //           createby: data['createby'],
+  //           subjects: (data['subjects'] as List<dynamic>? ?? [])
+  //               .map((s) => SubjectModel(
+  //             id: s['id'] ?? '',
+  //             name: s['name'] ?? '',
+  //           )).toList(),
+  //        timestamp: data['timestamp'] != null
+  //                ? DateTime.tryParse(data['timestamp'])
+  //               ?? DateTime.now()
+  //               : DateTime.now(),
+  //
+  //         );
+  //       }).toList();
+  //     } else {
+  //       teacherSetupList = [];
+  //     }
+  //   } catch (e) {
+  //     debugPrint("Error fetching teacherSetup: $e");
+  //   } finally {
+  //     isLoadingTeacherList = false;
+  //     notifyListeners();
+  //   }
+  // }
+  //
+
+  Future<void> fetchTeacherSetupList({int limit = 10,bool reset = false, bool nextPage = true,  }) async {    try {
       isLoadingTeacherList = true;
       notifyListeners();
+
       Query query = db
           .collection("teacherSetup")
           .orderBy("timestamp", descending: false)
           .limit(limit);
+
       if (!reset && lastTeacherDocument != null && nextPage) {
         query = query.startAfterDocument(lastTeacherDocument!);
       } else if (!reset && firstTeacherDocument != null && !nextPage) {
@@ -356,8 +424,93 @@ class Myprovider extends LoginProvider {
         // Save pagination cursors
         firstTeacherDocument = snapshot.docs.first;
         lastTeacherDocument = snapshot.docs.last;
+
         teacherSetupList = snapshot.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>;
+
+          // Helper: parse timestamp field safely
+          DateTime parseTimestamp(dynamic t) {
+            if (t == null) return DateTime.now();
+            if (t is Timestamp) return t.toDate();
+            if (t is DateTime) return t;
+            if (t is String) return DateTime.tryParse(t) ?? DateTime.now();
+            return DateTime.now();
+          }
+
+          // --- classname: can be Map<String, dynamic> or List<dynamic>
+          List<ClassModel> classnameList = [];
+          final classnameField = data['classname'];
+          if (classnameField != null) {
+            if (classnameField is Map) {
+              classnameList = (Map<String, dynamic>.from(classnameField))
+                  .values
+                  .map((c) {
+                final m = Map<String, dynamic>.from(c as Map);
+                return ClassModel(
+                  id: m['id'] ?? '',
+                  name: m['name'] ?? '',
+                  staff: m['staff'] ?? '',
+                  schoolId: m['schoolId'] ?? null,
+                  // if your ClassModel expects timestamp, you can parse m['timestamp'] similarly
+                );
+              }).toList();
+            } else if (classnameField is List) {
+              classnameList = (classnameField as List<dynamic>)
+                  .map((c) => ClassModel(
+                id: (c as Map)['id'] ?? '',
+                name: c['name'] ?? '',
+                staff: c['staff'] ?? '',
+                schoolId: c['schoolId'],
+              ))
+                  .toList();
+            }
+          }
+
+          // --- component: can be Map<String, dynamic> or List<dynamic>
+          List<ComponentModel> componentList = [];
+          final componentField = data['component'];
+          if (componentField != null) {
+            if (componentField is Map) {
+              componentList = (Map<String, dynamic>.from(componentField))
+                  .values
+                  .map((c) {
+                final m = Map<String, dynamic>.from(c as Map);
+                return ComponentModel.fromMap(m);
+              }).toList();
+            } else if (componentField is List) {
+              componentList = (componentField as List<dynamic>)
+                  .map((c) => ComponentModel.fromMap(Map<String, dynamic>.from(c as Map)))
+                  .toList();
+            }
+          }
+
+          // --- subjects: can be Map<String, dynamic> or List<dynamic>
+          List<SubjectModel> subjectsList = [];
+          final subjectsField = data['subjects'];
+          if (subjectsField != null) {
+            if (subjectsField is Map) {
+              subjectsList = (Map<String, dynamic>.from(subjectsField))
+                  .values
+                  .map((s) {
+                final m = Map<String, dynamic>.from(s as Map);
+                return SubjectModel(
+                  id: m['id'] ?? '',
+                  name: m['name'] ?? '',
+                  // if your SubjectModel has isComplete, include it:
+                  // isComplete: m['isComplete'] ?? 'no',
+                );
+              }).toList();
+            } else if (subjectsField is List) {
+              subjectsList = (subjectsField as List<dynamic>)
+                  .map((s) => SubjectModel(
+                id: (s as Map)['id'] ?? '',
+                name: s['name'] ?? '',
+              ))
+                  .toList();
+            }
+          }
+
+          final timestamp = parseTimestamp(data['timestamp']);
 
           return TeacherSetup(
             staffid: data['staffid'] ?? '',
@@ -365,41 +518,30 @@ class Myprovider extends LoginProvider {
             schoolId: data['schoolId'] ?? '',
             academicyear: data['academicyear'] ?? '',
             term: data['term'] ?? '',
-            component: (data['component'] as List<dynamic>?)
-                ?.map((c) => ComponentModel.fromMap(c as Map<String, dynamic>)).toList()?? [],
-            classname: (data['classname'] as List<dynamic>? ?? []).map((c) => ClassModel(
-              id: c['id'] ?? '',
-              name: c['name'] ?? '',
-              staff: name,
-            ))
-                .toList(),
+            component: componentList,
+            classname: classnameList,
             status: data['status'] ?? 'active',
             complete: data['complete'] ?? 'no',
-            email: data['email'],
-            phone: data['phone'],
-            createby: data['createby'],
-            subjects: (data['subjects'] as List<dynamic>? ?? [])
-                .map((s) => SubjectModel(
-              id: s['id'] ?? '',
-              name: s['name'] ?? '',
-            )).toList(),
-         timestamp: data['timestamp'] != null
-                 ? DateTime.tryParse(data['timestamp'])
-                ?? DateTime.now()
-                : DateTime.now(),
-
+            email: data['email'] ?? '',
+            phone: data['phone'] ?? '',
+            createby: data['createby'] ?? '',
+            subjects: subjectsList,
+            timestamp: timestamp,
           );
         }).toList();
       } else {
         teacherSetupList = [];
       }
-    } catch (e) {
+    } catch (e, st) {
       debugPrint("Error fetching teacherSetup: $e");
+      debugPrintStack(stackTrace: st);
     } finally {
       isLoadingTeacherList = false;
       notifyListeners();
     }
   }
+
+
   updateAccessComponent(String id, Map<String, dynamic> newData) async {
     try {
       final docRef = FirebaseFirestore.instance
@@ -417,180 +559,6 @@ class Myprovider extends LoginProvider {
     }
   }
 
- /* Future<void> saveTeacherSetupMulti({
-    required List<Staff> teacherIds,
-    required String schoolId,
-    required String academicYear,
-    required String term,
-    required List<ClassModel> classes,
-    required List<SubjectModel> subjects,
-    required List<ComponentModel> components,
-  }) async {
-    if (teacherIds.isEmpty) throw Exception("No teachers selected.");
-    if (subjects.isEmpty) throw Exception("No subjects selected.");
-    if (academicYear.trim().isEmpty || term.trim().isEmpty) {
-      throw Exception("Academic year and term are required.");
-    }
-    savingSetup = true;
-    notifyListeners();
-    const int _batchLimit = 450;
-    try {
-      // ----------------------------
-      // STEP 1: Create SubjectScoring docs for all students
-      // ----------------------------
-      WriteBatch batch = db.batch();
-      int writes = 0;
-
-      final classNames = classes.map((c) => c.name).toList();
-      final teacherid = teacherIds.map((c) => c.schoolId).toList();
-      final teachername = teacherIds.map((c) => c.name).toList();
-      final teacheremail = teacherIds.map((c) => c.email).toList();
-      final teacherschool = teacherIds.map((c) => c.schoolname).toList();
-
-
-      // Fetch all students in selected classes and levels
-      final studentSnap = await db
-          .collection("students")
-          .where("schoolId", isEqualTo: schoolId)
-          .where("level", whereIn: classNames)
-          .get();
-
-      // final Map<String, Map<String, String>> teacherInfo = {};
-      // for (int i = 0; i < teacherIds.length; i++) {
-      //   teacherInfo[teacherIds[i]] = {
-      //     "id": teacherIds[i],
-      //     "name": teacherNames[i],
-      //   };
-      // }
-
-      for (final studentDoc in studentSnap.docs) {
-        final studentData = studentDoc.data() as Map<String, dynamic>;
-        final studentId = studentDoc.id;
-        final studentClass = studentData['level'] ?? '';
-
-        if (!classNames.contains(studentClass)) continue;
-        // Build subjects using SubjectScoring model
-        final Map<String, dynamic> subjectMap = {};
-        final Map<String, String> scoredFlags = {};
-        final Map<String, String> totalScores = {};
-
-        for (final subject in subjects) {
-          final scoring = SubjectScoring.create(
-            studentId: studentId,
-            studentName: studentData['name'] ?? '',
-            academicYear: academicYear,
-            term: term,
-            staff: name,
-            classes: studentClass,
-            teacher: '', // assign teacher if needed
-            level: studentData['level'] ?? '',
-            department: studentData['department'] ?? '',
-            region: studentData['region'] ?? '',
-            schoolId: schoolId,
-            school: studentData['school'] ?? '',
-            photoUrl: studentData['photourl'] ?? '',
-            dob: studentData['dob'] ?? '',
-            email: studentData['email'] ?? '',
-            phone: studentData['phone'] ?? '',
-            sex: studentData['sex'] ?? '',
-            status: studentData['status'] ?? 'active',
-            yeargroup: studentData['yeargroup'] ?? '',
-            subjectId: subject.id,
-            subjectName: subject.name,
-            components: components,
-          );
-
-          subjectMap.addAll(scoring.subjectData);
-          scoredFlags.addAll(scoring.scoredFlags);
-          totalScores.addAll(scoring.totalScores);
-        }
-
-        final scoringId = "${studentId}_$academicYear$term";
-        final scoringRef = db.collection("subjectScoring").doc(scoringId);
-        final scoringData = {
-          "studentId": studentId,
-          "studentName": studentData['name'] ?? '',
-          "academicYear": academicYear,
-          "term": term,
-          "level": studentData['level'] ?? '',
-          "class": studentClass,
-          "department": studentData['department'] ?? '',
-          "region": studentData['region'] ?? '',
-          "schoolId": schoolId,
-          "school": studentData['school'] ?? '',
-          "photourl": studentData['photourl'] ?? '',
-          "dob": studentData['dob'] ?? '',
-          "email": studentData['email'] ?? '',
-          "phone": studentData['phone'] ?? '',
-          "sex": studentData['sex'] ?? '',
-          "status": studentData['status'] ?? 'active',
-          "yeargroup": studentData['yeargroup'] ?? '',
-          "teachers": teacherInfo,
-          "subjects":subjectMap,
-          //...subjectMap,
-          ...scoredFlags,
-          ...totalScores,
-          "timestamp": DateTime.now(),
-        };
-
-        batch.set(scoringRef, scoringData, SetOptions(merge: true));
-        writes++;
-
-        if (writes >= _batchLimit) {
-          await batch.commit();
-          batch = db.batch();
-          writes = 0;
-        }
-      }
-
-      if (writes > 0) await batch.commit();
-
-      // ----------------------------
-      // STEP 2: Save TeacherSetup docs after student scoring
-      // ----------------------------
-      batch = db.batch();
-      writes = 0;
-
-      for (int i = 0; i < teacherIds.length; i++) {
-        final teacherId = teacherIds[i];
-       // final teachername = teacherNames[i];
-
-        final teacherSetupId = "${teacherId}_${academicYear}_$term";
-
-        final teacherSetup = TeacherSetup(
-          staffid: teacherId,
-          staffname: teacherNames[i],
-          classname: classes,
-          schoolId: schoolId,
-          academicyear: academicYear,
-          term: term,
-          component: components,
-          levels: levels,
-          subjects: subjects,
-          createby: name,
-        );
-
-        final teacherSetupRef = db.collection("teacherSetup").doc(teacherSetupId);
-        batch.set(teacherSetupRef, teacherSetup.toJson(), SetOptions(merge: true));
-        writes++;
-
-        if (writes >= _batchLimit) {
-          await batch.commit();
-          batch = db.batch();
-          writes = 0;
-        }
-      }
-
-      if (writes > 0) await batch.commit();
-    } catch (e, stack) {
-      debugPrint("Error in saveTeacherSetupMulti: $e");
-      debugPrintStack(stackTrace: stack);
-      rethrow;
-    } finally {
-      savingSetup = false;
-      notifyListeners();
-    }
-  }*/
   Future<void> saveTeacherSetupMulti({required List<Staff> teacherIds,required String schoolId,required String academicYear, required String term,    required List<ClassModel> classes, required List<SubjectModel> subjects,  required List<ComponentModel> components,  }) async {
     if (teacherIds.isEmpty) throw Exception("No teachers selected.");
     if (subjects.isEmpty) throw Exception("No subjects selected.");
@@ -728,6 +696,8 @@ class Myprovider extends LoginProvider {
           component: componentsMap,
           subjects: subjectsList,
           createby: name,
+          email: teacher.email,
+          phone: teacher.phone,
         );
 
         final teacherSetupRef = db.collection("teacherSetup").doc(teacherSetupId);

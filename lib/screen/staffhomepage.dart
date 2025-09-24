@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -18,14 +19,13 @@ class _StaffHomePageState extends State<StaffHomePage> {
   Widget build(BuildContext context) {
     double mediaWidth = MediaQuery.of(context).size.width;
     int count = mediaWidth > 600 ? 3 : 2;
-
     return Consumer<Myprovider>(
       builder: (context, provider, child) {
         return Scaffold(
           extendBodyBehindAppBar: true,
           appBar: AppBar(
             title: Text(
-              'Welcome ${provider.name}~ ${provider.auth.currentUser?.email ?? "No user"}',
+              'Welcome ${provider.name} ~ ${provider.auth.currentUser?.email ?? "No user"}',
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w600,
@@ -55,19 +55,29 @@ class _StaffHomePageState extends State<StaffHomePage> {
                   return _buildMessage("An error occurred. Please try again.");
                 }
                 if (!snapshot.hasData || !snapshot.data!.exists) {
-                  return _buildMessage("No subjects assigned yet.");
+                  return _buildMessage("No subjects/classes assigned yet.");
                 }
-
                 final data = snapshot.data!.data() as Map<String, dynamic>;
+
+                final Map<String, dynamic> classesMap =
+                Map<String, dynamic>.from(data['classname'] ?? {});
                 final Map<String, dynamic> subjectsMap =
                 Map<String, dynamic>.from(data['subjects'] ?? {});
 
-                if (subjectsMap.isEmpty) {
-                  return _buildMessage("No subjects assigned yet.");
+                if (classesMap.isEmpty || subjectsMap.isEmpty) {
+                  return _buildMessage("No subjects/classes assigned yet.");
                 }
 
-                // Convert map values into a list
-                final assignedSubjects = subjectsMap.values.toList();
+                final List<Map<String, dynamic>> assignedList = [];
+                for (final classEntry in classesMap.values) {
+                  for (final subjectEntry in subjectsMap.values) {
+                    assignedList.add({
+                      "class": classEntry['name'],
+                      "subject": subjectEntry['name'],
+                      "department": classEntry['department'],
+                    });
+                  }
+                }
 
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -82,10 +92,9 @@ class _StaffHomePageState extends State<StaffHomePage> {
                           ? 1.3
                           : 1.0,
                     ),
-                    itemCount: assignedSubjects.length,
+                    itemCount: assignedList.length,
                     itemBuilder: (context, index) {
-                      final subject =
-                      assignedSubjects[index] as Map<String, dynamic>;
+                      final entry = assignedList[index];
                       final color =
                       Colors.primaries[index % Colors.primaries.length];
 
@@ -96,15 +105,16 @@ class _StaffHomePageState extends State<StaffHomePage> {
                           context.go(
                             Routes.staffscoring,
                             extra: {
-                              "subject": subject['name'],
-                              "level": subject['level'] ?? "Unknown",
+                              "subject": entry['subject'],
+                              "level": entry['class'],
+                              "department": entry['department'],
                             },
                           );
                         },
                         child: _buildClickableCard(
                           context,
                           icon: Icons.book_rounded,
-                          title: "${subject['name']} (${subject['level'] ?? ""})",
+                          title: "${entry['subject']} (${entry['class']})",
                           color: color,
                         ),
                       );
@@ -131,7 +141,6 @@ class _StaffHomePageState extends State<StaffHomePage> {
       ),
     );
   }
-
   Widget _buildClickableCard(
       BuildContext context, {
         required IconData icon,
