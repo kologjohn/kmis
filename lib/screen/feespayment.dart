@@ -76,7 +76,6 @@ class _FeepaymentState extends State<Feepayment> {
               body: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
                        SingleChildScrollView(
                         padding: const EdgeInsets.all(20),
                           child: Padding(
@@ -424,7 +423,7 @@ class _FeepaymentState extends State<Feepayment> {
                            ),
                                                     ),
                   ),
-                ],
+                     ],
               ),
             );
           },
