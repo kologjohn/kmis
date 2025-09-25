@@ -6,7 +6,10 @@ import 'package:ksoftsms/controller/dbmodels/feePaymentModel.dart';
 import 'package:provider/provider.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:ksoftsms/controller/routes.dart';
+import '../components/receiptpdf.dart';
 import '../widgets/dropdown.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
 
 class Feepayment extends StatefulWidget {
   const Feepayment({super.key});
@@ -366,10 +369,50 @@ class _FeepaymentState extends State<Feepayment> {
                                   label: const Text("Bill Students",
                                       style: TextStyle(color: Colors.white)),
                                 ),
+
                                 ElevatedButton(onPressed: ()async{
                                   //await value.setreceiptnumber(receiptNumberController.text.trim());
+
                                   context.go(Routes.nextpage);
                                 }, child: Text("Print Receipt"))
+
+                               , ElevatedButton(
+                                  onPressed: () async {
+                                    final printer = SchoolReceiptPrinter(
+                                      schoolName: "JOHNNY INT",
+                                      schoolAddress: "BOLGA, UPPER EAST",
+                                      schoolEmail: "info@kologsoft.com",
+                                      schoolWebsite: "www.kologsoft.com",
+                                      schoolPhone: "+233 553 354 349",
+                                      logoAssetPath: "assets/logo.png", // must exist in pubspec.yaml
+
+                                      date: "25/09/2025",
+                                      receiptNo: "RCPT2025001",
+                                      receivedFrom: "John Doe",
+                                      paymentType: "MOMO",
+                                      paymentFor: "First Term School Fees",
+                                      paymentDate: "25/09/2025",
+                                      records: {
+                                        "School Fee (First Term 2025)": 2500.00,
+                                        "Library Fee": 150.00,
+                                        "Sports Fee": 50.00,
+                                      },
+                                      total: 2700.00,
+                                    );
+
+                                    // Generate PDF
+                                    final pdfBytes = await printer.generatePdf(
+                                      PdfPageFormat.a4,
+                                      "School Receipt",
+                                    );
+
+                                    // Open print/share preview
+                                    await Printing.layoutPdf(
+                                      onLayout: (PdfPageFormat format) async => pdfBytes,
+                                    );
+                                  },
+                                  child: const Text("Print Receipt"),
+                                ),
                               ],
                                                        ),
                                                         ),
