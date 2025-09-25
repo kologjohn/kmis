@@ -28,11 +28,9 @@ class _FeepaymentState extends State<Feepayment> {
       provider.fetchterms();
       provider.fetchFess();
       provider.paymentmethodslist();
-     // provider.generatereceiptnumber();
-      //provider.receipt("receiptno");
-      print("Receipt: ${provider.receiptno}");
+      provider.generatereceiptnumber();
+      receiptNumberController.text = provider.receiptno; // update field
 
-     // receiptNumberController.text = provider.receiptno;
     });
   }
 
@@ -79,11 +77,11 @@ class _FeepaymentState extends State<Feepayment> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                        SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                           child: Padding(
                            padding: const EdgeInsets.all(20),
                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 400),
+                              constraints: const BoxConstraints(maxWidth: 300),
                              child: Form(
                               key: _formKey,
                               child: Column(
@@ -103,9 +101,7 @@ class _FeepaymentState extends State<Feepayment> {
                                     border: const OutlineInputBorder(),
                                   ),
                                 ),
-
                                 const SizedBox(height: 10),
-
                                 TextField(
                                   controller: searchController,
                                   decoration: InputDecoration(
@@ -143,8 +139,7 @@ class _FeepaymentState extends State<Feepayment> {
                                           title: Text(student.name ?? ""),
                                           subtitle:
                                           Text("ID: ${student.studentid}"),
-                                          trailing: Icon(
-                                            value.selectedStudents.any((s) =>
+                                          trailing: Icon(value.selectedStudents.any((s) =>
                                             s.studentid ==
                                                 student.studentid)
                                                 ? Icons.check_circle
@@ -156,7 +151,11 @@ class _FeepaymentState extends State<Feepayment> {
                                                 : Colors.grey,
                                           ),
                                           onTap: () {
+                                            value.selectedStudents.clear();
                                             value.addStudent(student);
+                                            searchController.clear();
+                                            value.emptysearchResults();
+
                                           },
                                         ),
                                       );
@@ -164,8 +163,7 @@ class _FeepaymentState extends State<Feepayment> {
                                   ),
                                 if (value.selectedStudents.isNotEmpty)
                                   Column(
-                                    children: value.selectedStudents
-                                        .map(
+                                    children: value.selectedStudents.map(
                                           (s) => Card(
                                         color: Colors.blue[50],
                                         margin: const EdgeInsets.symmetric(
@@ -294,8 +292,14 @@ class _FeepaymentState extends State<Feepayment> {
                                           if (dataexist.exists) {
                                             final existingData = dataexist.data() as Map<String, dynamic>;
                                             final existingFees = Map<String, dynamic>.from(existingData["fees"] ?? {});
+                                            if(existingData['studentID']!=student.studentid){
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Receipt ID $id already exists for another student."), backgroundColor: Colors.red,));
+                                              progress.dismiss();
+                                              return;
+                                            }
+
                                             // Only add if fee does not already exist
-                                            if (!existingFees.containsKey(selectedfee)) {
+                                           else if (!existingFees.containsKey(selectedfee)) {
                                               existingFees[selectedfee.toString()] = double.tryParse(amount) ?? 0;
                                               await value.db.collection("feepayment").doc(id).update({"fees": existingFees});
                                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fee '${selectedfee}' added to Receipt $id"), backgroundColor: Colors.green,));
@@ -373,7 +377,7 @@ class _FeepaymentState extends State<Feepayment> {
                                 ElevatedButton(onPressed: ()async{
                                   //await value.setreceiptnumber(receiptNumberController.text.trim());
 
-                                  context.go(Routes.nextpage);
+                                  context.go(Routes.receipt);
                                 }, child: Text("Print Receipt"))
 
                                , ElevatedButton(

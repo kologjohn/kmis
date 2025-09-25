@@ -230,7 +230,6 @@ class Myprovider extends LoginProvider {
       throw Exception("Failed to fetch score config: $e");
     }
   }
-
   Future<void> getfetchRegions() async {
     try {
       isLoadingRegions = true;
@@ -336,73 +335,6 @@ class Myprovider extends LoginProvider {
       "lastnumber": lastNumber,
     };
   }
-
-  // Future<void> fetchTeacherSetupList({int limit = 10, bool reset = false, bool nextPage = true,}) async {
-  //   try {
-  //     isLoadingTeacherList = true;
-  //     notifyListeners();
-  //     Query query = db
-  //         .collection("teacherSetup")
-  //         .orderBy("timestamp", descending: false)
-  //         .limit(limit);
-  //     if (!reset && lastTeacherDocument != null && nextPage) {
-  //       query = query.startAfterDocument(lastTeacherDocument!);
-  //     } else if (!reset && firstTeacherDocument != null && !nextPage) {
-  //       query = query.endBeforeDocument(firstTeacherDocument!).limitToLast(limit);
-  //     }
-  //
-  //     final snapshot = await query.get();
-  //
-  //     if (snapshot.docs.isNotEmpty) {
-  //       // Save pagination cursors
-  //       firstTeacherDocument = snapshot.docs.first;
-  //       lastTeacherDocument = snapshot.docs.last;
-  //       teacherSetupList = snapshot.docs.map((doc) {
-  //         final data = doc.data() as Map<String, dynamic>;
-  //
-  //         return TeacherSetup(
-  //           staffid: data['staffid'] ?? '',
-  //           staffname: data['staffname'] ?? '',
-  //           schoolId: data['schoolId'] ?? '',
-  //           academicyear: data['academicyear'] ?? '',
-  //           term: data['term'] ?? '',
-  //           component: (data['component'] as List<dynamic>?)
-  //               ?.map((c) => ComponentModel.fromMap(c as Map<String, dynamic>)).toList()?? [],
-  //           classname: (data['classname'] as List<dynamic>? ?? []).map((c) => ClassModel(
-  //             id: c['id'] ?? '',
-  //             name: c['name'] ?? '',
-  //             staff: name,
-  //           ))
-  //               .toList(),
-  //           status: data['status'] ?? 'active',
-  //           complete: data['complete'] ?? 'no',
-  //           email: data['email'],
-  //           phone: data['phone'],
-  //           createby: data['createby'],
-  //           subjects: (data['subjects'] as List<dynamic>? ?? [])
-  //               .map((s) => SubjectModel(
-  //             id: s['id'] ?? '',
-  //             name: s['name'] ?? '',
-  //           )).toList(),
-  //        timestamp: data['timestamp'] != null
-  //                ? DateTime.tryParse(data['timestamp'])
-  //               ?? DateTime.now()
-  //               : DateTime.now(),
-  //
-  //         );
-  //       }).toList();
-  //     } else {
-  //       teacherSetupList = [];
-  //     }
-  //   } catch (e) {
-  //     debugPrint("Error fetching teacherSetup: $e");
-  //   } finally {
-  //     isLoadingTeacherList = false;
-  //     notifyListeners();
-  //   }
-  // }
-  //
-
   Future<void> fetchTeacherSetupList({int limit = 10,bool reset = false, bool nextPage = true,  }) async {    try {
       isLoadingTeacherList = true;
       notifyListeners();
@@ -540,8 +472,6 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
-
-
   updateAccessComponent(String id, Map<String, dynamic> newData) async {
     try {
       final docRef = FirebaseFirestore.instance
@@ -558,7 +488,6 @@ class Myprovider extends LoginProvider {
       rethrow;
     }
   }
-
   Future<void> saveTeacherSetupMulti({required List<Staff> teacherIds,required String schoolId,required String academicYear, required String term,    required List<ClassModel> classes, required List<SubjectModel> subjects,  required List<ComponentModel> components,  }) async {
     if (teacherIds.isEmpty) throw Exception("No teachers selected.");
     if (subjects.isEmpty) throw Exception("No subjects selected.");
@@ -721,7 +650,6 @@ class Myprovider extends LoginProvider {
       notifyListeners();
     }
   }
-
   pickImageFromGallery(BuildContext context) async {
     try {
       final XFile? selectedImage = await ImagePicker().pickImage(
@@ -790,7 +718,6 @@ class Myprovider extends LoginProvider {
       print('Upload failed: $e');
     }
   }
-
   Future<void> deleteteacher(String staffId) async { const teachersetupColl = 'teachersetup';    const subjectScoringColl = 'subjectScoring';
     final teachersetupDocId = '${staffId}_${academicyrid}_$term';
     final setupRef = db.collection(teachersetupColl).doc(teachersetupDocId);
@@ -969,6 +896,7 @@ class Myprovider extends LoginProvider {
       rethrow;
     }
   }
+
   bool isloadac =false;
   List<Map<String, dynamic>> marksList = [];
   bool isloadscore=false;

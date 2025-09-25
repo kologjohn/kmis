@@ -86,6 +86,7 @@ class Routes {
   static const seasonreg = "/seasonreg";
   static const episodereg = "/episodereg";
   static const marks = "/marks";
+  static const receipt = "/receipt";
 
   static const weekreg = "/weekreg";
   static const scoresheet = "/scoresheet";
@@ -172,7 +173,7 @@ final GoRouter router = GoRouter(
     },),
 
     GoRoute(path: Routes.dashboard, builder: (c, s) => DashboardLayout()),
-    GoRoute(path: Routes.nextpage, builder: (c, s) => SchoolReceipt()),
+    GoRoute(path: Routes.receipt, builder: (c, s) => SchoolReceipt()),
 
     GoRoute(path: Routes.jscore, builder: (c, s) => JudgeGroundScreen()),
     GoRoute(
