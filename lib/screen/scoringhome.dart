@@ -283,7 +283,7 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
               alignment: Alignment.topCenter,
               child: Column(
                 children: [
-                  // 🔍 Search bar
+                  //Search bar
                   SizedBox(
                     width: maxWidth,
                     child: Padding(
@@ -371,6 +371,7 @@ class _StaffScoringPageState extends State<StaffScoringPage> {
                                     "subject": mark['subject'],
                                     "photoUrl": mark['photoUrl'],
                                     "scores": scores,
+                                    "subjectkey": subjectkey,
                                   },
                                 );
                               },
