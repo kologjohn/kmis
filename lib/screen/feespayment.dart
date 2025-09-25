@@ -33,7 +33,6 @@ class _FeepaymentState extends State<Feepayment> {
 
     });
   }
-
   final receiptNumberController = TextEditingController();
   final accountController = TextEditingController();
   final searchController = TextEditingController();
@@ -45,14 +44,12 @@ class _FeepaymentState extends State<Feepayment> {
   String? selectedpaymentmethod;
   String? selectedLinkedAccount;
 
-
   @override
   void dispose() {
     accountController.dispose();
     searchController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +65,7 @@ class _FeepaymentState extends State<Feepayment> {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => context.go(Routes.dashboard),
                 ),
-                title:  Text(
-                  'SCHOOL FEES PAYMENT',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
+                title:  Text('SCHOOL FEES PAYMENT', style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
               body: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
