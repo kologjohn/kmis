@@ -36,6 +36,7 @@ import '../screen/subject.dart';
 import '../screen/systemActivity.dart';
 import '../screen/teachersetup.dart';
 import '../screen/term.dart';
+import '../screen/terminalreport.dart';
 import '../screen/termlist.dart';
 import '../screen/viewacademicyr.dart';
 import '../screen/viewclass.dart';
@@ -260,6 +261,7 @@ final GoRouter router = GoRouter(
     GoRoute(path: Routes.feepayment, builder: (c, s) => Feepayment()),
     GoRoute(path: Routes.feesetup, builder: (c, s) => FeesSetup()),
     GoRoute(path: Routes.singlebilling, builder: (c, s) => SingleBilling()),
+    GoRoute(path: Routes.terminalreport, builder: (c, s) => ReportSheet()),
 
     GoRoute(
       path: Routes.entermark,

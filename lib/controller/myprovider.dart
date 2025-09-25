@@ -49,6 +49,7 @@ class Myprovider extends LoginProvider {
   bool loadingsconfig = true;
   bool isloadcomponents=true;
   bool savingSetup = false;
+  bool savemarks = false;
   bool loginform = true;
   bool regform = false;
   bool loadacademicyear =false;
@@ -1098,7 +1099,7 @@ class Myprovider extends LoginProvider {
       throw Exception("Error fetching grading system: $e");
     }
   }
-  Future<void> saveStudentMarks({
+ /* Future<void> saveStudentMarks({
     required String studentId,
     required String subject,
     required String ca,
@@ -1106,8 +1107,9 @@ class Myprovider extends LoginProvider {
     required String total,
     required String caConverted,
     required String examConverted,
-    required String academicYearId,
-    required String term,
+    required String subjectkey,
+    required String studentid,
+
     required String grade,
     required String remark,
     String? caw,
@@ -1115,37 +1117,49 @@ class Myprovider extends LoginProvider {
     String? maxca,
     String? maxexams,
     String? department,
-  }) async {    try {
+  }) async { try {
       //student subject record
-      final subjectId = "${schoolid}_${subject.toLowerCase()}";
-      final studentDocRef = db
-          .collection("marks")
-          .doc(academicYearId)
-          .collection(term)
-          .doc(studentId);
-      final studentData = {
-        subjectId: {
-          "CA": ca.toString(),
-          "Exams": exams.toString(),
-          "rawCA": caConverted,
-          "rawExams": examConverted,
-          "grade": grade,
-          "remark": remark,
-        },
-        "scores": {
-          "CA": ca.toString(),
-          "Exams": exams.toString(),
-          "totalScore": total,
-          "status": "completed",
-          "subjectId": subjectId,
-          "subjectName": subject,
-          "timestamp": FieldValue.serverTimestamp(),
-        }
-      };
-      //Save student marks
-      await studentDocRef.set(studentData, SetOptions(merge: true));
-      //Update teacher totals
-      final teacherDocRef = db.collection("teachers").doc(schoolid);
+
+    final studentDocRef = db
+        .collection("subjectScoring")
+        .doc(academicYearId)
+        .collection(term)
+        .doc(studentId);
+
+// 👇 Correct structure for nested subject update
+    final studentData = {
+      "subjects.$subjectId": {
+        "CA": ca.toString(),
+        "CAtotal": continuousWeight.toString(),
+        "Exams": exams.toString(),
+        "examstotal": examWeight.toString(),
+        "rawCA": caConverted.toStringAsFixed(2),
+        "rawExams": examConverted.toStringAsFixed(2),
+        "grade": grade ?? "",
+        "remark": remark ?? "",
+        "maxca": maxContinuous.toString(),
+        "maxexams": maxExam.toString(),
+        "caw": continuousWeight.toString(),
+        "examsw": examWeight.toString(),
+        "scored": "yes",
+      },
+      "scores": {
+        "CA": ca.toString(),
+        "Exams": exams.toString(),
+        "totalScore": total.toStringAsFixed(2),
+        "status": "completed",
+        "subjectId": subjectId,
+        "subjectName": subject,
+        "timestamp": FieldValue.serverTimestamp(),
+      }
+    };
+
+// ✅ Use update() so it only modifies existing keys (will fail if doc/field doesn’t exist)
+    await studentDocRef.update(studentData);
+
+    //Update teacher totals
+     /* final id ="${schoolid}_${academicyrid}_$term";
+      final teacherDocRef = db.collection("teacherSetup").doc(id);
       await teacherDocRef.set({
         schoolid: {
           "id": schoolid,
@@ -1156,8 +1170,89 @@ class Myprovider extends LoginProvider {
           "timestamp": FieldValue.serverTimestamp(),
         }
       }, SetOptions(merge: true));
+      */
     }
     catch (e) {
+      throw Exception("Error saving marks: $e");
+    }
+  }*/
+  Future<void> saveStudentMarks({
+    required String studentId,
+    required String subjectId,
+    required String subjectName,
+    required String ca,
+    required String exams,
+    required String total,
+    required String caConverted,
+    required String examConverted,
+    required String grade,
+    required String remark,
+    required String schoolId,
+    required String teacherId,
+    String? caw,
+    String? examsw,
+    String? maxca,
+    String? maxexams,
+  }) async {
+    try {
+      savemarks =true;
+      notifyListeners();
+      final studentid = "${studentId}_${academicyrid}_$term";
+      final studentDocRef = db
+          .collection("subjectScoring")
+          .doc(studentid);
+
+      //update this student's subject record
+      final studentData = {
+        "subjects.$subjectId": {
+          "CA": ca,
+          "CAtotal": caw ?? "0",
+          "Exams": exams,
+          "examstotal": examsw ?? "0",
+          "rawCA": caConverted,
+          "rawExams": examConverted,
+          "grade": grade,
+          "remark": remark,
+          "maxca": maxca ?? "0",
+          "maxexams": maxexams ?? "0",
+          "caw": caw ?? "0",
+          "examsw": examsw ?? "0",
+          "scored": "yes",
+        },
+        "scores": {
+          "CA": ca,
+          "Exams": exams,
+          "totalScore": total,
+          "status": "completed",
+          "subjectId": subjectId,
+          "subjectName": subjectName,
+          "timestamp": FieldValue.serverTimestamp(),
+        }
+      };
+
+     // await studentDocRef.set(studentData, SetOptions(merge: true));
+      await studentDocRef.update(studentData);
+
+      //all students are scored for this subject
+      final subjectQuery = await db
+          .collection("subjectScoring")
+          .where("subjects.$subjectId.scored", isEqualTo: "no")
+          .get();
+
+      final allScored = subjectQuery.docs.isEmpty;
+
+      if (allScored) {
+        //Mark teacherSetup subject complete
+        final teacherSetupId = "${teacherId}_${academicyrid}_$term";
+        final teacherDocRef = db.collection("teacherSetup").doc(teacherSetupId);
+        await teacherDocRef.update({
+          "subjects.$subjectId.isComplete": "yes",
+          "subjects.$subjectId.timestamp": FieldValue.serverTimestamp(),
+        });
+      }
+      savemarks =false;
+      notifyListeners();
+    } catch (e) {
       throw Exception("Error saving marks: $e");
     }
   }
