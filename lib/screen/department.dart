@@ -124,7 +124,7 @@ class _DepartmentState extends State<Department> {
                                         String idd = departmentName.replaceAll(RegExp(r'\s+'), '').toLowerCase();
                                         final id = "${value.schoolid}_$idd".replaceAll(" ", "");
                                         final data = DepartmentModel(
-                                          id: departmentName.toLowerCase(),
+                                          id: id,
                                           name: departmentName,
                                           schoolId: value.schoolid,
                                           timestamp: DateTime.now(),

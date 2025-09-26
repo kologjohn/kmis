@@ -3,11 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AcademicModel {
   final String id;
   final String name;
+  final String idd;
+  final String staff;
   final String? schoolid;
   final DateTime timestamp;
 
   AcademicModel({
     required this.id,
+    required this.idd,
+    required this.staff,
     required this.name,
     this.schoolid,
     DateTime? timestamp,
@@ -16,6 +20,8 @@ class AcademicModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'idd': idd,
+      'staff': staff,
       'name': name,
       'schoolid': schoolid,
       'timestamp': Timestamp.fromDate(timestamp),
@@ -40,6 +46,8 @@ class AcademicModel {
     return AcademicModel(
       id: docId,
       name: map['name'] ?? '',
+      idd: map['idd'] ?? '',
+      staff: map['staff'] ?? '',
       schoolid: map['schoolid'],
       timestamp: parsedTime,
     );

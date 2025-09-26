@@ -128,13 +128,16 @@ class _AcademicYrState extends State<AcademicYr> {
                                             String id = "${value.schoolid}_${yea.replaceAll(RegExp(r'\s+'), '').toLowerCase()}";
                                             final data = AcademicModel(
                                               id: id,
+                                              idd: yea,
                                               name: year,
+                                              staff: value.name,
                                               schoolid: value.schoolid,
                                               timestamp: DateTime.now(),
                                             ).toMap();
                                             await value.db.collection('academicyears').doc(id).set(data, SetOptions(merge: true));
                                             await value.db.collection('schools').doc(value.schoolid).update({
                                               "academicyr": year,
+                                              "academicyrid":yea,
                                               "updatedAt": DateTime.now(),
                                             });
                                             progress.dismiss();

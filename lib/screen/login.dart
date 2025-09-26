@@ -484,6 +484,7 @@ class _LoginPageState extends State<LoginPage> {
                                       final password = _passwordController.text.trim();
                                       final progress = ProgressHUD.of(context);
                                       context.go(Routes.dashboard);
+
                                     /*  try {
                                         progress?.show();
 

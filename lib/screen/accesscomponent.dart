@@ -1,3 +1,4 @@
+/*
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
@@ -190,9 +191,11 @@ class _RevenueGridPageState extends State<AccessComponent> {
                                               final data = ComponentModel(
                                                 name: categoryName,
                                                 totalMark: totalMark,
+                                                type: categoryName,
                                                 dateCreated: DateTime.now(),
                                                 schoolId: value.schoolid,
                                                 staff: value.name,
+                                                id: categoryName,
                                               );
 
                                               // Save as Map
@@ -289,6 +292,238 @@ class _RevenueGridPageState extends State<AccessComponent> {
           );
         },
       ),
+    );
+  }
+}
+*/
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../controller/dbmodels/componentmodel.dart';
+import '../controller/myprovider.dart';
+import '../controller/routes.dart';
+
+class AccessComponent extends StatefulWidget {
+  final ComponentModel? component; // null = insert, not null = edit
+  const AccessComponent({super.key, this.component});
+
+  @override
+  State<AccessComponent> createState() => _AccessComponentState();
+}
+
+class _AccessComponentState extends State<AccessComponent> {
+  final componentname = TextEditingController();
+  final totalmark = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  String? level;
+
+  @override
+  void initState() {
+    super.initState();
+    // Prefill if editing
+    if (widget.component != null) {
+      componentname.text = widget.component!.name;
+      totalmark.text = widget.component!.totalMark;
+    }
+  }
+
+  @override
+  void dispose() {
+    componentname.dispose();
+    totalmark.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final inputFill = const Color(0xFF2C2C3C);
+
+    return ProgressHUD(
+      child: Builder(
+        builder: (context) {
+          return Consumer<Myprovider>(
+            builder: (BuildContext context, Myprovider value, Widget? child) {
+              return Scaffold(
+                appBar: AppBar(
+                  backgroundColor: const Color(0xFF2D2F45),
+                  leading: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => context.go(Routes.dashboard),
+                  ),
+                  title: Text(
+                    widget.component == null
+                        ? 'Add Access Component'
+                        : 'Edit Access Component',
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
+                ),
+                body: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      color: const Color(0xFF2D2F45),
+                      margin: const EdgeInsets.all(20.0),
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              TextFormField(
+                                controller: componentname,
+                                decoration: _inputDecoration(
+                                  "Component Name",
+                                  inputFill,
+                                ),
+                                style: const TextStyle(color: Colors.white),
+                                validator: (value) =>
+                                value == null || value.trim().isEmpty
+                                    ? 'Component name cannot be empty'
+                                    : null,
+                              ),
+                              const SizedBox(height: 20),
+                              TextFormField(
+                                controller: totalmark,
+                                keyboardType: TextInputType.number,
+                                decoration: _inputDecoration(
+                                  "Total Mark",
+                                  inputFill,
+                                ),
+                                style: const TextStyle(color: Colors.white),
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Total mark cannot be empty';
+                                  }
+                                  if (int.tryParse(value.trim()) == null) {
+                                    return 'Total mark must be a number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 30),
+
+                              // Save Button
+                              ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueAccent,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 14),
+                                ),
+                                icon: const Icon(Icons.save),
+                                label: Text(widget.component == null
+                                    ? "Save Access"
+                                    : "Update Access"),
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      final progress = ProgressHUD.of(context);
+                                      progress?.show();
+                                      try {
+                                        String name = componentname.text.trim();
+                                        String mark = totalmark.text.trim();
+                                        String id = widget.component?.id ??
+                                            "${value.schoolid}_${name.replaceAll(RegExp(r'\\s+'), '').toLowerCase()}_${mark}";
+
+                                        final data = ComponentModel(
+                                          id: id,
+                                          name: name,
+                                          totalMark: mark,
+                                          type: name,
+                                          dateCreated: DateTime.now(),
+                                          schoolId: value.schoolid,
+                                          staff: value.name,
+                                        );
+
+                                        if (widget.component == null) {
+                                          // Insert new
+                                          await value.db
+                                              .collection("assesscomponent")
+                                              .doc(id)
+                                              .set(data.toJson());
+                                        } else {
+                                          // Update existing
+                                          await value.db
+                                              .collection("assesscomponent")
+                                              .doc(widget.component!.id)
+                                              .update(data.toJson());
+                                        }
+
+                                        progress?.dismiss();
+
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                              content: Text(widget.component == null
+                                                  ? "Data Saved Successfully"
+                                                  : "Data Updated Successfully"),
+                                              backgroundColor: Colors.green,
+                                            ),
+                                          );
+                                          context.go(Routes.accesslist);
+                                        }
+                                      } catch (e) {
+                                        progress?.dismiss();
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text("Failed to save data: $e"),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }
+
+                              ),
+                              const SizedBox(height: 20),
+
+                              // View Button
+                              OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  side:
+                                  const BorderSide(color: Colors.blueAccent),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 14),
+                                ),
+                                icon: const Icon(Icons.list),
+                                label: const Text("View Access"),
+                                onPressed: () => context.go(Routes.accesslist),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration(String label, Color fillColor) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: const TextStyle(color: Colors.white70),
+      border: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey[700]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey[700]!),
+      ),
+      focusedBorder: const OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.blueAccent),
+      ),
+      filled: true,
+      fillColor: fillColor,
     );
   }
 }

@@ -6,7 +6,10 @@ import 'package:ksoftsms/controller/dbmodels/feePaymentModel.dart';
 import 'package:provider/provider.dart';
 import 'package:ksoftsms/controller/myprovider.dart';
 import 'package:ksoftsms/controller/routes.dart';
+import '../components/receiptpdf.dart';
 import '../widgets/dropdown.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart';
 
 class Feepayment extends StatefulWidget {
   const Feepayment({super.key});
@@ -25,14 +28,11 @@ class _FeepaymentState extends State<Feepayment> {
       provider.fetchterms();
       provider.fetchFess();
       provider.paymentmethodslist();
-     // provider.generatereceiptnumber();
-      //provider.receipt("receiptno");
-      print("Receipt: ${provider.receiptno}");
+      provider.generatereceiptnumber();
+      receiptNumberController.text = provider.receiptno; // update field
 
-     // receiptNumberController.text = provider.receiptno;
     });
   }
-
   final receiptNumberController = TextEditingController();
   final accountController = TextEditingController();
   final searchController = TextEditingController();
@@ -44,14 +44,12 @@ class _FeepaymentState extends State<Feepayment> {
   String? selectedpaymentmethod;
   String? selectedLinkedAccount;
 
-
   @override
   void dispose() {
     accountController.dispose();
     searchController.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -67,20 +65,17 @@ class _FeepaymentState extends State<Feepayment> {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => context.go(Routes.dashboard),
                 ),
-                title:  Text(
-                  'SCHOOL FEES PAYMENT',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ),
+                title:  Text('SCHOOL FEES PAYMENT', style: TextStyle(color: Colors.white, fontSize: 18)),
               ),
               body: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                        SingleChildScrollView(
-                    padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(20),
                           child: Padding(
                            padding: const EdgeInsets.all(20),
                            child: Container(
-                              constraints: const BoxConstraints(maxWidth: 400),
+                              constraints: const BoxConstraints(maxWidth: 300),
                              child: Form(
                               key: _formKey,
                               child: Column(
@@ -100,9 +95,7 @@ class _FeepaymentState extends State<Feepayment> {
                                     border: const OutlineInputBorder(),
                                   ),
                                 ),
-
                                 const SizedBox(height: 10),
-
                                 TextField(
                                   controller: searchController,
                                   decoration: InputDecoration(
@@ -140,8 +133,7 @@ class _FeepaymentState extends State<Feepayment> {
                                           title: Text(student.name ?? ""),
                                           subtitle:
                                           Text("ID: ${student.studentid}"),
-                                          trailing: Icon(
-                                            value.selectedStudents.any((s) =>
+                                          trailing: Icon(value.selectedStudents.any((s) =>
                                             s.studentid ==
                                                 student.studentid)
                                                 ? Icons.check_circle
@@ -153,7 +145,11 @@ class _FeepaymentState extends State<Feepayment> {
                                                 : Colors.grey,
                                           ),
                                           onTap: () {
+                                            value.selectedStudents.clear();
                                             value.addStudent(student);
+                                            searchController.clear();
+                                            value.emptysearchResults();
+
                                           },
                                         ),
                                       );
@@ -161,8 +157,7 @@ class _FeepaymentState extends State<Feepayment> {
                                   ),
                                 if (value.selectedStudents.isNotEmpty)
                                   Column(
-                                    children: value.selectedStudents
-                                        .map(
+                                    children: value.selectedStudents.map(
                                           (s) => Card(
                                         color: Colors.blue[50],
                                         margin: const EdgeInsets.symmetric(
@@ -291,8 +286,14 @@ class _FeepaymentState extends State<Feepayment> {
                                           if (dataexist.exists) {
                                             final existingData = dataexist.data() as Map<String, dynamic>;
                                             final existingFees = Map<String, dynamic>.from(existingData["fees"] ?? {});
+                                            if(existingData['studentID']!=student.studentid){
+                                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Receipt ID $id already exists for another student."), backgroundColor: Colors.red,));
+                                              progress.dismiss();
+                                              return;
+                                            }
+
                                             // Only add if fee does not already exist
-                                            if (!existingFees.containsKey(selectedfee)) {
+                                           else if (!existingFees.containsKey(selectedfee)) {
                                               existingFees[selectedfee.toString()] = double.tryParse(amount) ?? 0;
                                               await value.db.collection("feepayment").doc(id).update({"fees": existingFees});
                                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Fee '${selectedfee}' added to Receipt $id"), backgroundColor: Colors.green,));
@@ -366,17 +367,57 @@ class _FeepaymentState extends State<Feepayment> {
                                   label: const Text("Bill Students",
                                       style: TextStyle(color: Colors.white)),
                                 ),
+
                                 ElevatedButton(onPressed: ()async{
                                   //await value.setreceiptnumber(receiptNumberController.text.trim());
-                                  context.go(Routes.nextpage);
+
+                                  context.go(Routes.receipt);
                                 }, child: Text("Print Receipt"))
+
+                               , ElevatedButton(
+                                  onPressed: () async {
+                                    final printer = SchoolReceiptPrinter(
+                                      schoolName: "JOHNNY INT",
+                                      schoolAddress: "BOLGA, UPPER EAST",
+                                      schoolEmail: "info@kologsoft.com",
+                                      schoolWebsite: "www.kologsoft.com",
+                                      schoolPhone: "+233 553 354 349",
+                                      logoAssetPath: "assets/logo.png", // must exist in pubspec.yaml
+
+                                      date: "25/09/2025",
+                                      receiptNo: "RCPT2025001",
+                                      receivedFrom: "John Doe",
+                                      paymentType: "MOMO",
+                                      paymentFor: "First Term School Fees",
+                                      paymentDate: "25/09/2025",
+                                      records: {
+                                        "School Fee (First Term 2025)": 2500.00,
+                                        "Library Fee": 150.00,
+                                        "Sports Fee": 50.00,
+                                      },
+                                      total: 2700.00,
+                                    );
+
+                                    // Generate PDF
+                                    final pdfBytes = await printer.generatePdf(
+                                      PdfPageFormat.a4,
+                                      "School Receipt",
+                                    );
+
+                                    // Open print/share preview
+                                    await Printing.layoutPdf(
+                                      onLayout: (PdfPageFormat format) async => pdfBytes,
+                                    );
+                                  },
+                                  child: const Text("Print Receipt"),
+                                ),
                               ],
                                                        ),
                                                         ),
                            ),
                                                     ),
                   ),
-                ],
+                     ],
               ),
             );
           },
