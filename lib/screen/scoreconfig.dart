@@ -1,3 +1,4 @@
+/*
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
@@ -190,6 +191,249 @@ class _ScoreConfigPageState extends State<ScoreConfigPage> {
           );
         },
       ),
+    );
+  }
+}
+*/
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_progress_hud/flutter_progress_hud.dart';
+import 'package:ksoftsms/controller/myprovider.dart';
+import 'package:provider/provider.dart';
+
+import '../controller/dbmodels/scoremodel.dart';
+
+class ScoreConfigPage extends StatefulWidget {
+  final ScoremodelConfig? config;
+  const ScoreConfigPage({super.key, this.config});
+
+  @override
+  State<ScoreConfigPage> createState() => _ScoreConfigPageState();
+}
+
+class _ScoreConfigPageState extends State<ScoreConfigPage> {
+  final _formKey = GlobalKey<FormState>();
+  late TextEditingController continuousController;
+  late TextEditingController examController;
+  late TextEditingController minContinuousController;
+  late TextEditingController maxContinuousController;
+  late TextEditingController minExamController;
+  late TextEditingController maxExamController;
+
+  @override
+  void initState() {
+    super.initState();
+    continuousController =
+        TextEditingController(text: widget.config?.continuous.toString() ?? '');
+    examController =
+        TextEditingController(text: widget.config?.exam.toString() ?? '');
+    minContinuousController =
+        TextEditingController(text: widget.config?.minContinuous ?? '');
+    maxContinuousController =
+        TextEditingController(text: widget.config?.maxContinuous ?? '');
+    minExamController =
+        TextEditingController(text: widget.config?.minExam ?? '');
+    maxExamController =
+        TextEditingController(text: widget.config?.maxExam ?? '');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isEdit = widget.config != null;
+    return ProgressHUD(
+      child: Builder(
+        builder: (context) {
+          return Consumer<Myprovider>(
+            builder: (context, provider, _) {
+              return Scaffold(
+                appBar: AppBar(
+                  backgroundColor: const Color(0xFF2D2F45),
+                  title: Text(
+                    isEdit ? "Edit Score Config ${provider.name}" : "New Score Config ${provider.name}",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ),
+                body: SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Container(
+                      color: const Color(0xFF2D2F45),
+                      margin: const EdgeInsets.all(30.0),
+                      constraints: const BoxConstraints(maxWidth: 800),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: [
+                              _buildNumberField(
+                                controller: continuousController,
+                                label: "Continuous (%)",
+                                hint: "Enter continuous score",
+                              ),
+                              const SizedBox(height: 20),
+                              _buildNumberField(
+                                controller: examController,
+                                label: "Exam (%)",
+                                hint: "Enter exam score",
+                              ),
+                              const SizedBox(height: 20),
+                              _buildNumberField(
+                                controller: minContinuousController,
+                                label: "Min Continuous",
+                                hint: "Enter min continuous",
+                              ),
+                              const SizedBox(height: 20),
+                              _buildNumberField(
+                                controller: maxContinuousController,
+                                label: "Max Continuous",
+                                hint: "Enter max continuous",
+                              ),
+                              const SizedBox(height: 20),
+                              _buildNumberField(
+                                controller: minExamController,
+                                label: "Min Exam",
+                                hint: "Enter min exam",
+                              ),
+                              const SizedBox(height: 20),
+                              _buildNumberField(
+                                controller: maxExamController,
+                                label: "Max Exam",
+                                hint: "Enter max exam",
+                              ),
+                              const SizedBox(height: 30),
+                              ElevatedButton.icon(
+                                onPressed: () async {
+                                  if (_formKey.currentState!.validate()) {
+                                    final progress = ProgressHUD.of(context);
+                                    progress?.show();
+
+                                    try {
+                                      double continuous = double.parse(
+                                          continuousController.text.trim());
+                                      double exam = double.parse(
+                                          examController.text.trim());
+                                      double total = exam + continuous;
+                                      if (total != 100.0) {
+                                        progress?.dismiss();
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                "Continuous + Exam must equal 100%"),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      String idd = ("$continuous$exam")
+                                          .replaceAll(RegExp(r'\s+'), '')
+                                          .toLowerCase();
+                                      final id = widget.config?.id ?? "${provider.schoolid}$idd";
+                                      final scoreConfig = ScoremodelConfig(
+                                        id: id,
+                                        schoolId: provider.schoolid,
+                                        continuous: continuous.toString(),
+                                        exam: exam.toString(),
+                                        minContinuous:
+                                        minContinuousController.text.trim(),
+                                        maxContinuous:
+                                        maxContinuousController.text.trim(),
+                                        minExam: minExamController.text.trim(),
+                                        maxExam: maxExamController.text.trim(),
+                                        staff: provider.name,
+                                      ).toMap();
+                                      await provider.db.collection("scoreconfig")
+                                          .doc(id)
+                                          .set(scoreConfig,
+                                          SetOptions(merge: true));
+
+                                      progress?.dismiss();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(isEdit
+                                              ? "Config updated successfully"
+                                              : "Config saved successfully"),
+                                          backgroundColor: Colors.green,
+                                        ),
+                                      );
+
+                                      if (!isEdit) {
+                                        setState(() {
+                                          continuousController.clear();
+                                          examController.clear();
+                                          minContinuousController.clear();
+                                          maxContinuousController.clear();
+                                          minExamController.clear();
+                                          maxExamController.clear();
+                                        });
+                                      }
+                                    }
+                                    catch (e) {
+                                      progress?.dismiss();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text("Error: $e"),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                icon: Icon(isEdit ? Icons.update : Icons.save),
+                                label: Text(
+                                    isEdit ? "Update Config" : "Save Config"),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blueAccent,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 40, vertical: 15),
+                                  textStyle: const TextStyle(fontSize: 18),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildNumberField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+  }) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: hint,
+        labelStyle: const TextStyle(color: Colors.white),
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "$label cannot be empty";
+        }
+        final num? val = num.tryParse(value);
+        if (val == null) return "Enter a valid number";
+        if (val < 0 || val > 100) {
+          return "Must be between 0 and 100";
+        }
+        return null;
+      },
     );
   }
 }

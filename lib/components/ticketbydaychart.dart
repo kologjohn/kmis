@@ -11,18 +11,8 @@ class TicketsByDayChart extends StatelessWidget {
       width: cwidth,
       height: 250,
       decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFe8fbf0),// very light cyan
-              Colors.white,
-
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          )
-        // boxShadow: [
-        //   BoxShadow(offset: Offset(0.5, 0.5), spreadRadius: 1, blurRadius: 1),
-        // ],
+        color: Colors.white,
+        borderRadius: BorderRadius.all(Radius.circular(10))
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -30,10 +20,10 @@ class TicketsByDayChart extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Score Sheet Performance',
+              'School Performance',
               style: TextStyle(color: Color(0xFF00273a), fontSize: 16),
             ),
-            SizedBox(height: 8),
+            SizedBox(height: 10),
             SizedBox(
               height: 150,
               width: 650,
@@ -47,14 +37,12 @@ class TicketsByDayChart extends StatelessWidget {
                         reservedSize: 28,
                         getTitlesWidget: (value, _) {
                           final days = [
-                            '08/13',
-                            '08/14',
-                            '08/15',
-                            '08/16',
-                            '08/17',
-                            '08/18',
-                            '08/19',
-                            '08/20',
+                            'Week 01',
+                            'Week 02',
+                            'Week 03',
+                            'Week 04',
+                            'Week 05',
+                            'Week 06',
                           ];
                           return Text(
                             days[value.toInt()],
@@ -94,31 +82,27 @@ class TicketsByDayChart extends StatelessWidget {
                       spots: [
                         FlSpot(0, 1),
                         FlSpot(1, 3),
-                        FlSpot(2, 2),
-                        FlSpot(3, 3),
-                        FlSpot(4, 0),
-                        FlSpot(5, 0),
-                        FlSpot(6, 4),
-                        FlSpot(7, 6),
+                        FlSpot(2, 2.5),
+                        FlSpot(3, 3.5),
+                        FlSpot(4, 4),
+                        FlSpot(5, 3),
                       ],
                     ),
                     LineChartBarData(
                       isCurved: true,
-                      color: Color(0xFFb0bcc2),
+                      color: Color(0xFF7A6FF0),
                       dotData: FlDotData(show: true),
                       spots: [
                         FlSpot(0, 1),
-                        FlSpot(1, 2),
-                        FlSpot(2, 1.5),
-                        FlSpot(3, 2),
-                        FlSpot(4, 1),
-                        FlSpot(5, 1),
-                        FlSpot(6, 6),
-                        FlSpot(7, 3),
+                        FlSpot(1, 4),
+                        FlSpot(2, 2),
+                        FlSpot(3, 4),
+                        FlSpot(4, 3),
+                        FlSpot(5, 5),
                       ],
                       belowBarData: BarAreaData(
                         show: true,
-                        color: const Color(0xFFb0bcc2).withOpacity(0.3),
+                        color: const Color(0xFF7A6FF0).withOpacity(0.3),
                       ),
                     ),
                   ],
@@ -129,9 +113,9 @@ class TicketsByDayChart extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                LegendDot(color: Color(0xFFfb7d5b), label: 'Created',),
+                LegendDot(color: Color(0xFF7A6FF0), label: 'This week',),
                 SizedBox(width: 20),
-                LegendDot(color: Color(0xFFb0bcc2), label: 'Solved'),
+                LegendDot(color: Color(0xFFfb7d5b), label: 'Last week'),
               ],
             ),
           ],

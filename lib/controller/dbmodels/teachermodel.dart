@@ -1,37 +1,100 @@
-/*
+
+// import 'package:ksoftsms/controller/dbmodels/subjectmodel.dart';
+// import 'classmodel.dart';
+// import 'componentmodel.dart';
+// import 'departmodel.dart';
+// class TeacherSetup {
+//   final String staffid;
+//   final String staffname;
+//   final String createby;
+//   final String schoolId;
+//   final String academicyear;
+//   final String term;
+//   final List<ClassModel>  classname;
+//   final String status;
+//   final String complete;
+//   final String? email;
+//   final String? phone;
+//
+//   final List<SubjectModel> subjects;
+//   final List<ComponentModel>? component;
+//   final DateTime timestamp;
+//
+//   TeacherSetup({
+//     required this.staffid,
+//     required this.staffname,
+//     required this.createby,
+//     required this.schoolId,
+//     required this.academicyear,
+//     required this.term,
+//     required this.classname,
+//     this.status = "active",
+//     this.complete = "no",
+//     this.email,
+//     this.phone,
+//     required this.subjects,
+//     this.component,
+//     DateTime? timestamp,
+//   }) : timestamp = timestamp ?? DateTime.now();
+//
+//   Map<String, dynamic> toJson() {
+//     return {
+//       "staffid": staffid,
+//       "staffname": staffname,
+//       "createby": createby,
+//       "schoolId": schoolId,
+//       "academicyear": academicyear,
+//       "term": term,
+//       "component": component?.map((s) => s.toJson()).toList(),
+//       "classname": classname.map((s) => s.toMap()).toList(),
+//       "status": status,
+//       "complete": complete,
+//       "email": email,
+//       "phone": phone,
+//       "asesssubjects": subjects.map((lvl) => {
+//         "id": lvl.id,
+//         "name": lvl.name,
+//         "isComplete": "no",
+//       }).toList(),
+//       "timestamp": timestamp.toIso8601String(),
+//     };
+//   }
+// }
+
 import 'package:ksoftsms/controller/dbmodels/subjectmodel.dart';
-import 'departmodel.dart';
+import 'classmodel.dart';
+import 'componentmodel.dart';
 
 class TeacherSetup {
   final String staffid;
   final String staffname;
+  final String createby;
   final String schoolId;
   final String academicyear;
   final String term;
-  final String? classid;
-  final String? classname;
+  final List<ClassModel> classname;
   final String status;
   final String complete;
   final String? email;
   final String? phone;
-  final List<DepartmentModel>? levels;
   final List<SubjectModel> subjects;
+  final List<ComponentModel>? component;
   final DateTime timestamp;
 
   TeacherSetup({
     required this.staffid,
     required this.staffname,
+    required this.createby,
     required this.schoolId,
     required this.academicyear,
     required this.term,
-    this.classid,
-    this.classname,
+    required this.classname,
     this.status = "active",
     this.complete = "no",
     this.email,
     this.phone,
-    this.levels,
     required this.subjects,
+    this.component,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
 
@@ -39,86 +102,53 @@ class TeacherSetup {
     return {
       "staffid": staffid,
       "staffname": staffname,
+      "createby": createby,
       "schoolId": schoolId,
       "academicyear": academicyear,
       "term": term,
-      "subjects": subjects ?? [],
-      "classid": classid,
-      "classname": classname,
       "status": status,
       "complete": complete,
       "email": email,
       "phone": phone,
-      "levels": levels?.map((lvl) => {
-        "id": lvl.id,
-        "name": lvl.name,
-        "isComplete": "no",
-      }).toList() ?? [],
-      "asesssubjects": subjects.map((c) => c.toMap()).toList(),
       "timestamp": timestamp.toIso8601String(),
+
+
+      "classname": {
+        for (var c in classname)
+          c.name: {
+            "id": c.id,
+            "name": c.name,
+            "department": c.department,
+            "staff": c.staff,
+          }
+      },
+
+
+      "component": component != null
+          ? {
+        for (var comp in component!)
+          comp.name: {
+            "id": comp.id,
+            "name": comp.name,
+            "staff": comp.staff,
+            "schoolId": comp.schoolId,
+            "totalMark": comp.totalMark,
+            "type": comp.type,
+          }
+      }
+          : {},
+
+
+      "subjects": {
+        for (var lvl in subjects)
+          lvl.name: {
+            "id": lvl.id,
+            "name": lvl.name,
+            "isComplete": "no",
+          }
+      },
     };
   }
 }
-*/
 
-import 'package:ksoftsms/controller/dbmodels/subjectmodel.dart';
-import 'departmodel.dart';
-
-class TeacherSetup {
-  final String staffid;
-  final String staffname;
-  final String schoolId;
-  final String academicyear;
-  final String term;
-  final String? classid;
-  final String? classname;
-  final String status;
-  final String complete;
-  final String? email;
-  final String? phone;
-  final List<DepartmentModel>? levels;
-  final List<SubjectModel> subjects;
-  final DateTime timestamp;
-
-  TeacherSetup({
-    required this.staffid,
-    required this.staffname,
-    required this.schoolId,
-    required this.academicyear,
-    required this.term,
-    this.classid,
-    this.classname,
-    this.status = "active",
-    this.complete = "no",
-    this.email,
-    this.phone,
-    this.levels,
-    required this.subjects,
-    DateTime? timestamp,
-  }) : timestamp = timestamp ?? DateTime.now();
-
-  Map<String, dynamic> toJson() {
-    return {
-      "staffid": staffid,
-      "staffname": staffname,
-      "schoolId": schoolId,
-      "academicyear": academicyear,
-      "term": term,
-      "subjects": subjects.map((s) => s.toMap()).toList(),
-      "classid": classid,
-      "classname": classname,
-      "status": status,
-      "complete": complete,
-      "email": email,
-      "phone": phone,
-      "levels": levels?.map((lvl) => {
-        "id": lvl.id,
-        "name": lvl.name,
-        "isComplete": "no",
-      }).toList() ?? [],
-      "asesssubjects": subjects.map((c) => c.toMap()).toList(),
-      "timestamp": timestamp.toIso8601String(),
-    };
-  }
-}
 

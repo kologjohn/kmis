@@ -22,8 +22,7 @@ class DuplicateContainer extends StatefulWidget {
 class _DuplicateContainerState extends State<DuplicateContainer> {
   @override
   Widget build(BuildContext context) {
-    final male = 60;
-    final female = 40;
+
     int touchedIndex = -1;
 
     List<PieChartSectionData> showingSections() {
@@ -35,7 +34,7 @@ class _DuplicateContainerState extends State<DuplicateContainer> {
 
       return List.generate(data.length, (i) {
         final isTouched = i == touchedIndex;
-        final double radius = isTouched ? 70 : 40; // bigger on hover/tap
+        final double radius = isTouched ? 50 : 40;
         return PieChartSectionData(
           color: data[i]['color'] as Color,
           value: data[i]['value'] as double,
@@ -73,83 +72,85 @@ class _DuplicateContainerState extends State<DuplicateContainer> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  height: 120,
-                  width: 150,
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(
-                          color: Colors.black12
+                Expanded(
+                  child: Container(
+                    height: 120,
+                    width: 150,
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                            color: Colors.black12
+                        ),
+                        borderRadius: BorderRadius.all(Radius.circular(6))
+                    ),
+                    child: Center(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.school_sharp, size: 40,),
+                          Text("Total Staff", style: TextStyle(fontSize: 13)),
+                          Text("1,200", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30))
+                        ],
                       ),
-                      borderRadius: BorderRadius.all(Radius.circular(6))
-                  ),
-                  child: Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.school_sharp, size: 40,),
-                        Text("Total Staff", style: TextStyle(fontSize: 13)),
-                        Text("1,200", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30))
-                      ],
                     ),
                   ),
                 ),
-                Container(
-                  height: 120,
-                  width: 150,
-                  decoration: BoxDecoration(
-                      color: Color(0xFFada1ff).withOpacity(0.1),
-                      borderRadius: BorderRadius.all(Radius.circular(6))
-                  ),
-                  child: Column(
-                    //crossAxisAlignment: CrossAxisAlignment.center,
-                    //mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
-                            Text(
-                              "Teachers Attendance",
-                              style: TextStyle(
-                                  fontSize: 10,
-                                  color: Color(0xFF2F3A4C)),
-                            ),
-                            Icon(Icons.more_horiz, color: Colors.grey),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      SizedBox(
-                        height: 30,
-                        child: PieChart(
-                          PieChartData(
-                            sectionsSpace: 0,
-                            centerSpaceRadius: 0,
-                            pieTouchData: PieTouchData(
-                              // touchCallback: (event, pieTouchResponse) {
-                              //   setState(() {
-                              //     if (!event.isInterestedForInteractions ||
-                              //         pieTouchResponse == null ||
-                              //         pieTouchResponse.touchedSection == null) {
-                              //       touchedIndex = -1;
-                              //       return;
-                              //     }
-                              //     touchedIndex =
-                              //         pieTouchResponse.touchedSection!.touchedSectionIndex;
-                              //   });
-                              // },
-                            ),
-                            sections: showingSections(),
+                SizedBox(width: 10),
+                Expanded(
+                  child: Container(
+                    height: 120,
+                    width: 150,
+                    decoration: BoxDecoration(
+                        color: Color(0xFFada1ff).withOpacity(0.3),
+                        borderRadius: BorderRadius.all(Radius.circular(6))
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: const [
+                              Text(
+                                "Teachers Attendance",
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: Color(0xFF2F3A4C)),
+                              ),
+                              Icon(Icons.more_vert, color: Colors.grey),
+                            ],
                           ),
-                          swapAnimationDuration: const Duration(milliseconds: 800),
-                          swapAnimationCurve: Curves.easeOut,
                         ),
-                      ),
-
-                    ],
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          height: 30,
+                          child: PieChart(
+                            PieChartData(
+                              sectionsSpace: 0,
+                              centerSpaceRadius: 0,
+                              pieTouchData: PieTouchData(
+                                // touchCallback: (event, pieTouchResponse) {
+                                //   setState(() {
+                                //     if (!event.isInterestedForInteractions ||
+                                //         pieTouchResponse == null ||
+                                //         pieTouchResponse.touchedSection == null) {
+                                //       touchedIndex = -1;
+                                //       return;
+                                //     }
+                                //     touchedIndex =
+                                //         pieTouchResponse.touchedSection!.touchedSectionIndex;
+                                //   });
+                                // },
+                              ),
+                              sections: showingSections(),
+                            ),
+                            swapAnimationDuration: const Duration(milliseconds: 800),
+                            swapAnimationCurve: Curves.easeOut,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

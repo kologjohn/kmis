@@ -448,7 +448,7 @@ class CustomDrawer extends StatelessWidget {
                                   title: 'View Results',
                                   onTap: () async {
                                     try {
-                                      context.go(Routes.viewscore);
+                                      context.go(Routes.staffhome);
                                     } catch (e) {
                                       print(e);
                                     }
@@ -456,45 +456,9 @@ class CustomDrawer extends StatelessWidget {
                                 ),
                               ),
 
-                              // SizedBox(
-                              //   child: _drawerTile(
-                              //     icon: Icons.insert_page_break,
-                              //     title: 'Enter Judge Results',
-                              //     onTap: () async {
-                              //       try {
-                              //         context.go(Routes.adminresults,
-                              //         );
-                              //       } catch (e) {
-                              //         print(e);
-                              //       }
-                              //     },
-                              //   ),
-                              // ),
 
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Votes',
-                                  onTap: () =>
-                                      context.go(Routes.votes),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'test vote',
-                                  onTap: () =>
-                                      context.go(Routes.testvote),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'view votes  test',
-                                  onTap: () =>
-                                      context.go(Routes.rawvote),
-                                ),
-                              ),
+
+
                             ],
                           ),
                         ),
@@ -525,44 +489,6 @@ class CustomDrawer extends StatelessWidget {
                               style: TextStyle(color: Colors.white54),
                             ),
                             children: [
-                              // SizedBox(
-                              //   child: _drawerTile(
-                              //     icon: Icons.calendar_month,
-                              //     title: 'Contestant Sheet',
-                              //     onTap: () =>  context.go(Routes.scoresheet),
-                              //   ),
-                              // ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Judge Sheet',
-                                  onTap: () => context.go(Routes.judgescoresheet,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'weekly Sheet',
-                                  onTap: () =>  context.go(Routes.weeklysheet,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Eviction',
-                                  onTap: () =>  context.go(Routes.eviction),
-                                ),
-                              ),
-                              SizedBox(
-                                child: _drawerTile(
-                                  icon: Icons.calendar_month,
-                                  title: 'Best Criteria',
-                                  onTap: () =>  context.go(Routes.bestcriteria,
-                                  ),
-                                ),
-                              ),
                               SizedBox(
                                 child: _drawerTile(
                                   icon: Icons.calendar_month,

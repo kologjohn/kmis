@@ -1,3 +1,4 @@
+import 'package:ksoftsms/components/attendancetracking.dart';
 import 'package:ksoftsms/components/scoresheet.dart';
 import 'package:ksoftsms/controller/loginprovider.dart';
 import 'package:ksoftsms/controller/statsprovider.dart';
@@ -124,18 +125,27 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                           reader: double.parse(value.totalscored.toString()),
                           totalval: double.parse(value.totaltempaltes.toString()),
                         ),
-                        DuplicateContainer(
-                          heading: 'Staff & Teacher Information',
-                          number: value.totalcontestants.toString(),
-                          value: '${value.accesslevel}',
-                          containerWidth: isMobile
+                        // DuplicateContainer(
+                        //   heading: 'Staff & Teacher Information',
+                        //   number: value.totalcontestants.toString(),
+                        //   value: '${value.accesslevel}',
+                        //   containerWidth: isMobile
+                        //       ? screenWidth * 0.95
+                        //       : isTablet
+                        //       ? screenWidth * 0.63
+                        //       : isBigTablet
+                        //       ? screenWidth * 0.473
+                        //       : screenWidth * 0.24,
+                        // ),
+                        AttendanceTracking(
+                          cwidth: isMobile
                               ? screenWidth * 0.95
                               : isTablet
                               ? screenWidth * 0.63
                               : isBigTablet
                               ? screenWidth * 0.473
-                              : screenWidth * 0.24,
-                        ),
+                              : screenWidth * 0.23,
+                        )
                       ],
                     ),
                     SizedBox(height: 15),

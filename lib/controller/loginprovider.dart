@@ -33,6 +33,7 @@ class LoginProvider extends ChangeNotifier {
   String phone = "";
   String name = "";
   String year = "";
+  String academicyrid = "";
   String term = "";
   String errorMessage = "";
   int staffcount_in_school = 0;
@@ -117,6 +118,7 @@ class LoginProvider extends ChangeNotifier {
     accesslevel = prefs.getString('role') ?? '';
     name = prefs.getString('name') ?? '';
     year = prefs.getString('year') ?? '';
+    academicyrid = prefs.getString('academicyrid') ?? '';
     term = prefs.getString('term') ?? '';
     staffSchoolIds = prefs.getStringList("staffschools") ?? [];
     schoolnames = prefs.getStringList("schoolnames") ?? [];
@@ -191,8 +193,10 @@ class LoginProvider extends ChangeNotifier {
         final data = snapshot.data() as Map<String, dynamic>;
         final String termTxt = data['term']?.toString() ?? "";
         final String yearTxt = data['academicyr']?.toString() ?? "";
+        final String academicyridTxt = data['academicyrid']?.toString() ?? "";
         await prefs.setString("term", termTxt);
         await prefs.setString("year", yearTxt);
+        await prefs.setString("academicyrid", academicyridTxt);
       }
     } catch (e) {
       debugPrint("Error fetching term/year: $e");
