@@ -91,23 +91,21 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                       runSpacing: 15,
                       crossAxisAlignment: WrapCrossAlignment.start,
                       children: [
-                        DuplicateContainer(
-                          heading: 'Total Contestants Registered${value.totalcontestants}',
-                          number: value.totalcontestants.toString(),
-                          value: '${value.accesslevel}',
-                          containerwidth: isMobile
+                        HourMinutes(
+                          cwidth: isMobile
                               ? screenWidth * 0.95
                               : isTablet
                               ? screenWidth * 0.63
                               : isBigTablet
                               ? screenWidth * 0.473
-                              : screenWidth * 0.24,
+                              : screenWidth * 0.23,
+                          topcollector: topCollector.toLowerCase(),
                         ),
                         DuplicateContainer(
                           heading: 'Total Judges Assigned',
                           number: value.totaljugdes.toString(),
                           value: 'Judges',
-                          containerwidth: isMobile
+                          containerWidth: isMobile
                               ? screenWidth * 0.95
                               : isTablet
                               ? screenWidth * 0.63
@@ -126,15 +124,17 @@ class _DashboardLayoutState extends State<DashboardLayout> {
                           reader: double.parse(value.totalscored.toString()),
                           totalval: double.parse(value.totaltempaltes.toString()),
                         ),
-                        HourMinutes(
-                          cwidth: isMobile
+                        DuplicateContainer(
+                          heading: 'Staff & Teacher Information',
+                          number: value.totalcontestants.toString(),
+                          value: '${value.accesslevel}',
+                          containerWidth: isMobile
                               ? screenWidth * 0.95
                               : isTablet
                               ? screenWidth * 0.63
                               : isBigTablet
                               ? screenWidth * 0.473
-                              : screenWidth * 0.23,
-                          topcollector: topCollector.toLowerCase(),
+                              : screenWidth * 0.24,
                         ),
                       ],
                     ),
